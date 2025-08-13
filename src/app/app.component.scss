@@ -1,0 +1,189 @@
+.app-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.toolbar-title {
+  margin-left: 16px;
+  font-weight: 500;
+}
+
+.content-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.add-birthday-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.birthday-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.submit-button {
+  min-width: 180px;
+  
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.birthdays-list-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.no-birthdays {
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+  
+  .large-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 8px 0;
+    
+    &:first-of-type {
+      font-size: 18px;
+      font-weight: 500;
+    }
+  }
+}
+
+.birthday-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #e0e0e0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .birthday-info {
+    .name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .age {
+      font-size: 14px;
+      color: #666;
+    }
+  }
+  
+  .birthday-details {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 8px 0;
+    
+    .birth-date {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .next-birthday {
+      font-size: 14px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background-color: #e3f2fd;
+      color: #1976d2;
+      
+      &.today {
+        background-color: #ffebee;
+        color: #d32f2f;
+        font-weight: 600;
+      }
+      
+      &.tomorrow {
+        background-color: #fff3e0;
+        color: #f57c00;
+        font-weight: 600;
+      }
+    }
+  }
+  
+  .notes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+  }
+  
+  .small-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .delete-button {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+}
+
+// Override Material styles
+mat-list-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  
+  .mat-mdc-list-item-content {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .content-container {
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .birthday-details {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  
+  .form-actions {
+    justify-content: stretch;
+    
+    .submit-button {
+      width: 100%;
+    }
+  }
+}

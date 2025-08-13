@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -14,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
@@ -23,7 +24,6 @@ import { Birthday } from './models/birthday.model';
   standalone: true,
   imports: [
     CommonModule,
-    RouterOutlet,
     ReactiveFormsModule,
     MatToolbarModule,
     MatCardModule,
@@ -33,7 +33,9 @@ import { Birthday } from './models/birthday.model';
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatListModule
+    MatListModule,
+    MatDividerModule,
+    MatTooltipModule
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
@@ -49,7 +51,7 @@ export class AppComponent implements OnInit {
   ) {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
-      birthDate: ['', Validators.required],
+      birthDate: ['', [Validators.required, this.pastDateValidator]],
       notes: [''],
       reminderDays: [7, [Validators.min(1), Validators.max(365)]]
     });
@@ -83,9 +85,9 @@ export class AppComponent implements OnInit {
     const diffTime = nextBirthday.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'Oggi!';
-    if (diffDays === 1) return 'Domani!';
-    return `Tra ${diffDays} giorni`;
+    if (diffDays === 0) return 'Today!';
+    if (diffDays === 1) return 'Tomorrow!';
+    return `In ${diffDays} days`;
   }
 
   calculateAge(birthDate: Date): number {
@@ -98,5 +100,20 @@ export class AppComponent implements OnInit {
     }
     
     return age;
+  }
+
+  // Custom validator to prevent future dates
+  private pastDateValidator(control: any) {
+    if (!control.value) return null;
+    
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+    
+    if (selectedDate > today) {
+      return { futureDate: true };
+    }
+    
+    return null;
   }
 }
