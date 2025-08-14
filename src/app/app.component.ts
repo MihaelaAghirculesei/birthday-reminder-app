@@ -15,6 +15,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
@@ -35,7 +37,9 @@ import { Birthday } from './models/birthday.model';
     MatNativeDateModule,
     MatListModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSelectModule,
+    MatChipsModule
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
@@ -44,6 +48,23 @@ export class AppComponent implements OnInit {
   title = 'Birthday Reminder App';
   birthdayForm: FormGroup;
   birthdays$: Observable<Birthday[]>;
+  filteredBirthdays$: Observable<Birthday[]>;
+  
+  // Filter properties
+  searchTerm$ = this.birthdayService.searchTerm$;
+  selectedMonth$ = this.birthdayService.selectedMonth$;
+  sortOrder$ = this.birthdayService.sortOrder$;
+  
+  months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  sortOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'age', label: 'Age (Oldest first)' },
+    { value: 'nextBirthday', label: 'Next Birthday' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -57,6 +78,7 @@ export class AppComponent implements OnInit {
     });
 
     this.birthdays$ = this.birthdayService.birthdays$;
+    this.filteredBirthdays$ = this.birthdayService.filteredBirthdays$;
   }
 
   ngOnInit() {}
@@ -100,6 +122,28 @@ export class AppComponent implements OnInit {
     }
     
     return age;
+  }
+
+  // Filter methods
+  onSearchChange(event: any): void {
+    this.birthdayService.setSearchTerm(event.target.value);
+  }
+
+  onMonthChange(month: number | null): void {
+    this.birthdayService.setSelectedMonth(month);
+  }
+
+  onSortChange(sortOrder: string): void {
+    this.birthdayService.setSortOrder(sortOrder);
+  }
+
+  clearFilters(): void {
+    this.birthdayService.clearFilters();
+  }
+
+  getMonthName(monthIndex: number | null): string {
+    if (monthIndex === null || monthIndex < 0) return '';
+    return this.months[monthIndex] || '';
   }
 
   // Custom validator to prevent future dates
