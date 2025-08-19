@@ -169,6 +169,59 @@ export class BirthdayService {
     return age;
   }
 
+  // Dashboard Statistics Methods
+  getBirthdaysThisMonth(): Birthday[] {
+    const currentMonth = new Date().getMonth();
+    return this.birthdays.filter(birthday => 
+      birthday.birthDate.getMonth() === currentMonth
+    );
+  }
+
+  getAverageAge(): number {
+    if (this.birthdays.length === 0) return 0;
+    const totalAge = this.birthdays.reduce((sum, birthday) => 
+      sum + this.calculateAge(birthday.birthDate), 0
+    );
+    return Math.round(totalAge / this.birthdays.length);
+  }
+
+  getNext5Birthdays(): Birthday[] {
+    return this.birthdays
+      .map(birthday => ({
+        ...birthday,
+        nextBirthday: this.getNextBirthdayDate(birthday.birthDate),
+        daysUntil: this.getDaysUntilBirthday(birthday.birthDate)
+      }))
+      .sort((a, b) => a.nextBirthday.getTime() - b.nextBirthday.getTime())
+      .slice(0, 5);
+  }
+
+  getBirthdaysByMonth(): { month: string; count: number; monthIndex: number }[] {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    
+    const monthCounts = new Array(12).fill(0);
+    
+    this.birthdays.forEach(birthday => {
+      monthCounts[birthday.birthDate.getMonth()]++;
+    });
+    
+    return months.map((month, index) => ({
+      month,
+      count: monthCounts[index],
+      monthIndex: index
+    }));
+  }
+
+  private getDaysUntilBirthday(birthDate: Date): number {
+    const today = new Date();
+    const nextBirthday = this.getNextBirthdayDate(birthDate);
+    const diffTime = nextBirthday.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
   private loadFromLocalStorage(): void {
     if (isPlatformBrowser(this.platformId)) {
       const stored = localStorage.getItem('birthdays');

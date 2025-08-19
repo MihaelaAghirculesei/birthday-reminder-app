@@ -20,6 +20,7 @@ import { MatChipsModule } from '@angular/material/chips';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
+import { DashboardComponent } from './components/dashboard.component';
 
 @Component({
   selector: 'app-root',
@@ -39,7 +40,8 @@ import { Birthday } from './models/birthday.model';
     MatDividerModule,
     MatTooltipModule,
     MatSelectModule,
-    MatChipsModule
+    MatChipsModule,
+    DashboardComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

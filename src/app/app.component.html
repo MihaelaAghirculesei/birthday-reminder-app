@@ -6,6 +6,9 @@
   </mat-toolbar>
 
   <div class="content-container">
+    <!-- Dashboard Section -->
+    <app-dashboard *ngIf="(birthdays$ | async)?.length! > 0"></app-dashboard>
+
     <!-- Birthday form -->
     <mat-card class="add-birthday-card">
       <mat-card-header>
