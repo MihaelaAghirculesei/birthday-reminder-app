@@ -2,6 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { Birthday } from '../models/birthday.model';
+import { MONTHS } from '../shared/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -157,7 +158,7 @@ export class BirthdayService {
     this.setSortOrder('name');
   }
 
-  private calculateAge(birthDate: Date): number {
+  calculateAge(birthDate: Date): number {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -197,29 +198,32 @@ export class BirthdayService {
   }
 
   getBirthdaysByMonth(): { month: string; count: number; monthIndex: number }[] {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    
     const monthCounts = new Array(12).fill(0);
     
     this.birthdays.forEach(birthday => {
       monthCounts[birthday.birthDate.getMonth()]++;
     });
     
-    return months.map((month, index) => ({
+    return MONTHS.SHORT.map((month, index) => ({
       month,
       count: monthCounts[index],
       monthIndex: index
     }));
   }
 
-  private getDaysUntilBirthday(birthDate: Date): number {
+  getDaysUntilBirthday(birthDate: Date): number {
     const today = new Date();
     const nextBirthday = this.getNextBirthdayDate(birthDate);
     const diffTime = nextBirthday.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  getNextBirthdayText(birthDate: Date): string {
+    const days = this.getDaysUntilBirthday(birthDate);
+    
+    if (days === 0) return 'Today!';
+    if (days === 1) return 'Tomorrow!';
+    return `In ${days} days`;
   }
 
   private loadFromLocalStorage(): void {

@@ -3,24 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-// Angular Material imports
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatListModule } from '@angular/material/list';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSelectModule } from '@angular/material/select';
-import { MatChipsModule } from '@angular/material/chips';
+import { MaterialModule } from './shared/material.module';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
 import { DashboardComponent } from './components/dashboard.component';
+import { MONTHS, SORT_OPTIONS } from './shared/constants';
 
 @Component({
   selector: 'app-root',
@@ -28,19 +16,7 @@ import { DashboardComponent } from './components/dashboard.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatToolbarModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatListModule,
-    MatDividerModule,
-    MatTooltipModule,
-    MatSelectModule,
-    MatChipsModule,
+    MaterialModule,
     DashboardComponent
   ],
   templateUrl: './app.component.html',
@@ -57,16 +33,8 @@ export class AppComponent implements OnInit {
   selectedMonth$ = this.birthdayService.selectedMonth$;
   sortOrder$ = this.birthdayService.sortOrder$;
   
-  months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  sortOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'age', label: 'Age (Oldest first)' },
-    { value: 'nextBirthday', label: 'Next Birthday' }
-  ];
+  months = MONTHS.FULL;
+  sortOptions = SORT_OPTIONS;
 
   constructor(
     private fb: FormBuilder,
@@ -98,32 +66,11 @@ export class AppComponent implements OnInit {
   }
 
   getNextBirthdayText(birthDate: Date): string {
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
-    
-    if (nextBirthday < today) {
-      nextBirthday.setFullYear(currentYear + 1);
-    }
-    
-    const diffTime = nextBirthday.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today!';
-    if (diffDays === 1) return 'Tomorrow!';
-    return `In ${diffDays} days`;
+    return this.birthdayService.getNextBirthdayText(birthDate);
   }
 
   calculateAge(birthDate: Date): number {
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
+    return this.birthdayService.calculateAge(birthDate);
   }
 
   // Filter methods

@@ -1,15 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, map } from 'rxjs';
-
-// Angular Material imports
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatListModule } from '@angular/material/list';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatChipsModule } from '@angular/material/chips';
-
+import { MaterialModule } from '../shared/material.module';
 import { BirthdayService } from '../services/birthday.service';
 import { Birthday } from '../models/birthday.model';
 
@@ -18,12 +10,7 @@ import { Birthday } from '../models/birthday.model';
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule,
-    MatListModule,
-    MatDividerModule,
-    MatChipsModule
+    MaterialModule
   ],
   template: `
     <div class="dashboard-container">
