@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { MaterialModule } from './shared/material.module';
 import { DashboardComponent } from './components/dashboard.component';
 import { CalendarIconComponent } from './shared/icons/calendar-icon.component';
+import { PhotoUploadComponent } from './shared/components/photo-upload.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
@@ -19,7 +20,8 @@ import { MONTHS, SORT_OPTIONS } from './shared/constants';
     ReactiveFormsModule,
     MaterialModule,
     DashboardComponent,
-    CalendarIconComponent
+    CalendarIconComponent,
+    PhotoUploadComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
@@ -29,6 +31,7 @@ export class AppComponent implements OnInit {
   birthdayForm: FormGroup;
   birthdays$: Observable<Birthday[]>;
   filteredBirthdays$: Observable<Birthday[]>;
+  selectedPhoto: string | null = null;
   
   // Filter properties
   searchTerm$ = this.birthdayService.searchTerm$;
@@ -46,7 +49,8 @@ export class AppComponent implements OnInit {
       name: ['', Validators.required],
       birthDate: ['', [Validators.required, this.pastDateValidator]],
       notes: [''],
-      reminderDays: [7, [Validators.min(1), Validators.max(365)]]
+      reminderDays: [7, [Validators.min(1), Validators.max(365)]],
+      photo: [null]
     });
 
     this.birthdays$ = this.birthdayService.birthdays$;
@@ -57,9 +61,14 @@ export class AppComponent implements OnInit {
 
   onSubmit() {
     if (this.birthdayForm.valid) {
-      this.birthdayService.addBirthday(this.birthdayForm.value);
+      const formData = {
+        ...this.birthdayForm.value,
+        photo: this.selectedPhoto
+      };
+      this.birthdayService.addBirthday(formData);
       this.birthdayForm.reset();
       this.birthdayForm.patchValue({ reminderDays: 7 });
+      this.selectedPhoto = null;
     }
   }
 
@@ -90,6 +99,16 @@ export class AppComponent implements OnInit {
 
   clearFilters(): void {
     this.birthdayService.clearFilters();
+  }
+
+  onPhotoSelected(photo: string): void {
+    this.selectedPhoto = photo;
+    this.birthdayForm.patchValue({ photo: photo });
+  }
+
+  onPhotoRemoved(): void {
+    this.selectedPhoto = null;
+    this.birthdayForm.patchValue({ photo: null });
   }
 
   getMonthName(monthIndex: number | null): string {

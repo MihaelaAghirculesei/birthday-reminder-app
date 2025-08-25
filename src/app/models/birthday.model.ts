@@ -3,5 +3,6 @@ export interface Birthday {
   name: string;
   birthDate: Date;
   notes?: string;
-  reminderDays?: number; 
+  reminderDays?: number;
+  photo?: string; 
 }

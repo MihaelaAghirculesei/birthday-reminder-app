@@ -93,19 +93,30 @@ import { Birthday } from '../models/birthday.model';
             </div>
             
             <ng-template #birthdaysList>
-              <mat-list>
-                <mat-list-item *ngFor="let birthday of next5Birthdays$ | async; let last = last">
-                  <mat-icon matListItemIcon color="primary">person</mat-icon>
-                  <div matListItemTitle>{{ birthday.name }}</div>
-                  <div matListItemLine class="birthday-info">
-                    <span>{{ birthday.birthDate | date:'MMM dd' }}</span>
-                    <mat-chip [class]="getDaysChipClass(birthday.daysUntil)">
-                      {{ getDaysText(birthday.daysUntil) }}
-                    </mat-chip>
+              <div class="dashboard-birthday-list">
+                <div *ngFor="let birthday of next5Birthdays$ | async; let last = last" class="dashboard-birthday-item">
+                  <!-- Contact Photo or Default Icon -->
+                  <div class="dashboard-avatar">
+                    <img *ngIf="birthday.photo" 
+                         [src]="birthday.photo" 
+                         [alt]="birthday.name"
+                         class="dashboard-photo">
+                    <mat-icon *ngIf="!birthday.photo" color="primary" class="dashboard-default-icon">person</mat-icon>
                   </div>
-                  <mat-divider *ngIf="!last"></mat-divider>
-                </mat-list-item>
-              </mat-list>
+                  
+                  <div class="dashboard-birthday-content">
+                    <div class="dashboard-name">{{ birthday.name }}</div>
+                    <div class="dashboard-birthday-info">
+                      <span class="dashboard-date">{{ birthday.birthDate | date:'MMM dd' }}</span>
+                      <mat-chip [class]="getDaysChipClass(birthday.daysUntil)">
+                        {{ getDaysText(birthday.daysUntil) }}
+                      </mat-chip>
+                    </div>
+                  </div>
+                  
+                  <mat-divider *ngIf="!last" class="dashboard-divider"></mat-divider>
+                </div>
+              </div>
             </ng-template>
           </mat-card-content>
         </mat-card>
@@ -319,7 +330,8 @@ import { Birthday } from '../models/birthday.model';
       }
       
       .mat-mdc-card-content {
-        padding: 24px !important;
+        padding: 32px !important;
+        min-height: 400px !important;
       }
     }
 
@@ -484,9 +496,126 @@ import { Birthday } from '../models/birthday.model';
 
     .no-data-text {
       text-align: center;
-      color: #666;
+      color: var(--text-secondary);
       font-style: italic;
       margin-top: 16px;
+    }
+    
+    .dashboard-avatar {
+      width: 200px !important;
+      height: 200px !important;
+      min-width: 200px !important;
+      min-height: 200px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--surface-elevated);
+      border: 3px solid var(--primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      
+      .dashboard-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      
+      .dashboard-default-icon {
+        font-size: 100px !important;
+        width: 100px !important;
+        height: 100px !important;
+        background: var(--primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      &:hover {
+        transform: scale(1.05);
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      }
+    }
+    
+    .dashboard-birthday-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .dashboard-birthday-item {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 16px 0;
+      position: relative;
+    }
+    
+    .dashboard-birthday-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .dashboard-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .dashboard-birthday-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 8px 0;
+      
+      .dashboard-date {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 1rem;
+      }
+      
+      mat-chip {
+        border-radius: var(--radius-sm) !important;
+        font-weight: 600 !important;
+        padding: 8px 16px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &.today { 
+          background: var(--warning) !important;
+          color: var(--text-inverse) !important;
+          animation: pulse 2s infinite;
+          box-shadow: 0 4px 12px rgba(252, 70, 107, 0.3);
+        }
+        &.tomorrow { 
+          background: var(--secondary) !important;
+          color: var(--text-inverse) !important;
+          box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+        }
+        &.soon { 
+          background: var(--success) !important;
+          color: var(--text-inverse) !important;
+          box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+        }
+        &.later { 
+          background: var(--surface-hover) !important;
+          color: var(--text-secondary) !important;
+          border: 2px solid var(--border) !important;
+        }
+      }
+    }
+    
+    .dashboard-divider {
+      position: absolute;
+      bottom: 0;
+      left: 240px;
+      right: 0;
+      border-color: var(--border-light) !important;
     }
 
     // Responsive Design

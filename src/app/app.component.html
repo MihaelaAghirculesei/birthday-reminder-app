@@ -23,6 +23,13 @@
       
       <mat-card-content>
         <form [formGroup]="birthdayForm" (ngSubmit)="onSubmit()" class="birthday-form">
+          <!-- Photo Upload -->
+          <photo-upload 
+            [currentPhoto]="selectedPhoto"
+            (photoSelected)="onPhotoSelected($event)"
+            (photoRemoved)="onPhotoRemoved()">
+          </photo-upload>
+
           <!-- Name -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Name</mat-label>
@@ -173,7 +180,14 @@
         <ng-template #birthdaysList>
           <mat-list>
             <mat-list-item *ngFor="let birthday of filteredBirthdays$ | async" class="birthday-item">
-              <mat-icon matListItemIcon color="primary">person</mat-icon>
+              <!-- Contact Photo or Default Icon -->
+              <div matListItemIcon class="contact-avatar">
+                <img *ngIf="birthday.photo" 
+                     [src]="birthday.photo" 
+                     [alt]="birthday.name"
+                     class="contact-photo-small">
+                <mat-icon *ngIf="!birthday.photo" color="primary" class="default-avatar">person</mat-icon>
+              </div>
               
               <div matListItemTitle class="birthday-info">
                 <div class="name">{{ birthday.name }}</div>
