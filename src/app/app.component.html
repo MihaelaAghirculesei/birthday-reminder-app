@@ -178,10 +178,10 @@
         </div>
 
         <ng-template #birthdaysList>
-          <mat-list>
-            <mat-list-item *ngFor="let birthday of filteredBirthdays$ | async" class="birthday-item">
+          <div class="birthday-list-container">
+            <div *ngFor="let birthday of filteredBirthdays$ | async; let last = last" class="birthday-item">
               <!-- Contact Photo or Default Icon -->
-              <div matListItemIcon class="contact-avatar">
+              <div class="contact-avatar">
                 <img *ngIf="birthday.photo" 
                      [src]="birthday.photo" 
                      [alt]="birthday.name"
@@ -189,25 +189,27 @@
                 <mat-icon *ngIf="!birthday.photo" color="primary" class="default-avatar">person</mat-icon>
               </div>
               
-              <div matListItemTitle class="birthday-info">
-                <div class="name">{{ birthday.name }}</div>
-                <div class="age">{{ calculateAge(birthday.birthDate) }} years old</div>
-              </div>
-              
-              <div matListItemLine class="birthday-details">
-                <span class="birth-date">
-                  <calendar-icon size="16" strokeWidth="2" cssClass="small-icon"></calendar-icon>
-                  {{ birthday.birthDate | date:'MM/dd/yyyy' }}
-                </span>
-                <span class="next-birthday" [class.today]="getNextBirthdayText(birthday.birthDate) === 'Today!'" 
-                      [class.tomorrow]="getNextBirthdayText(birthday.birthDate) === 'Tomorrow!'">
-                  {{ getNextBirthdayText(birthday.birthDate) }}
-                </span>
-              </div>
-              
-              <div matListItemLine *ngIf="birthday.notes" class="notes">
-                <mat-icon class="small-icon">notes</mat-icon>
-                {{ birthday.notes }}
+              <div class="birthday-content">
+                <div class="birthday-info">
+                  <div class="name">{{ birthday.name }}</div>
+                  <div class="age">{{ calculateAge(birthday.birthDate) }} years old</div>
+                </div>
+                
+                <div class="birthday-details">
+                  <span class="birth-date">
+                    <calendar-icon size="16" strokeWidth="2" cssClass="small-icon"></calendar-icon>
+                    {{ birthday.birthDate | date:'MM/dd/yyyy' }}
+                  </span>
+                  <span class="next-birthday" [class.today]="getNextBirthdayText(birthday.birthDate) === 'Today!'" 
+                        [class.tomorrow]="getNextBirthdayText(birthday.birthDate) === 'Tomorrow!'">
+                    {{ getNextBirthdayText(birthday.birthDate) }}
+                  </span>
+                </div>
+                
+                <div *ngIf="birthday.notes" class="notes">
+                  <mat-icon class="small-icon">notes</mat-icon>
+                  {{ birthday.notes }}
+                </div>
               </div>
 
               <button 
@@ -218,10 +220,8 @@
                 class="delete-button">
                 <mat-icon>delete</mat-icon>
               </button>
-            </mat-list-item>
-            
-            <mat-divider *ngIf="(filteredBirthdays$ | async)?.length! > 1"></mat-divider>
-          </mat-list>
+            </div>
+          </div>
         </ng-template>
       </mat-card-content>
       </mat-card>

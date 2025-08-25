@@ -221,6 +221,27 @@
   
   .mat-mdc-card-content {
     padding: 32px;
+    max-height: 600px;
+    overflow-y: auto;
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: var(--surface-elevated);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+      transition: background 0.3s ease;
+      
+      &:hover {
+        background: var(--secondary);
+      }
+    }
   }
 }
 
@@ -343,75 +364,130 @@
   }
 }
 
+.birthday-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .birthday-item {
-  padding: 24px 0;
-  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px 20px;
+  border: 1px solid var(--border-light);
+  background: linear-gradient(135deg, 
+    rgba(241, 245, 249, 1) 0%, 
+    rgba(226, 232, 240, 0.95) 50%, 
+    rgba(203, 213, 225, 1) 100%
+  );
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: var(--radius-sm);
-  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
   
-  &:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    transform-origin: bottom;
+  }
+  
+  .birthday-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   
   &:hover {
-    background: var(--surface-elevated);
-    transform: translateX(4px);
-    padding-left: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: linear-gradient(135deg, 
+      rgba(248, 250, 252, 1) 0%, 
+      rgba(241, 245, 249, 0.98) 50%, 
+      rgba(226, 232, 240, 1) 100%
+    );
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border-color: var(--primary);
+    
+    &::before {
+      transform: scaleY(1);
+    }
     
     .contact-avatar {
-      transform: scale(1.05);
+      transform: scale(1.1);
       border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .birthday-info .name {
+      transform: translateX(4px);
     }
   }
   
   .birthday-info {
     .name {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-      background: var(--primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-primary) !important;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
     .age {
-      font-size: 1rem;
+      font-size: 1.1rem;
       color: var(--text-secondary);
-      font-weight: 500;
+      font-weight: 600;
+      padding: 4px 12px;
+      background: var(--surface-elevated);
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      border: 1px solid var(--border-light);
     }
   }
   
   .birthday-details {
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin: 12px 0;
+    gap: 16px;
+    margin: 16px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface-hover) 100%);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
     
     .birth-date {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 1rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-      padding: 8px 12px;
-      background: var(--surface-elevated);
-      border-radius: var(--radius-sm);
+      gap: 10px;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       
       calendar-icon {
         color: var(--primary);
-        opacity: 0.8;
+        opacity: 0.9;
       }
       
       &:hover {
-        background: var(--surface-hover);
+        background: var(--surface-elevated);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
         
         calendar-icon {
           opacity: 1;
@@ -421,29 +497,33 @@
     }
     
     .next-birthday {
-      font-size: 1rem;
-      font-weight: 600;
-      padding: 10px 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 12px 20px;
       border-radius: var(--radius);
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
       color: var(--text-inverse);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      font-size: 0.95rem;
       
       &.today {
-        background: var(--warning);
+        background: linear-gradient(135deg, var(--warning) 0%, #ff1744 100%);
         animation: pulse 2s infinite;
-        box-shadow: 0 0 20px rgba(252, 70, 107, 0.4);
+        box-shadow: 0 6px 20px rgba(252, 70, 107, 0.4);
       }
       
       &.tomorrow {
-        background: var(--secondary);
-        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+        background: linear-gradient(135deg, var(--secondary) 0%, #c51162 100%);
+        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
       }
       
       &:hover {
-        transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
       }
     }
   }
@@ -470,16 +550,18 @@
   }
 
   .contact-avatar {
-    width: 56px;
-    height: 56px;
+    width: 72px;
+    height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     overflow: hidden;
-    background: var(--surface-elevated);
-    border: 2px solid var(--border-light);
+    background: linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface-hover) 100%);
+    border: 3px solid var(--primary);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    flex-shrink: 0;
     
     .contact-photo-small {
       width: 100%;
@@ -489,13 +571,10 @@
     }
     
     .default-avatar {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
-      background: var(--primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 36px !important;
+      width: 36px !important;
+      height: 36px !important;
+      color: var(--primary) !important;
     }
   }
   
@@ -520,17 +599,40 @@
   }
 }
 
-// Override Material styles
-mat-list-item {
-  display: flex !important;
-  align-items: flex-start !important;
-  
-  .mat-mdc-list-item-content {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    padding: 0 !important;
+// Custom birthday list styles
+.birthday-list-container .birthday-item:last-child {
+  margin-bottom: 0;
+}
+
+// Animations
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -566,14 +668,19 @@ mat-list-item {
   }
   
   .filters-section {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 20px;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 20px !important;
+    
+    &::before,
+    &::after {
+      display: none !important;
+    }
     
     .clear-filters-btn {
-      height: 48px;
-      width: 100%;
-      min-width: auto;
+      height: 48px !important;
+      width: 100% !important;
+      min-width: auto !important;
     }
   }
   
