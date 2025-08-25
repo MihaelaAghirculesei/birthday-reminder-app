@@ -1,0 +1,57 @@
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'calendar-icon',
+  standalone: true,
+  template: `
+    <svg 
+      xmlns="http://www.w3.org/2000/svg"  
+      [attr.width]="size"  
+      [attr.height]="size"  
+      viewBox="0 0 24 24"  
+      fill="none"  
+      stroke="currentColor"  
+      [attr.stroke-width]="strokeWidth"  
+      stroke-linecap="round"  
+      stroke-linejoin="round"  
+      class="calendar-icon"
+      [class]="cssClass">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
+      <path d="M16 3v4" />
+      <path d="M8 3v4" />
+      <path d="M4 11h16" />
+      <path d="M8 14v4" />
+      <path d="M12 14v4" />
+      <path d="M16 14v4" />
+    </svg>
+  `,
+  styles: [`
+    .calendar-icon {
+      display: inline-block;
+      vertical-align: middle;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .calendar-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .hero-icon {
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    
+    .small-icon {
+      opacity: 0.8;
+    }
+    
+    .primary-icon {
+      color: var(--primary);
+    }
+  `]
+})
+export class CalendarIconComponent {
+  @Input() size: string = '24';
+  @Input() strokeWidth: string = '2';
+  @Input() cssClass: string = '';
+}

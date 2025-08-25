@@ -4,10 +4,11 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Observable } from 'rxjs';
 
 import { MaterialModule } from './shared/material.module';
+import { DashboardComponent } from './components/dashboard.component';
+import { CalendarIconComponent } from './shared/icons/calendar-icon.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
-import { DashboardComponent } from './components/dashboard.component';
 import { MONTHS, SORT_OPTIONS } from './shared/constants';
 
 @Component({
@@ -17,7 +18,8 @@ import { MONTHS, SORT_OPTIONS } from './shared/constants';
     CommonModule,
     ReactiveFormsModule,
     MaterialModule,
-    DashboardComponent
+    DashboardComponent,
+    CalendarIconComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

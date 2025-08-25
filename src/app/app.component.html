@@ -1,19 +1,25 @@
 <div class="app-container">
-  <!-- Header -->
-  <mat-toolbar color="primary">
-    <mat-icon>cake</mat-icon>
-    <span class="toolbar-title">{{ title }}</span>
-  </mat-toolbar>
+  <!-- Modern Header Section -->
+  <div class="app-header">
+    <h1 class="hero-title">
+      <calendar-icon size="48" strokeWidth="2" cssClass="hero-icon"></calendar-icon>
+      Birthday Memories
+    </h1>
+    <p class="hero-subtitle">Never forget the special moments that matter most. Keep track of all your loved ones' birthdays with style.</p>
+  </div>
 
   <div class="content-container">
     <!-- Dashboard Section -->
     <app-dashboard *ngIf="(birthdays$ | async)?.length! > 0"></app-dashboard>
 
-    <!-- Birthday form -->
-    <mat-card class="add-birthday-card">
-      <mat-card-header>
-        <mat-card-title>Add Birthday</mat-card-title>
-      </mat-card-header>
+    <!-- Main Content Sections -->
+    <div class="content-sections">
+
+      <!-- Birthday form -->
+      <mat-card class="add-birthday-card">
+        <mat-card-header>
+          <mat-card-title>✨ Add New Birthday</mat-card-title>
+        </mat-card-header>
       
       <mat-card-content>
         <form [formGroup]="birthdayForm" (ngSubmit)="onSubmit()" class="birthday-form">
@@ -70,12 +76,12 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Birthdays list -->
-    <mat-card class="birthdays-list-card">
-      <mat-card-header>
-        <mat-card-title>Your Birthdays</mat-card-title>
-        <mat-card-subtitle>{{ (birthdays$ | async)?.length || 0 }} birthdays saved</mat-card-subtitle>
-      </mat-card-header>
+      <!-- Birthdays list -->
+      <mat-card class="birthdays-list-card">
+        <mat-card-header>
+          <mat-card-title>🎉 Your Birthday Collection</mat-card-title>
+          <mat-card-subtitle>{{ (birthdays$ | async)?.length || 0 }} special memories saved</mat-card-subtitle>
+        </mat-card-header>
       
       <mat-card-content>
         <!-- Search and Filter Section -->
@@ -99,7 +105,7 @@
                 {{ month }}
               </mat-option>
             </mat-select>
-            <mat-icon matSuffix>event</mat-icon>
+            <calendar-icon size="20" strokeWidth="2" cssClass="primary-icon"></calendar-icon>
           </mat-form-field>
 
           <!-- Sort Options -->
@@ -176,7 +182,7 @@
               
               <div matListItemLine class="birthday-details">
                 <span class="birth-date">
-                  <mat-icon class="small-icon">event</mat-icon>
+                  <calendar-icon size="16" strokeWidth="2" cssClass="small-icon"></calendar-icon>
                   {{ birthday.birthDate | date:'MM/dd/yyyy' }}
                 </span>
                 <span class="next-birthday" [class.today]="getNextBirthdayText(birthday.birthDate) === 'Today!'" 
@@ -204,6 +210,7 @@
           </mat-list>
         </ng-template>
       </mat-card-content>
-    </mat-card>
+      </mat-card>
+    </div>
   </div>
 </div>
