@@ -738,7 +738,7 @@ export class DashboardComponent implements OnInit {
     );
 
     this.maxCount$ = this.chartData$.pipe(
-      map(data => Math.max(...data.map(d => d.count), 1))
+      map(data => data.length > 0 ? Math.max(...data.map(d => d.count)) || 1 : 1)
     );
   }
 

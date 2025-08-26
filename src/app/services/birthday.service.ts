@@ -115,6 +115,7 @@ export class BirthdayService {
 
   private getNextBirthdayDate(birthDate: Date): Date {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); 
     const currentYear = today.getFullYear();
     const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
     
@@ -126,7 +127,7 @@ export class BirthdayService {
   }
 
   private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
 
   private updateBirthdaysSubject(): void {
@@ -213,9 +214,11 @@ export class BirthdayService {
 
   getDaysUntilBirthday(birthDate: Date): number {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); 
     const nextBirthday = this.getNextBirthdayDate(birthDate);
+    nextBirthday.setHours(0, 0, 0, 0); 
     const diffTime = nextBirthday.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
   }
 
   getNextBirthdayText(birthDate: Date): string {
@@ -228,13 +231,21 @@ export class BirthdayService {
 
   private loadFromLocalStorage(): void {
     if (isPlatformBrowser(this.platformId)) {
-      const stored = localStorage.getItem('birthdays');
-      if (stored) {
-        this.birthdays = JSON.parse(stored).map((b: any) => ({
-          ...b,
-          birthDate: new Date(b.birthDate)
-        }));
-        this.updateBirthdaysSubject();
+      try {
+        const stored = localStorage.getItem('birthdays');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            this.birthdays = parsed.map((b: Omit<Birthday, 'birthDate'> & { birthDate: string }) => ({
+              ...b,
+              birthDate: new Date(b.birthDate)
+            }));
+            this.updateBirthdaysSubject();
+          }
+        }
+      } catch (error) {
+        localStorage.removeItem('birthdays');
+        console.warn('Corrupted birthday data removed from localStorage');
       }
     }
   }
