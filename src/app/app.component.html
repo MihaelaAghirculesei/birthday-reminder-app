@@ -10,7 +10,7 @@
 
   <div class="content-container">
     <!-- Dashboard Section -->
-    <app-dashboard *ngIf="(birthdays$ | async)?.length! > 0"></app-dashboard>
+    <app-dashboard *ngIf="(birthdays$ | async)?.length"></app-dashboard>
 
     <!-- Main Content Sections -->
     <div class="content-sections">
@@ -157,7 +157,9 @@
 
         <!-- Results Info -->
         <div class="results-info">
-          <span>Showing {{ (filteredBirthdays$ | async)?.length || 0 }} of {{ (birthdays$ | async)?.length || 0 }} birthdays</span>
+          <span *ngIf="filteredBirthdays$ | async as filtered">
+            Showing {{ filtered.length }} of {{ (birthdays$ | async)?.length || 0 }} birthdays
+          </span>
         </div>
 
         <!-- Birthdays List or Empty State -->
