@@ -578,9 +578,15 @@
     }
   }
   
-  .delete-button {
+  .birthday-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-left: auto;
     flex-shrink: 0;
+  }
+
+  .delete-button {
     background: var(--warning) !important;
     color: var(--text-inverse) !important;
     border-radius: 50% !important;

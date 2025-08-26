@@ -7,10 +7,12 @@ import { MaterialModule } from './shared/material.module';
 import { DashboardComponent } from './components/dashboard.component';
 import { CalendarIconComponent } from './shared/icons/calendar-icon.component';
 import { PhotoUploadComponent } from './shared/components/photo-upload.component';
+import { ZodiacIconComponent } from './shared/components/zodiac-icon.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
 import { MONTHS, SORT_OPTIONS } from './shared/constants';
+import { getZodiacSign } from './shared/utils/zodiac.util';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +23,8 @@ import { MONTHS, SORT_OPTIONS } from './shared/constants';
     MaterialModule,
     DashboardComponent,
     CalendarIconComponent,
-    PhotoUploadComponent
+    PhotoUploadComponent,
+    ZodiacIconComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
@@ -61,9 +64,13 @@ export class AppComponent implements OnInit {
 
   onSubmit() {
     if (this.birthdayForm.valid) {
+      const birthDate = new Date(this.birthdayForm.value.birthDate);
+      const zodiacSign = getZodiacSign(birthDate);
+      
       const formData = {
         ...this.birthdayForm.value,
-        photo: this.selectedPhoto
+        photo: this.selectedPhoto,
+        zodiacSign: zodiacSign.name
       };
       this.birthdayService.addBirthday(formData);
       this.birthdayForm.reset();

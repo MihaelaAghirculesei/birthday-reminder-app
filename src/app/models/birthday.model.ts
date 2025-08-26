@@ -4,5 +4,6 @@ export interface Birthday {
   birthDate: Date;
   notes?: string;
   reminderDays?: number;
-  photo?: string; 
+  photo?: string;
+  zodiacSign?: string;
 }

@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { Birthday } from '../models/birthday.model';
 import { MONTHS } from '../shared/constants';
+import { getZodiacSign } from '../shared/utils/zodiac.util';
 
 @Injectable({
   providedIn: 'root'
@@ -236,10 +237,14 @@ export class BirthdayService {
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) {
-            this.birthdays = parsed.map((b: Omit<Birthday, 'birthDate'> & { birthDate: string }) => ({
-              ...b,
-              birthDate: new Date(b.birthDate)
-            }));
+            this.birthdays = parsed.map((b: Omit<Birthday, 'birthDate'> & { birthDate: string }) => {
+              const birthDate = new Date(b.birthDate);
+              return {
+                ...b,
+                birthDate,
+                zodiacSign: b.zodiacSign || getZodiacSign(birthDate).name
+              };
+            });
             this.updateBirthdaysSubject();
           }
         }

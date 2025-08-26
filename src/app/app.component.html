@@ -214,14 +214,17 @@
                 </div>
               </div>
 
-              <button 
-                mat-icon-button 
-                color="warn" 
-                (click)="deleteBirthday(birthday.id)"
-                matTooltip="Delete birthday"
-                class="delete-button">
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="birthday-actions">
+                <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign"></zodiac-icon>
+                <button 
+                  mat-icon-button 
+                  color="warn" 
+                  (click)="deleteBirthday(birthday.id)"
+                  matTooltip="Delete birthday"
+                  class="delete-button">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </ng-template>
