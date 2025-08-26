@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Observable, map } from 'rxjs';
 import { MaterialModule } from '../shared/material.module';
 import { CalendarIconComponent } from '../shared/icons/calendar-icon.component';
+import { ZodiacIconComponent } from '../shared/components/zodiac-icon.component';
 import { BirthdayService } from '../services/birthday.service';
 import { Birthday } from '../models/birthday.model';
 
@@ -12,7 +13,8 @@ import { Birthday } from '../models/birthday.model';
   imports: [
     CommonModule,
     MaterialModule,
-    CalendarIconComponent
+    CalendarIconComponent,
+    ZodiacIconComponent
   ],
   template: `
     <div class="dashboard-container">
@@ -108,6 +110,7 @@ import { Birthday } from '../models/birthday.model';
                     <div class="dashboard-name">{{ birthday.name }}</div>
                     <div class="dashboard-birthday-info">
                       <span class="dashboard-date">{{ birthday.birthDate | date:'MMM dd' }}</span>
+                      <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign" class="dashboard-zodiac-inline"></zodiac-icon>
                       <mat-chip [class]="getDaysChipClass(birthday.daysUntil)">
                         {{ getDaysText(birthday.daysUntil) }}
                       </mat-chip>
@@ -559,6 +562,11 @@ import { Birthday } from '../models/birthday.model';
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+    
+    .dashboard-zodiac-inline {
+      margin: 0 8px;
+      flex-shrink: 0;
     }
     
     .dashboard-name {
