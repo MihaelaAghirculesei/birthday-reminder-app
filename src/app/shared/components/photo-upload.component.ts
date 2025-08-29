@@ -12,7 +12,6 @@ import { MaterialModule } from '../material.module';
            [class.has-photo]="currentPhoto"
            (click)="triggerFileInput()">
         
-        <!-- Photo Preview -->
         <div *ngIf="currentPhoto" class="photo-display">
           <img [src]="currentPhoto" alt="Contact photo" class="contact-photo">
           <div class="photo-overlay">
@@ -20,15 +19,13 @@ import { MaterialModule } from '../material.module';
             <span>Change Photo</span>
           </div>
         </div>
-        
-        <!-- Upload Placeholder -->
+
         <div *ngIf="!currentPhoto" class="photo-placeholder">
           <mat-icon class="upload-icon">add_a_photo</mat-icon>
           <span class="upload-text">Add Photo</span>
           <small class="upload-hint">Click to upload image</small>
         </div>
         
-        <!-- Hidden File Input -->
         <input
           #fileInput
           type="file"
@@ -37,7 +34,6 @@ import { MaterialModule } from '../material.module';
           style="display: none;">
       </div>
       
-      <!-- Remove Button -->
       <button *ngIf="currentPhoto" 
               mat-icon-button 
               color="warn" 
@@ -174,7 +170,6 @@ import { MaterialModule } from '../material.module';
       }
     }
     
-    // Responsive
     @media (max-width: 768px) {
       .photo-upload-container {
         flex-direction: column;
@@ -204,19 +199,16 @@ export class PhotoUploadComponent {
     if (input.files && input.files[0]) {
       const file = input.files[0];
       
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         return;
       }
       
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         alert('Please select a valid image file');
         return;
       }
-      
-      // Convert to base64
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = e.target?.result as string;

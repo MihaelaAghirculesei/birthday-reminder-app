@@ -49,7 +49,6 @@
   z-index: 1;
 }
 
-// Modern header section
 .app-header {
   text-align: center;
   margin: 40px 0 60px 0;
@@ -92,7 +91,6 @@
   }
 }
 
-// Modern card sections
 .content-sections {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -605,12 +603,10 @@
   }
 }
 
-// Custom birthday list styles
 .birthday-list-container .birthday-item:last-child {
   margin-bottom: 0;
 }
 
-// Animations
 @keyframes gradientShift {
   0%, 100% {
     background-position: 0% 50%;
@@ -642,7 +638,6 @@
   }
 }
 
-// Responsive Design
 @media (max-width: 1200px) {
   .content-sections {
     grid-template-columns: 1fr;

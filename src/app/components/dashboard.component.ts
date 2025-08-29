@@ -23,9 +23,7 @@ import { Birthday } from '../models/birthday.model';
         Dashboard & Statistics
       </h2>
 
-      <!-- Statistics Cards Row -->
       <div class="stats-row">
-        <!-- Total Birthdays -->
         <mat-card class="stat-card">
           <mat-card-content>
             <div class="stat-content">
@@ -38,7 +36,6 @@ import { Birthday } from '../models/birthday.model';
           </mat-card-content>
         </mat-card>
 
-        <!-- This Month -->
         <mat-card class="stat-card">
           <mat-card-content>
             <div class="stat-content">
@@ -51,7 +48,6 @@ import { Birthday } from '../models/birthday.model';
           </mat-card-content>
         </mat-card>
 
-        <!-- Average Age -->
         <mat-card class="stat-card">
           <mat-card-content>
             <div class="stat-content">
@@ -64,7 +60,6 @@ import { Birthday } from '../models/birthday.model';
           </mat-card-content>
         </mat-card>
 
-        <!-- Next Birthday -->
         <mat-card class="stat-card">
           <mat-card-content>
             <div class="stat-content">
@@ -78,9 +73,7 @@ import { Birthday } from '../models/birthday.model';
         </mat-card>
       </div>
 
-      <!-- Content Row -->
       <div class="content-row">
-        <!-- Next 5 Birthdays -->
         <mat-card class="next-birthdays-card">
           <mat-card-header>
             <mat-card-title>
@@ -97,7 +90,6 @@ import { Birthday } from '../models/birthday.model';
             <ng-template #birthdaysList>
               <div class="dashboard-birthday-list">
                 <div *ngFor="let birthday of next5Birthdays$ | async; let last = last" class="dashboard-birthday-item">
-                  <!-- Contact Photo or Default Icon -->
                   <div class="dashboard-avatar">
                     <img *ngIf="birthday.photo" 
                          [src]="birthday.photo" 
@@ -124,7 +116,6 @@ import { Birthday } from '../models/birthday.model';
           </mat-card-content>
         </mat-card>
 
-        <!-- Birthday Chart -->
         <mat-card class="chart-card">
           <mat-card-header>
             <mat-card-title>
@@ -626,7 +617,6 @@ import { Birthday } from '../models/birthday.model';
       border-color: var(--border-light) !important;
     }
 
-    // Responsive Design
     @media (max-width: 1200px) {
       .stats-row {
         grid-template-columns: repeat(2, 1fr);
@@ -768,6 +758,6 @@ export class DashboardComponent implements OnInit {
   getBarHeight(count: number, maxCount: number | null): number {
     const max = maxCount || 1;
     if (max === 0) return 0;
-    return (count / max) * 90; // 90% max height
+    return (count / max) * 90; 
   }
 }

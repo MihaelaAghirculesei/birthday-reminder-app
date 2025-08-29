@@ -35,8 +35,7 @@ export class AppComponent implements OnInit {
   birthdays$: Observable<Birthday[]>;
   filteredBirthdays$: Observable<Birthday[]>;
   selectedPhoto: string | null = null;
-  
-  // Filter properties
+
   searchTerm$ = this.birthdayService.searchTerm$;
   selectedMonth$ = this.birthdayService.selectedMonth$;
   sortOrder$ = this.birthdayService.sortOrder$;
@@ -91,7 +90,6 @@ export class AppComponent implements OnInit {
     return this.birthdayService.calculateAge(birthDate);
   }
 
-  // Filter methods
   onSearchChange(event: any): void {
     this.birthdayService.setSearchTerm(event.target.value);
   }
@@ -123,13 +121,12 @@ export class AppComponent implements OnInit {
     return this.months[monthIndex] || '';
   }
 
-  // Custom validator to prevent future dates
   private pastDateValidator(control: any) {
     if (!control.value) return null;
     
     const selectedDate = new Date(control.value);
     const today = new Date();
-    today.setHours(23, 59, 59, 999); // End of today
+    today.setHours(23, 59, 59, 999); 
     
     if (selectedDate > today) {
       return { futureDate: true };

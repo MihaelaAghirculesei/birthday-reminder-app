@@ -1,5 +1,4 @@
 <div class="app-container">
-  <!-- Modern Header Section -->
   <div class="app-header">
     <h1 class="hero-title">
       <calendar-icon size="48" strokeWidth="2" cssClass="hero-icon"></calendar-icon>
@@ -9,35 +8,24 @@
   </div>
 
   <div class="content-container">
-    <!-- Dashboard Section -->
     <app-dashboard *ngIf="(birthdays$ | async)?.length"></app-dashboard>
-
-    <!-- Main Content Sections -->
     <div class="content-sections">
-
-      <!-- Birthday form -->
       <mat-card class="add-birthday-card">
         <mat-card-header>
           <mat-card-title>✨ Add New Birthday</mat-card-title>
-        </mat-card-header>
-      
+        </mat-card-header>   
       <mat-card-content>
         <form [formGroup]="birthdayForm" (ngSubmit)="onSubmit()" class="birthday-form">
-          <!-- Photo Upload -->
           <photo-upload 
             [currentPhoto]="selectedPhoto"
             (photoSelected)="onPhotoSelected($event)"
             (photoRemoved)="onPhotoRemoved()">
           </photo-upload>
-
-          <!-- Name -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Name</mat-label>
             <input matInput formControlName="name" placeholder="e.g. John Doe">
             <mat-icon matSuffix>person</mat-icon>
           </mat-form-field>
-
-          <!-- Birth date -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Birth Date</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="birthDate">
@@ -51,23 +39,17 @@
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
-
-          <!-- Optional notes -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Notes (optional)</mat-label>
             <textarea matInput formControlName="notes" placeholder="e.g. Gift: cooking book" rows="2"></textarea>
             <mat-icon matSuffix>notes</mat-icon>
           </mat-form-field>
-
-          <!-- Reminder days -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Reminder Days</mat-label>
             <input matInput type="number" formControlName="reminderDays" min="1" max="365">
             <mat-hint>How many days before do you want to be reminded?</mat-hint>
             <mat-icon matSuffix>notifications</mat-icon>
           </mat-form-field>
-
-          <!-- Submit button -->
           <div class="form-actions">
             <button 
               mat-raised-button 
@@ -82,8 +64,6 @@
         </form>
       </mat-card-content>
     </mat-card>
-
-      <!-- Birthdays list -->
       <mat-card class="birthdays-list-card">
         <mat-card-header>
           <mat-card-title>🎉 Your Birthday Collection</mat-card-title>
@@ -91,9 +71,7 @@
         </mat-card-header>
       
       <mat-card-content>
-        <!-- Search and Filter Section -->
         <div class="filters-section">
-          <!-- Search Bar -->
           <mat-form-field appearance="outline" class="search-field">
             <mat-label>Search by name</mat-label>
             <input matInput 
@@ -101,8 +79,6 @@
                    (input)="onSearchChange($event)">
             <mat-icon matSuffix>search</mat-icon>
           </mat-form-field>
-
-          <!-- Month Filter -->
           <mat-form-field appearance="outline" class="month-filter">
             <mat-label>Filter by month</mat-label>
             <mat-select [value]="selectedMonth$ | async" 
@@ -114,8 +90,6 @@
             </mat-select>
             <calendar-icon size="20" strokeWidth="2" cssClass="primary-icon"></calendar-icon>
           </mat-form-field>
-
-          <!-- Sort Options -->
           <mat-form-field appearance="outline" class="sort-field">
             <mat-label>Sort by</mat-label>
             <mat-select [value]="sortOrder$ | async" 
@@ -126,8 +100,6 @@
             </mat-select>
             <mat-icon matSuffix>sort</mat-icon>
           </mat-form-field>
-
-          <!-- Clear Filters Button -->
           <button mat-stroked-button 
                   color="primary" 
                   (click)="clearFilters()"
@@ -137,8 +109,6 @@
             Clear
           </button>
         </div>
-
-        <!-- Active Filters Display -->
         <div class="active-filters" *ngIf="(searchTerm$ | async) || (selectedMonth$ | async) !== null">
           <span class="filters-label">Active filters:</span>
           <mat-chip-set>
@@ -154,15 +124,11 @@
             </mat-chip>
           </mat-chip-set>
         </div>
-
-        <!-- Results Info -->
         <div class="results-info">
           <span *ngIf="filteredBirthdays$ | async as filtered">
             Showing {{ filtered.length }} of {{ (birthdays$ | async)?.length || 0 }} birthdays
           </span>
         </div>
-
-        <!-- Birthdays List or Empty State -->
         <div *ngIf="(filteredBirthdays$ | async)?.length === 0; else birthdaysList" class="no-birthdays">
           <mat-icon class="large-icon">
             {{ (birthdays$ | async)?.length === 0 ? 'cake' : 'search_off' }}
@@ -182,7 +148,6 @@
         <ng-template #birthdaysList>
           <div class="birthday-list-container">
             <div *ngFor="let birthday of filteredBirthdays$ | async; let last = last" class="birthday-item">
-              <!-- Contact Photo or Default Icon -->
               <div class="contact-avatar">
                 <img *ngIf="birthday.photo" 
                      [src]="birthday.photo" 

@@ -94,17 +94,15 @@ export const ZODIAC_SIGNS: ZodiacSign[] = [
 ];
 
 export function getZodiacSign(birthDate: Date): ZodiacSign {
-  const month = birthDate.getMonth() + 1; // getMonth() returns 0-11
+  const month = birthDate.getMonth() + 1; 
   const day = birthDate.getDate();
 
   for (const sign of ZODIAC_SIGNS) {
-    // Handle Capricorn (spans December to January)
     if (sign.name === 'Capricorn') {
       if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) {
         return sign;
       }
     } else {
-      // Handle regular signs
       if (
         (month === sign.startDate.month && day >= sign.startDate.day) ||
         (month === sign.endDate.month && day <= sign.endDate.day)
@@ -114,6 +112,5 @@ export function getZodiacSign(birthDate: Date): ZodiacSign {
     }
   }
 
-  // Fallback (should never happen)
   return ZODIAC_SIGNS[0];
 }

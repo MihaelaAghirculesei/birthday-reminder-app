@@ -72,41 +72,35 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/zodiac.util';
       100% { transform: rotate(360deg); }
     }
 
-    /* Base styles for all zodiac signs */
     .zodiac-button[class*="zodiac-"] {
       background-origin: border-box !important;
       background-clip: content-box, border-box !important;
     }
 
-    /* Fire signs */
     .zodiac-aries, .zodiac-leo, .zodiac-sagittarius {
       color: #e74c3c;
       background-image: linear-gradient(white, white), 
                        linear-gradient(45deg, #e74c3c, #f39c12, #e74c3c) !important;
     }
 
-    /* Earth signs */
     .zodiac-taurus, .zodiac-virgo, .zodiac-capricorn {
       color: #27ae60;
       background-image: linear-gradient(white, white), 
                        linear-gradient(45deg, #27ae60, #2ecc71, #27ae60) !important;
     }
 
-    /* Air signs */
     .zodiac-gemini, .zodiac-libra, .zodiac-aquarius {
       color: #3498db;
       background-image: linear-gradient(white, white), 
                        linear-gradient(45deg, #3498db, #5dade2, #3498db) !important;
     }
 
-    /* Water signs */
     .zodiac-cancer, .zodiac-scorpio, .zodiac-pisces {
       color: #9b59b6;
       background-image: linear-gradient(white, white), 
                        linear-gradient(45deg, #9b59b6, #bb8fce, #9b59b6) !important;
     }
 
-    /* Fallback/unknown */
     .zodiac-button:not([class*="zodiac-"]) {
       color: #95a5a6;
       background-image: linear-gradient(white, white), 

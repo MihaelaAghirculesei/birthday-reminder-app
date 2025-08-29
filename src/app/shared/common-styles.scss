@@ -1,6 +1,3 @@
-// Common mixins and styles
-
-// Status colors for birthdays
 @mixin birthday-status-colors {
   &.today {
     background-color: #ffebee;
@@ -25,26 +22,22 @@
   }
 }
 
-// Small icons
 @mixin small-icon {
   font-size: 16px;
   width: 16px;
   height: 16px;
 }
 
-// Card shadow
 @mixin card-shadow {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-// Flex center
 @mixin flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-// Common classes
 .small-icon {
   @include small-icon;
 }

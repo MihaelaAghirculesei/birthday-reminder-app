@@ -13,7 +13,6 @@ export class BirthdayService {
   private birthdaysSubject = new BehaviorSubject<Birthday[]>([]);
   public birthdays$ = this.birthdaysSubject.asObservable();
 
-  // Filter and search subjects
   private searchTermSubject = new BehaviorSubject<string>('');
   private selectedMonthSubject = new BehaviorSubject<number | null>(null);
   private sortOrderSubject = new BehaviorSubject<string>('name');
@@ -22,7 +21,6 @@ export class BirthdayService {
   public selectedMonth$ = this.selectedMonthSubject.asObservable();
   public sortOrder$ = this.sortOrderSubject.asObservable();
 
-  // Filtered and sorted birthdays
   public filteredBirthdays$ = combineLatest([
     this.birthdays$,
     this.searchTerm$,
@@ -32,21 +30,18 @@ export class BirthdayService {
     map(([birthdays, searchTerm, selectedMonth, sortOrder]) => {
       let filtered = [...birthdays];
 
-      // Apply search filter
       if (searchTerm.trim()) {
         filtered = filtered.filter(birthday =>
           birthday.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
-      // Apply month filter
       if (selectedMonth !== null) {
         filtered = filtered.filter(birthday =>
           birthday.birthDate.getMonth() === selectedMonth
         );
       }
 
-      // Apply sorting
       filtered.sort((a, b) => {
         switch (sortOrder) {
           case 'name':
@@ -67,7 +62,6 @@ export class BirthdayService {
   );
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    // Carica dati dal localStorage solo se siamo nel browser
     if (isPlatformBrowser(this.platformId)) {
       this.loadFromLocalStorage();
     }
@@ -141,7 +135,6 @@ export class BirthdayService {
     }
   }
 
-  // Filter and search methods
   setSearchTerm(term: string): void {
     this.searchTermSubject.next(term);
   }
@@ -172,7 +165,6 @@ export class BirthdayService {
     return age;
   }
 
-  // Dashboard Statistics Methods
   getBirthdaysThisMonth(): Birthday[] {
     const currentMonth = new Date().getMonth();
     return this.birthdays.filter(birthday => 
