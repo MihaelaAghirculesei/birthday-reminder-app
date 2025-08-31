@@ -8,6 +8,7 @@ import { DashboardComponent } from './components/dashboard.component';
 import { CalendarIconComponent } from './shared/icons/calendar-icon.component';
 import { PhotoUploadComponent } from './shared/components/photo-upload.component';
 import { ZodiacIconComponent } from './shared/components/zodiac-icon.component';
+import { NetworkStatusComponent } from './shared/components/network-status.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
@@ -24,7 +25,8 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     DashboardComponent,
     CalendarIconComponent,
     PhotoUploadComponent,
-    ZodiacIconComponent
+    ZodiacIconComponent,
+    NetworkStatusComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

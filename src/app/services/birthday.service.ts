@@ -1,9 +1,11 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, firstValueFrom } from 'rxjs';
 import { Birthday } from '../models/birthday.model';
 import { MONTHS } from '../shared/constants';
 import { getZodiacSign } from '../shared/utils/zodiac.util';
+import { IndexedDBStorageService } from './offline-storage.service';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +14,8 @@ export class BirthdayService {
   private birthdays: Birthday[] = [];
   private birthdaysSubject = new BehaviorSubject<Birthday[]>([]);
   public birthdays$ = this.birthdaysSubject.asObservable();
+  private isInitialized = false;
+  private pendingChanges: (() => Promise<void>)[] = [];
 
   private searchTermSubject = new BehaviorSubject<string>('');
   private selectedMonthSubject = new BehaviorSubject<number | null>(null);
@@ -61,13 +65,18 @@ export class BirthdayService {
     })
   );
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private offlineStorage: IndexedDBStorageService,
+    private networkService: NetworkService
+  ) {
     if (isPlatformBrowser(this.platformId)) {
-      this.loadFromLocalStorage();
+      this.initializeService();
+      this.setupNetworkSync();
     }
   }
 
-  addBirthday(birthday: Omit<Birthday, 'id'>): void {
+  async addBirthday(birthday: Omit<Birthday, 'id'>): Promise<void> {
     const newBirthday: Birthday = {
       ...birthday,
       id: this.generateId()
@@ -75,21 +84,24 @@ export class BirthdayService {
     
     this.birthdays.push(newBirthday);
     this.updateBirthdaysSubject();
-    this.saveToLocalStorage();
+    
+    await this.saveToStorage(newBirthday, 'add');
   }
 
-  deleteBirthday(id: string): void {
+  async deleteBirthday(id: string): Promise<void> {
     this.birthdays = this.birthdays.filter(b => b.id !== id);
     this.updateBirthdaysSubject();
-    this.saveToLocalStorage();
+    
+    await this.saveToStorage({ id } as Birthday, 'delete');
   }
 
-  updateBirthday(updatedBirthday: Birthday): void {
+  async updateBirthday(updatedBirthday: Birthday): Promise<void> {
     const index = this.birthdays.findIndex(b => b.id === updatedBirthday.id);
     if (index !== -1) {
       this.birthdays[index] = updatedBirthday;
       this.updateBirthdaysSubject();
-      this.saveToLocalStorage();
+      
+      await this.saveToStorage(updatedBirthday, 'update');
     }
   }
 
@@ -222,27 +234,118 @@ export class BirthdayService {
     return `In ${days} days`;
   }
 
-  private loadFromLocalStorage(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      try {
-        const stored = localStorage.getItem('birthdays');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) {
-            this.birthdays = parsed.map((b: Omit<Birthday, 'birthDate'> & { birthDate: string }) => {
-              const birthDate = new Date(b.birthDate);
-              return {
-                ...b,
-                birthDate,
-                zodiacSign: b.zodiacSign || getZodiacSign(birthDate).name
-              };
-            });
-            this.updateBirthdaysSubject();
+  private async initializeService(): Promise<void> {
+    if (this.isInitialized) return;
+    
+    try {
+      // Try IndexedDB first
+      const storedBirthdays = await this.offlineStorage.getBirthdays();
+      
+      if (storedBirthdays.length > 0) {
+        this.birthdays = storedBirthdays.map(b => ({
+          ...b,
+          zodiacSign: b.zodiacSign || getZodiacSign(b.birthDate).name
+        }));
+      } else {
+        // Fallback to localStorage if IndexedDB is empty
+        await this.migrateFromLocalStorage();
+      }
+      
+      this.updateBirthdaysSubject();
+      this.isInitialized = true;
+    } catch (error) {
+      console.warn('Error initializing service, falling back to localStorage:', error);
+      await this.migrateFromLocalStorage();
+      this.isInitialized = true;
+    }
+  }
+
+  private async migrateFromLocalStorage(): Promise<void> {
+    try {
+      const stored = localStorage.getItem('birthdays');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          this.birthdays = parsed.map((b: Omit<Birthday, 'birthDate'> & { birthDate: string }) => {
+            const birthDate = new Date(b.birthDate);
+            return {
+              ...b,
+              birthDate,
+              zodiacSign: b.zodiacSign || getZodiacSign(birthDate).name
+            };
+          });
+          
+          // Migrate to IndexedDB
+          await this.offlineStorage.saveBirthdays(this.birthdays);
+          
+          // Clear localStorage after successful migration
+          localStorage.removeItem('birthdays');
+        }
+      }
+    } catch (error) {
+      console.warn('Error migrating from localStorage:', error);
+      localStorage.removeItem('birthdays');
+    }
+  }
+
+  private setupNetworkSync(): void {
+    this.networkService.online$.subscribe(async (isOnline) => {
+      if (isOnline && this.pendingChanges.length > 0) {
+        // Process pending changes when coming back online
+        const changes = [...this.pendingChanges];
+        this.pendingChanges = [];
+        
+        for (const changeFunction of changes) {
+          try {
+            await changeFunction();
+          } catch (error) {
+            console.warn('Error processing pending change:', error);
           }
         }
-      } catch (error) {
-        localStorage.removeItem('birthdays');
-        console.warn('Corrupted birthday data removed from localStorage');
+      }
+    });
+  }
+
+  private async saveToStorage(birthday: Birthday, operation: 'add' | 'update' | 'delete'): Promise<void> {
+    try {
+      switch (operation) {
+        case 'add':
+          await this.offlineStorage.addBirthday(birthday);
+          break;
+        case 'update':
+          await this.offlineStorage.updateBirthday(birthday);
+          break;
+        case 'delete':
+          await this.offlineStorage.deleteBirthday(birthday.id);
+          break;
+      }
+      
+      // Also save to localStorage as backup
+      this.saveToLocalStorage();
+    } catch (error) {
+      console.warn(`Error saving to IndexedDB, using localStorage backup:`, error);
+      this.saveToLocalStorage();
+      
+      // Add to pending changes if offline
+      if (this.networkService.isOffline) {
+        const changeFunction = async () => {
+          try {
+            switch (operation) {
+              case 'add':
+                await this.offlineStorage.addBirthday(birthday);
+                break;
+              case 'update':
+                await this.offlineStorage.updateBirthday(birthday);
+                break;
+              case 'delete':
+                await this.offlineStorage.deleteBirthday(birthday.id);
+                break;
+            }
+          } catch (retryError) {
+            console.warn('Retry failed:', retryError);
+          }
+        };
+        this.pendingChanges.push(changeFunction);
       }
     }
   }

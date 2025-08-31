@@ -55,6 +55,19 @@
   position: relative;
   z-index: 2;
   
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+  }
+  
   .hero-title {
     font-size: 3.5rem;
     font-weight: 900;
@@ -62,7 +75,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     text-shadow: 0 4px 6px rgba(0,0,0,0.1);
     animation: fadeInUp 0.8s ease-out;
     display: flex;
