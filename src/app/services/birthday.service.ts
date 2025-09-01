@@ -6,6 +6,7 @@ import { MONTHS } from '../shared/constants';
 import { getZodiacSign } from '../shared/utils/zodiac.util';
 import { IndexedDBStorageService } from './offline-storage.service';
 import { NetworkService } from './network.service';
+import { GoogleCalendarService } from './google-calendar.service';
 
 @Injectable({
   providedIn: 'root'
@@ -68,7 +69,8 @@ export class BirthdayService {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private offlineStorage: IndexedDBStorageService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private googleCalendarService: GoogleCalendarService
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.initializeService();
@@ -82,6 +84,15 @@ export class BirthdayService {
       id: this.generateId()
     };
     
+    if (this.googleCalendarService.isEnabled()) {
+      try {
+        const eventId = await this.googleCalendarService.syncBirthdayToCalendar(newBirthday);
+        newBirthday.googleCalendarEventId = eventId;
+      } catch (error) {
+        console.warn('Failed to sync birthday to Google Calendar:', error);
+      }
+    }
+    
     this.birthdays.push(newBirthday);
     this.updateBirthdaysSubject();
     
@@ -89,6 +100,16 @@ export class BirthdayService {
   }
 
   async deleteBirthday(id: string): Promise<void> {
+    const birthdayToDelete = this.birthdays.find(b => b.id === id);
+    
+    if (birthdayToDelete?.googleCalendarEventId && this.googleCalendarService.isEnabled()) {
+      try {
+        await this.googleCalendarService.deleteBirthdayFromCalendar(birthdayToDelete.googleCalendarEventId);
+      } catch (error) {
+        console.warn('Failed to delete birthday from Google Calendar:', error);
+      }
+    }
+    
     this.birthdays = this.birthdays.filter(b => b.id !== id);
     this.updateBirthdaysSubject();
     
@@ -98,6 +119,14 @@ export class BirthdayService {
   async updateBirthday(updatedBirthday: Birthday): Promise<void> {
     const index = this.birthdays.findIndex(b => b.id === updatedBirthday.id);
     if (index !== -1) {
+      if (updatedBirthday.googleCalendarEventId && this.googleCalendarService.isEnabled()) {
+        try {
+          await this.googleCalendarService.updateBirthdayInCalendar(updatedBirthday, updatedBirthday.googleCalendarEventId);
+        } catch (error) {
+          console.warn('Failed to update birthday in Google Calendar:', error);
+        }
+      }
+      
       this.birthdays[index] = updatedBirthday;
       this.updateBirthdaysSubject();
       
@@ -238,7 +267,6 @@ export class BirthdayService {
     if (this.isInitialized) return;
     
     try {
-      // Try IndexedDB first
       const storedBirthdays = await this.offlineStorage.getBirthdays();
       
       if (storedBirthdays.length > 0) {
@@ -247,7 +275,6 @@ export class BirthdayService {
           zodiacSign: b.zodiacSign || getZodiacSign(b.birthDate).name
         }));
       } else {
-        // Fallback to localStorage if IndexedDB is empty
         await this.migrateFromLocalStorage();
       }
       
@@ -275,10 +302,8 @@ export class BirthdayService {
             };
           });
           
-          // Migrate to IndexedDB
           await this.offlineStorage.saveBirthdays(this.birthdays);
           
-          // Clear localStorage after successful migration
           localStorage.removeItem('birthdays');
         }
       }
@@ -291,7 +316,6 @@ export class BirthdayService {
   private setupNetworkSync(): void {
     this.networkService.online$.subscribe(async (isOnline) => {
       if (isOnline && this.pendingChanges.length > 0) {
-        // Process pending changes when coming back online
         const changes = [...this.pendingChanges];
         this.pendingChanges = [];
         
@@ -320,13 +344,11 @@ export class BirthdayService {
           break;
       }
       
-      // Also save to localStorage as backup
       this.saveToLocalStorage();
     } catch (error) {
       console.warn(`Error saving to IndexedDB, using localStorage backup:`, error);
       this.saveToLocalStorage();
       
-      // Add to pending changes if offline
       if (this.networkService.isOffline) {
         const changeFunction = async () => {
           try {

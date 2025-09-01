@@ -724,39 +724,184 @@
 
 @media (max-width: 480px) {
   .app-header {
+    margin: 12px 0 20px 0;
+    
     .hero-title {
-      font-size: 2rem;
+      font-size: 1.7rem;
+      gap: 8px;
     }
     
     .hero-subtitle {
-      font-size: 1rem;
+      font-size: 0.9rem;
+      padding: 0 12px;
+      line-height: 1.4;
     }
   }
   
   .content-container {
-    padding: 20px 12px;
+    padding: 16px 8px;
+    gap: 16px;
+  }
+  
+  .content-sections {
+    gap: 16px;
   }
   
   .add-birthday-card,
   .birthdays-list-card {
+    border-radius: var(--radius) !important;
+    
     .mat-mdc-card-header {
-      padding: 24px !important;
+      padding: 16px !important;
       
       .mat-mdc-card-title {
-        font-size: 1.5rem !important;
+        font-size: 1.1rem !important;
+      }
+      
+      .mat-mdc-card-subtitle {
+        font-size: 0.85rem;
+        margin-top: 4px;
       }
     }
     
     .mat-mdc-card-content {
-      padding: 24px !important;
+      padding: 16px !important;
     }
   }
   
-  .birthday-form {
-    gap: 20px;
+  .filters-section {
+    padding: 12px !important;
+    gap: 10px !important;
+    
+    .clear-filters-btn {
+      height: 42px !important;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+    }
   }
   
-  .birthday-item .birthday-info .name {
-    font-size: 1.1rem;
+  .active-filters {
+    padding: 10px 16px;
+    
+    .filters-label {
+      font-size: 0.85rem;
+    }
+    
+    mat-chip {
+      font-size: 0.75rem !important;
+      padding: 4px 8px !important;
+    }
+  }
+  
+  .results-info {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .birthday-form {
+    gap: 14px;
+    
+    .form-actions .submit-button {
+      font-size: 0.9rem;
+      padding: 10px 18px;
+      height: 42px;
+    }
+  }
+  
+  .birthday-item {
+    padding: 12px 0;
+    gap: 10px;
+    
+    .contact-avatar {
+      min-width: 50px;
+      min-height: 50px;
+      
+      .contact-photo-small {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .default-avatar {
+        font-size: 26px !important;
+        width: 26px !important;
+        height: 26px !important;
+      }
+    }
+    
+    .birthday-content {
+      .birthday-info {
+        gap: 2px;
+        margin-bottom: 6px;
+        
+        .name {
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+        
+        .age {
+          font-size: 0.8rem;
+        }
+      }
+      
+      .birthday-details {
+        gap: 6px;
+        font-size: 0.8rem;
+        
+        .birth-date,
+        .next-birthday {
+          font-size: 0.8rem;
+        }
+        
+        .small-icon {
+          font-size: 12px !important;
+          width: 12px !important;
+          height: 12px !important;
+        }
+      }
+      
+      .notes {
+        font-size: 0.8rem;
+        margin-top: 4px;
+        
+        .small-icon {
+          font-size: 12px !important;
+        }
+      }
+    }
+    
+    .birthday-actions {
+      gap: 6px;
+      
+      .delete-button {
+        min-width: 36px;
+        width: 36px;
+        height: 36px;
+        
+        mat-icon {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  
+  .no-birthdays {
+    padding: 24px 12px;
+    
+    .large-icon {
+      font-size: 40px !important;
+      width: 40px !important;
+      height: 40px !important;
+      margin-bottom: 12px;
+    }
+    
+    p {
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+    
+    button {
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
   }
 }

@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { MaterialModule } from '../shared/material.module';
 import { CalendarIconComponent } from '../shared/icons/calendar-icon.component';
 import { ZodiacIconComponent } from '../shared/components/zodiac-icon.component';
+import { GoogleCalendarSyncComponent } from './google-calendar-sync.component';
 import { BirthdayService } from '../services/birthday.service';
 import { Birthday } from '../models/birthday.model';
 
@@ -14,7 +15,8 @@ import { Birthday } from '../models/birthday.model';
     CommonModule,
     MaterialModule,
     CalendarIconComponent,
-    ZodiacIconComponent
+    ZodiacIconComponent,
+    GoogleCalendarSyncComponent
   ],
   template: `
     <div class="dashboard-container">
@@ -141,6 +143,10 @@ import { Birthday } from '../models/birthday.model';
             </div>
           </mat-card-content>
         </mat-card>
+      </div>
+
+      <div class="sync-row">
+        <app-google-calendar-sync></app-google-calendar-sync>
       </div>
     </div>
   `,
@@ -288,7 +294,7 @@ import { Birthday } from '../models/birthday.model';
 
     .content-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 400px;
       gap: 32px;
       margin-top: 24px;
     }
@@ -324,8 +330,8 @@ import { Birthday } from '../models/birthday.model';
       }
       
       .mat-mdc-card-content {
-        padding: 32px !important;
-        min-height: 400px !important;
+        padding: 24px !important;
+        min-height: 350px !important;
       }
     }
 
@@ -380,8 +386,8 @@ import { Birthday } from '../models/birthday.model';
       display: flex;
       align-items: end;
       justify-content: space-between;
-      height: 240px;
-      padding: 24px 0;
+      height: 180px;
+      padding: 16px 0;
       border-bottom: 3px solid var(--primary);
       background: linear-gradient(180deg, transparent 0%, var(--surface-elevated) 100%);
       border-radius: var(--radius-sm) var(--radius-sm) 0 0;
@@ -399,7 +405,7 @@ import { Birthday } from '../models/birthday.model';
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 160px;
+      height: 120px;
       justify-content: end;
       position: relative;
     }
@@ -624,26 +630,37 @@ import { Birthday } from '../models/birthday.model';
       }
     }
     
+    .sync-row {
+      margin-top: 32px;
+      display: flex;
+      justify-content: center;
+
+      app-google-calendar-sync {
+        width: 100%;
+        max-width: 800px;
+      }
+    }
+
     @media (max-width: 768px) {
       .dashboard-container {
-        padding: 0;
+        padding: 0 8px;
       }
       
       .dashboard-title {
-        font-size: 2rem;
-        margin-bottom: 32px;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
         
         mat-icon {
-          font-size: 2.5rem;
-          width: 2.5rem;
-          height: 2.5rem;
+          font-size: 2.2rem;
+          width: 2.2rem;
+          height: 2.2rem;
         }
       }
 
       .stats-row {
         grid-template-columns: 1fr;
-        gap: 16px;
-        margin-bottom: 32px;
+        gap: 12px;
+        margin-bottom: 24px;
       }
       
       .stat-card {
@@ -664,38 +681,209 @@ import { Birthday } from '../models/birthday.model';
 
       .content-row {
         grid-template-columns: 1fr;
-        gap: 24px;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .next-birthdays-card, .chart-card {
+        .mat-mdc-card-content {
+          padding: 16px !important;
+          min-height: 280px !important;
+        }
+        
+        .mat-mdc-card-header {
+          padding: 16px;
+          
+          .mat-mdc-card-title {
+            font-size: 1.2rem;
+          }
+        }
       }
 
       .chart-container {
-        height: 180px;
-        padding: 16px 0;
+        height: 140px;
+        padding: 8px 0;
       }
 
       .bar-container {
-        height: 140px;
+        height: 100px;
+      }
+
+      .sync-row {
+        margin-top: 24px;
+        
+        app-google-calendar-sync {
+          max-width: none;
+          margin: 0;
+        }
       }
 
       .bar {
         width: 20px;
       }
+
+      .dashboard-birthday-list {
+        gap: 16px;
+      }
+
+      .dashboard-birthday-item {
+        padding: 12px 0;
+        gap: 16px;
+      }
+
+      .dashboard-avatar {
+        width: 80px !important;
+        height: 80px !important;
+        min-width: 80px !important;
+        min-height: 80px !important;
+        border: 2px solid var(--primary);
+        
+        .dashboard-default-icon {
+          font-size: 40px !important;
+          width: 40px !important;
+          height: 40px !important;
+        }
+      }
+
+      .dashboard-birthday-content {
+        gap: 4px;
+      }
+
+      .dashboard-name {
+        font-size: 1rem;
+      }
+
+      .dashboard-birthday-info {
+        padding: 4px 0;
+        
+        .dashboard-date {
+          font-size: 0.9rem;
+        }
+        
+        mat-chip {
+          font-size: 0.8rem !important;
+          padding: 6px 4px !important;
+          min-width: 65px !important;
+          width: 65px !important;
+          text-align: center !important;
+          display: inline-flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+        }
+      }
+
+      .dashboard-zodiac-inline {
+        margin: 0 4px;
+      }
+
+      .dashboard-divider {
+        left: 96px;
+      }
     }
     
+    @media (min-width: 769px) and (max-width: 1023px) {
+      .content-row {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .next-birthdays-card, .chart-card {
+        .mat-mdc-card-content {
+          padding: 20px !important;
+          min-height: 320px !important;
+        }
+      }
+
+      .sync-row app-google-calendar-sync {
+        max-width: 600px;
+      }
+    }
+
     @media (max-width: 480px) {
+      .dashboard-container {
+        padding: 0 4px;
+      }
+
       .dashboard-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+        gap: 8px;
         
         mat-icon {
-          font-size: 2rem;
-          width: 2rem;
-          height: 2rem;
+          font-size: 1.8rem;
+          width: 1.8rem;
+          height: 1.8rem;
         }
       }
       
-      .stat-card .stat-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 16px;
+      .stat-card {
+        .mat-mdc-card-content {
+          padding: 16px !important;
+        }
+        
+        .stat-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 12px;
+        }
+
+        .stat-icon {
+          min-width: 60px;
+          min-height: 60px;
+          font-size: 36px;
+        }
+
+        .stat-info .stat-number {
+          font-size: 2rem;
+        }
+      }
+
+      .dashboard-avatar {
+        width: 60px !important;
+        height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
+        
+        .dashboard-default-icon {
+          font-size: 30px !important;
+          width: 30px !important;
+          height: 30px !important;
+        }
+      }
+
+      .dashboard-name {
+        font-size: 0.95rem;
+      }
+
+      .dashboard-birthday-info {
+        mat-chip {
+          min-width: 75px !important;
+          width: 75px !important;
+          text-align: center !important;
+          display: inline-flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+        }
+      }
+
+      .dashboard-divider {
+        left: 76px;
+      }
+
+      .chart-container {
+        height: 120px;
+      }
+
+      .bar-container {
+        height: 90px;
+      }
+
+      .bar {
+        width: 16px;
+      }
+
+      .bar-label {
+        font-size: 0.75rem;
       }
     }
   `]
