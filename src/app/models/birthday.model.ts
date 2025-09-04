@@ -7,4 +7,5 @@ export interface Birthday {
   photo?: string;
   zodiacSign?: string;
   googleCalendarEventId?: string;
+  category?: string;
 }

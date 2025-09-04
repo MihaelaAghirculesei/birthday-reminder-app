@@ -4,9 +4,11 @@ import { Observable, map } from 'rxjs';
 import { MaterialModule } from '../shared/material.module';
 import { CalendarIconComponent } from '../shared/icons/calendar-icon.component';
 import { ZodiacIconComponent } from '../shared/components/zodiac-icon.component';
+import { CategoryIconComponent } from '../shared/components/category-icon.component';
 import { GoogleCalendarSyncComponent } from './google-calendar-sync.component';
 import { BirthdayService } from '../services/birthday.service';
 import { Birthday } from '../models/birthday.model';
+import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categories';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,6 +18,7 @@ import { Birthday } from '../models/birthday.model';
     MaterialModule,
     CalendarIconComponent,
     ZodiacIconComponent,
+    CategoryIconComponent,
     GoogleCalendarSyncComponent
   ],
   template: `
@@ -103,8 +106,13 @@ import { Birthday } from '../models/birthday.model';
                   <div class="dashboard-birthday-content">
                     <div class="dashboard-name">{{ birthday.name }}</div>
                     <div class="dashboard-birthday-info">
-                      <span class="dashboard-date">{{ birthday.birthDate | date:'MMM dd' }}</span>
-                      <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign" class="dashboard-zodiac-inline"></zodiac-icon>
+                      <div class="dashboard-date-section">
+                        <span class="dashboard-date">{{ birthday.birthDate | date:'MMM dd' }}</span>
+                        <div class="dashboard-icons">
+                          <category-icon [categoryId]="birthday.category || defaultCategory" class="dashboard-category-inline"></category-icon>
+                          <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign" class="dashboard-zodiac-inline"></zodiac-icon>
+                        </div>
+                      </div>
                       <mat-chip [class]="getDaysChipClass(birthday.daysUntil)">
                         {{ getDaysText(birthday.daysUntil) }}
                       </mat-chip>
@@ -143,6 +151,24 @@ import { Birthday } from '../models/birthday.model';
             </div>
           </mat-card-content>
         </mat-card>
+      </div>
+
+      <div class="categories-section" *ngIf="(categoriesStats$ | async)?.length! > 0">
+        <h3 class="section-title">
+          <mat-icon>category</mat-icon>
+          Categories Overview
+        </h3>
+        <div class="categories-grid">
+          <div *ngFor="let categoryStats of categoriesStats$ | async" class="category-stat-card">
+            <div class="category-stat-content">
+              <category-icon [categoryId]="categoryStats.id" cssClass="category-stat-icon"></category-icon>
+              <div class="category-stat-info">
+                <div class="category-stat-name">{{ categoryStats.name }}</div>
+                <div class="category-stat-count">{{ categoryStats.count }} persone</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="sync-row">
@@ -589,8 +615,12 @@ import { Birthday } from '../models/birthday.model';
     }
     
     .dashboard-zodiac-inline {
-      margin: 0 8px;
       flex-shrink: 0;
+    }
+    
+    .dashboard-category-inline {
+      flex-shrink: 0;
+      font-size: 18px !important;
     }
     
     .dashboard-name {
@@ -606,10 +636,22 @@ import { Birthday } from '../models/birthday.model';
       width: 100%;
       padding: 8px 0;
       
+      .dashboard-date-section {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      
       .dashboard-date {
         font-weight: 600;
         color: var(--text-secondary);
         font-size: 1rem;
+      }
+      
+      .dashboard-icons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
       
       mat-chip {
@@ -657,6 +699,77 @@ import { Birthday } from '../models/birthday.model';
       }
     }
     
+    .categories-section {
+      margin-top: 32px;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      
+      mat-icon {
+        color: var(--primary);
+        font-size: 1.8rem;
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+    }
+    
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .category-stat-card {
+      background: var(--surface) !important;
+      border-radius: var(--radius) !important;
+      box-shadow: var(--shadow) !important;
+      border: 1px solid var(--border-light) !important;
+      padding: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-elevated) !important;
+      }
+    }
+    
+    .category-stat-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .category-stat-icon {
+      font-size: 32px !important;
+      width: 32px !important;
+      height: 32px !important;
+    }
+    
+    .category-stat-info {
+      flex: 1;
+    }
+    
+    .category-stat-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .category-stat-count {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
     .sync-row {
       margin-top: 32px;
       display: flex;
@@ -1062,7 +1175,9 @@ export class DashboardComponent implements OnInit {
   nextBirthdayDays$: Observable<number>;
   chartData$: Observable<any[]>;
   maxCount$: Observable<number>;
+  categoriesStats$: Observable<any[]>;
   currentMonth = new Date().getMonth();
+  defaultCategory = DEFAULT_CATEGORY;
   isAddingTestData = false;
   isClearingData = false;
 
@@ -1093,6 +1208,16 @@ export class DashboardComponent implements OnInit {
 
     this.maxCount$ = this.chartData$.pipe(
       map(data => data.length > 0 ? Math.max(...data.map(d => d.count)) || 1 : 1)
+    );
+
+    this.categoriesStats$ = this.birthdayService.birthdays$.pipe(
+      map(birthdays => {
+        const stats = BIRTHDAY_CATEGORIES.map(category => ({
+          ...category,
+          count: birthdays.filter(b => (b.category || DEFAULT_CATEGORY) === category.id).length
+        })).filter(stat => stat.count > 0);
+        return stats;
+      })
     );
   }
 

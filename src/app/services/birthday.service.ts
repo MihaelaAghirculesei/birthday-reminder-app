@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, map, firstValueFrom } from 'rxjs';
 import { Birthday } from '../models/birthday.model';
 import { MONTHS } from '../shared/constants';
 import { getZodiacSign } from '../shared/utils/zodiac.util';
+import { DEFAULT_CATEGORY } from '../shared/constants/categories';
 import { IndexedDBStorageService } from './offline-storage.service';
 import { NetworkService } from './network.service';
 import { GoogleCalendarService } from './google-calendar.service';
@@ -20,19 +21,22 @@ export class BirthdayService {
 
   private searchTermSubject = new BehaviorSubject<string>('');
   private selectedMonthSubject = new BehaviorSubject<number | null>(null);
+  private selectedCategorySubject = new BehaviorSubject<string | null>(null);
   private sortOrderSubject = new BehaviorSubject<string>('name');
 
   public searchTerm$ = this.searchTermSubject.asObservable();
   public selectedMonth$ = this.selectedMonthSubject.asObservable();
+  public selectedCategory$ = this.selectedCategorySubject.asObservable();
   public sortOrder$ = this.sortOrderSubject.asObservable();
 
   public filteredBirthdays$ = combineLatest([
     this.birthdays$,
     this.searchTerm$,
     this.selectedMonth$,
+    this.selectedCategory$,
     this.sortOrder$
   ]).pipe(
-    map(([birthdays, searchTerm, selectedMonth, sortOrder]) => {
+    map(([birthdays, searchTerm, selectedMonth, selectedCategory, sortOrder]) => {
       let filtered = [...birthdays];
 
       if (searchTerm.trim()) {
@@ -44,6 +48,12 @@ export class BirthdayService {
       if (selectedMonth !== null) {
         filtered = filtered.filter(birthday =>
           birthday.birthDate.getMonth() === selectedMonth
+        );
+      }
+
+      if (selectedCategory !== null) {
+        filtered = filtered.filter(birthday =>
+          (birthday.category || DEFAULT_CATEGORY) === selectedCategory
         );
       }
 
@@ -81,7 +91,9 @@ export class BirthdayService {
   async addBirthday(birthday: Omit<Birthday, 'id'>): Promise<void> {
     const newBirthday: Birthday = {
       ...birthday,
-      id: this.generateId()
+      id: this.generateId(),
+      category: birthday.category || DEFAULT_CATEGORY,
+      zodiacSign: birthday.zodiacSign || getZodiacSign(birthday.birthDate).name
     };
     
     if (this.googleCalendarService.isEnabled()) {
@@ -188,9 +200,14 @@ export class BirthdayService {
     this.sortOrderSubject.next(order);
   }
 
+  setSelectedCategory(category: string | null): void {
+    this.selectedCategorySubject.next(category);
+  }
+
   clearFilters(): void {
     this.searchTermSubject.next('');
     this.selectedMonthSubject.next(null);
+    this.selectedCategorySubject.next(null);
     this.setSortOrder('name');
   }
 
@@ -392,6 +409,7 @@ export class BirthdayService {
         birthDate: new Date(1985, 0, 15),
         notes: 'Loves pizza and soccer',
         reminderDays: 7,
+        category: 'friends',
         photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -399,6 +417,7 @@ export class BirthdayService {
         birthDate: new Date(1991, 0, 18),
         notes: 'Teacher and book lover',
         reminderDays: 3,
+        category: 'colleagues',
         photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -406,6 +425,7 @@ export class BirthdayService {
         birthDate: new Date(1988, 0, 25),
         notes: 'Musician and photographer',
         reminderDays: 5,
+        category: 'friends',
         photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -413,6 +433,7 @@ export class BirthdayService {
         birthDate: new Date(1987, 0, 29),
         notes: 'Designer and artist',
         reminderDays: 5,
+        category: 'romantic',
         photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -420,6 +441,7 @@ export class BirthdayService {
         birthDate: new Date(1995, 4, 8),
         notes: 'Chef and foodie',
         reminderDays: 7,
+        category: 'family',
         photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -427,6 +449,7 @@ export class BirthdayService {
         birthDate: new Date(1990, 4, 15),
         notes: 'Software developer',
         reminderDays: 14,
+        category: 'colleagues',
         photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -434,6 +457,7 @@ export class BirthdayService {
         birthDate: new Date(1993, 4, 25),
         notes: 'Doctor and runner',
         reminderDays: 10,
+        category: 'acquaintances',
         photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -441,6 +465,7 @@ export class BirthdayService {
         birthDate: new Date(1992, 8, 12),
         notes: 'Travel enthusiast',
         reminderDays: 3,
+        category: 'friends',
         photo: undefined
       },
       {
@@ -448,6 +473,7 @@ export class BirthdayService {
         birthDate: new Date(1994, 8, 22),
         notes: 'Lawyer and yoga lover',
         reminderDays: 5,
+        category: 'family',
         photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=300&fit=crop&crop=face'
       },
       {
@@ -455,6 +481,7 @@ export class BirthdayService {
         birthDate: new Date(1989, 11, 10),
         notes: 'Engineer and cyclist',
         reminderDays: 7,
+        category: 'other',
         photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=300&h=300&fit=crop&crop=face'
       }
     ];
