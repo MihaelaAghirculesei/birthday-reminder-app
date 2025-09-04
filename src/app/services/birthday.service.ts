@@ -290,6 +290,7 @@ export class BirthdayService {
   private async migrateFromLocalStorage(): Promise<void> {
     try {
       const stored = localStorage.getItem('birthdays');
+      
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
@@ -303,7 +304,6 @@ export class BirthdayService {
           });
           
           await this.offlineStorage.saveBirthdays(this.birthdays);
-          
           localStorage.removeItem('birthdays');
         }
       }
@@ -369,6 +369,98 @@ export class BirthdayService {
         };
         this.pendingChanges.push(changeFunction);
       }
+    }
+  }
+
+  async clearAllBirthdays(): Promise<void> {
+    this.birthdays = [];
+    this.updateBirthdaysSubject();
+    
+    try {
+      await this.offlineStorage.clear();
+      localStorage.removeItem('birthdays');
+    } catch (error) {
+      console.warn('Error clearing birthdays:', error);
+      localStorage.removeItem('birthdays');
+    }
+  }
+
+  async addTestBirthdays(): Promise<void> {
+    const testBirthdays = [
+      {
+        name: 'Marcus Ross',
+        birthDate: new Date(1985, 0, 15),
+        notes: 'Loves pizza and soccer',
+        reminderDays: 7,
+        photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Claire Rice',
+        birthDate: new Date(1991, 0, 18),
+        notes: 'Teacher and book lover',
+        reminderDays: 3,
+        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Alexander Green',
+        birthDate: new Date(1988, 0, 25),
+        notes: 'Musician and photographer',
+        reminderDays: 5,
+        photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Valentina Roman',
+        birthDate: new Date(1987, 0, 29),
+        notes: 'Designer and artist',
+        reminderDays: 5,
+        photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Sofia Black',
+        birthDate: new Date(1995, 4, 8),
+        notes: 'Chef and foodie',
+        reminderDays: 7,
+        photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Lorenzo Ferrari',
+        birthDate: new Date(1990, 4, 15),
+        notes: 'Software developer',
+        reminderDays: 14,
+        photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Frank White',
+        birthDate: new Date(1993, 4, 25),
+        notes: 'Doctor and runner',
+        reminderDays: 10,
+        photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Julia White',
+        birthDate: new Date(1992, 8, 12),
+        notes: 'Travel enthusiast',
+        reminderDays: 3,
+        photo: undefined
+      },
+      {
+        name: 'Elena Gallo',
+        birthDate: new Date(1994, 8, 22),
+        notes: 'Lawyer and yoga lover',
+        reminderDays: 5,
+        photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'David Moretti',
+        birthDate: new Date(1989, 11, 10),
+        notes: 'Engineer and cyclist',
+        reminderDays: 7,
+        photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=300&h=300&fit=crop&crop=face'
+      }
+    ];
+
+    for (const testBirthday of testBirthdays) {
+      await this.addBirthday(testBirthday);
     }
   }
 }

@@ -37,6 +37,7 @@ export class AppComponent implements OnInit {
   birthdays$: Observable<Birthday[]>;
   filteredBirthdays$: Observable<Birthday[]>;
   selectedPhoto: string | null = null;
+  isAddingTestData = false;
 
   searchTerm$ = this.birthdayService.searchTerm$;
   selectedMonth$ = this.birthdayService.selectedMonth$;
@@ -121,6 +122,15 @@ export class AppComponent implements OnInit {
   getMonthName(monthIndex: number | null): string {
     if (monthIndex === null || monthIndex < 0) return '';
     return this.months[monthIndex] || '';
+  }
+
+  async addTestData(): Promise<void> {
+    this.isAddingTestData = true;
+    try {
+      await this.birthdayService.addTestBirthdays();
+    } finally {
+      this.isAddingTestData = false;
+    }
   }
 
   private pastDateValidator(control: any) {

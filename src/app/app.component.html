@@ -12,6 +12,26 @@
 
   <div class="content-container">
     <app-dashboard *ngIf="(birthdays$ | async)?.length"></app-dashboard>
+    
+    <div class="test-data-section" *ngIf="(birthdays$ | async)?.length === 0">
+      <mat-card class="test-data-card">
+        <mat-card-content>
+          <div class="test-data-content">
+            <mat-icon class="test-icon">groups</mat-icon>
+            <div class="test-info">
+              <h3>Want to explore the app?</h3>
+              <p>Add some sample birthdays to discover all the dashboard features</p>
+            </div>
+            <button mat-raised-button color="primary" (click)="addTestData()" [disabled]="isAddingTestData" class="add-test-btn">
+              <mat-icon *ngIf="!isAddingTestData">visibility</mat-icon>
+              <mat-progress-spinner *ngIf="isAddingTestData" diameter="20" mode="indeterminate"></mat-progress-spinner>
+              {{ isAddingTestData ? 'Loading...' : 'Show Demo' }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
     <div class="content-sections">
       <mat-card class="add-birthday-card">
         <mat-card-header>
@@ -156,7 +176,7 @@
                      [src]="birthday.photo" 
                      [alt]="birthday.name"
                      class="contact-photo-small">
-                <mat-icon *ngIf="!birthday.photo" color="primary" class="default-avatar">person</mat-icon>
+                <mat-icon *ngIf="!birthday.photo" color="primary" class="default-avatar">face</mat-icon>
               </div>
               
               <div class="birthday-content">
