@@ -85,6 +85,18 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
             </div>
           </mat-card-content>
         </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-card-content>
+            <div class="stat-content">
+              <mat-icon class="stat-icon upcoming">event</mat-icon>
+              <div class="stat-info">
+                <div class="stat-number">{{ nextBirthdayText$ | async }}</div>
+                <div class="stat-label">Next Birthday</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
 
       <div class="content-row">
@@ -122,9 +134,11 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                           <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign" class="dashboard-zodiac-inline"></zodiac-icon>
                         </div>
                       </div>
-                      <mat-chip [class]="getDaysChipClass(birthday.daysUntil)">
-                        {{ getDaysText(birthday.daysUntil) }}
-                      </mat-chip>
+                      <div class="birthday-days-circle" [class]="getDaysChipClass(birthday.daysUntil)">
+                        <div class="days-circle-content">
+                          <div class="days-number">{{ getDaysText(birthday.daysUntil) }}</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
@@ -215,7 +229,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           </button>
         </div>
         
-        <!-- Lista filtrata in stile dashboard -->
         <div class="filtered-dashboard-grid" *ngIf="selectedCategory && (birthdayService.filteredBirthdays$ | async)?.length! > 0">
           <div *ngFor="let birthday of getSortedFilteredBirthdays(birthdayService.filteredBirthdays$ | async)" class="filtered-birthday-card">
             <div class="filtered-card-content">
@@ -415,6 +428,11 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           background: linear-gradient(135deg, var(--accent));
           color: var(--text-inverse);
           box-shadow: 0 8px 16px rgba(79, 172, 254, 0.3);
+        }
+        &.upcoming { 
+          background: linear-gradient(135deg, var(--warning));
+          color: var(--text-inverse);
+          box-shadow: 0 8px 16px rgba(252, 70, 107, 0.3);
         }
       }
       
@@ -791,6 +809,208 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       left: 240px;
       right: 0;
       border-color: var(--border-light) !important;
+    }
+    
+    .birthday-days-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.9rem;
+      color: white;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: visible;
+      flex-shrink: 0;
+      cursor: pointer;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border-radius: 50%;
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 0;
+      }
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+        border-radius: 50%;
+        z-index: 1;
+      }
+      
+      .days-circle-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+      
+      .days-number {
+        font-size: 0.9rem;
+        font-weight: 900;
+        line-height: 1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        letter-spacing: -0.5px;
+      }
+      
+      &.red-alert { 
+        background: radial-gradient(circle, #ff4757 0%, #ff3742 40%, #c23616 100%);
+        animation: red-alert-attention 1.5s infinite;
+        box-shadow: 0 0 35px rgba(255, 71, 87, 0.9), 
+                    0 0 70px rgba(255, 71, 87, 0.5),
+                    0 0 100px rgba(255, 71, 87, 0.2),
+                    inset 0 2px 10px rgba(255,255,255,0.4);
+        
+        &::before {
+          background: radial-gradient(circle, rgba(255, 71, 87, 0.7) 0%, transparent 70%);
+          animation: red-ring-pulse 2s infinite;
+          opacity: 1;
+        }
+        
+        .days-number {
+          animation: red-text-glow 2s infinite;
+          font-weight: 900;
+        }
+      }
+      
+      &.orange-warning { 
+        background: radial-gradient(circle, #ff9500 0%, #ff7675 40%, #e17055 100%);
+        animation: orange-warning-attention 2.5s infinite;
+        box-shadow: 0 0 25px rgba(255, 149, 0, 0.7),
+                    0 0 50px rgba(255, 149, 0, 0.3),
+                    inset 0 2px 8px rgba(255,255,255,0.3);
+        
+        &::before {
+          background: radial-gradient(circle, rgba(255, 149, 0, 0.5) 0%, transparent 70%);
+          animation: orange-ring-pulse 3s infinite;
+        }
+      }
+      
+      &.green-safe { 
+        background: radial-gradient(circle, #00b894 0%, #00a085 40%, #00cec9 100%);
+        animation: green-calm-glow 4s infinite;
+        box-shadow: 0 0 15px rgba(0, 184, 148, 0.5),
+                    0 0 30px rgba(0, 184, 148, 0.2),
+                    inset 0 2px 8px rgba(255,255,255,0.3);
+        
+        &::before {
+          background: radial-gradient(circle, rgba(0, 184, 148, 0.3) 0%, transparent 70%);
+          animation: green-ring-pulse 4s infinite;
+        }
+      }
+      
+      &:hover {
+        transform: scale(1.15) rotate(5deg);
+        
+        &.red-alert { 
+          transform: scale(1.25) rotate(10deg);
+          box-shadow: 0 0 50px rgba(255, 71, 87, 1), 
+                      0 0 100px rgba(255, 71, 87, 0.6);
+        }
+        &.orange-warning { 
+          transform: scale(1.18) rotate(6deg);
+          box-shadow: 0 0 35px rgba(255, 149, 0, 0.8);
+        }
+        &.green-safe { 
+          transform: scale(1.12) rotate(3deg);
+          box-shadow: 0 0 25px rgba(0, 184, 148, 0.6);
+        }
+      }
+    }
+    
+    @keyframes red-alert-attention {
+      0%, 100% { 
+        transform: scale(1) rotate(0deg);
+        box-shadow: 0 0 35px rgba(255, 71, 87, 0.9), 
+                    0 0 70px rgba(255, 71, 87, 0.5),
+                    0 0 100px rgba(255, 71, 87, 0.2);
+      }
+      25% { 
+        transform: scale(1.08) rotate(3deg);
+        box-shadow: 0 0 45px rgba(255, 71, 87, 1), 
+                    0 0 90px rgba(255, 71, 87, 0.6),
+                    0 0 120px rgba(255, 71, 87, 0.3);
+      }
+      50% { 
+        transform: scale(1.04) rotate(-2deg);
+        box-shadow: 0 0 40px rgba(255, 71, 87, 0.95), 
+                    0 0 80px rgba(255, 71, 87, 0.5),
+                    0 0 110px rgba(255, 71, 87, 0.25);
+      }
+      75% { 
+        transform: scale(1.06) rotate(2deg);
+        box-shadow: 0 0 42px rgba(255, 71, 87, 0.98), 
+                    0 0 85px rgba(255, 71, 87, 0.55),
+                    0 0 115px rgba(255, 71, 87, 0.28);
+      }
+    }
+    
+    @keyframes orange-warning-attention {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 25px rgba(255, 149, 0, 0.7),
+                    0 0 50px rgba(255, 149, 0, 0.3);
+      }
+      50% { 
+        transform: scale(1.04);
+        box-shadow: 0 0 32px rgba(255, 149, 0, 0.8),
+                    0 0 65px rgba(255, 149, 0, 0.4);
+      }
+    }
+    
+    @keyframes green-calm-glow {
+      0%, 100% { 
+        box-shadow: 0 0 15px rgba(0, 184, 148, 0.5),
+                    0 0 30px rgba(0, 184, 148, 0.2);
+      }
+      50% { 
+        box-shadow: 0 0 20px rgba(0, 184, 148, 0.6),
+                    0 0 40px rgba(0, 184, 148, 0.3);
+      }
+    }
+    
+    @keyframes red-ring-pulse {
+      0%, 100% { opacity: 0; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.5); }
+    }
+    
+    @keyframes orange-ring-pulse {
+      0%, 100% { opacity: 0; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+    
+    @keyframes green-ring-pulse {
+      0%, 100% { opacity: 0; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    
+    @keyframes red-text-glow {
+      0%, 100% { 
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      }
+      50% { 
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4), 
+                     0 0 12px rgba(255,255,255,0.9),
+                     0 0 20px rgba(255, 71, 87, 0.6);
+      }
     }
 
     @media (max-width: 1200px) {
@@ -1482,15 +1702,13 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           font-size: 0.9rem;
         }
         
-        mat-chip {
-          font-size: 0.8rem !important;
-          padding: 6px 4px !important;
-          min-width: 65px !important;
-          width: 65px !important;
-          text-align: center !important;
-          display: inline-flex !important;
-          justify-content: center !important;
-          align-items: center !important;
+        .birthday-days-circle {
+          width: 70px;
+          height: 70px;
+          
+          .days-number {
+            font-size: 0.8rem;
+          }
         }
       }
 
@@ -1578,13 +1796,13 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       }
 
       .dashboard-birthday-info {
-        mat-chip {
-          min-width: 75px !important;
-          width: 75px !important;
-          text-align: center !important;
-          display: inline-flex !important;
-          justify-content: center !important;
-          align-items: center !important;
+        .birthday-days-circle {
+          width: 65px;
+          height: 65px;
+          
+          .days-number {
+            font-size: 0.75rem;
+          }
         }
       }
 
@@ -1616,6 +1834,7 @@ export class DashboardComponent implements OnInit {
   averageAge$: Observable<number>;
   next5Birthdays$: Observable<any[]>;
   nextBirthdayDays$: Observable<number>;
+  nextBirthdayText$: Observable<string>;
   chartData$: Observable<any[]>;
   maxCount$: Observable<number>;
   categoriesStats$: Observable<any[]>;
@@ -1646,6 +1865,16 @@ export class DashboardComponent implements OnInit {
       map(birthdays => birthdays.length > 0 ? birthdays[0].daysUntil : 0)
     );
 
+    this.nextBirthdayText$ = this.next5Birthdays$.pipe(
+      map(birthdays => {
+        if (birthdays.length === 0) return 'None';
+        const days = birthdays[0].daysUntil;
+        if (days === 0) return 'Today!';
+        if (days === 1) return 'Tomorrow';
+        return `${days} days`;
+      })
+    );
+
     this.chartData$ = this.birthdayService.birthdays$.pipe(
       map(() => this.birthdayService.getBirthdaysByMonth())
     );
@@ -1674,11 +1903,11 @@ export class DashboardComponent implements OnInit {
   }
 
   getDaysChipClass(days: number): string {
-    if (days === 0) return 'today';
-    if (days === 1) return 'tomorrow';
-    if (days <= 7) return 'soon';
-    return 'later';
+    if (days <= 7) return 'red-alert';    
+    if (days <= 30) return 'orange-warning'; 
+    return 'green-safe';                      
   }
+
 
   getBarHeight(count: number, maxCount: number | null): number {
     const max = maxCount || 1;
