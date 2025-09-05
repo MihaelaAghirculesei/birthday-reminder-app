@@ -8,19 +8,19 @@ export interface BirthdayCategory {
 export const BIRTHDAY_CATEGORIES: BirthdayCategory[] = [
   {
     id: 'family',
-    name: 'Famiglia',
+    name: 'Family',
     icon: 'family_restroom',
     color: '#4CAF50'
   },
   {
     id: 'friends',
-    name: 'Amici',
+    name: 'Friends',
     icon: 'groups',
     color: '#2196F3'
   },
   {
     id: 'colleagues',
-    name: 'Colleghi',
+    name: 'Colleagues',
     icon: 'business_center',
     color: '#FF9800'
   },
@@ -32,13 +32,13 @@ export const BIRTHDAY_CATEGORIES: BirthdayCategory[] = [
   },
   {
     id: 'acquaintances',
-    name: 'Conoscenti',
+    name: 'Acquaintances',
     icon: 'handshake',
     color: '#9C27B0'
   },
   {
     id: 'other',
-    name: 'Altro',
+    name: 'Other',
     icon: 'stars',
     color: '#607D8B'
   }

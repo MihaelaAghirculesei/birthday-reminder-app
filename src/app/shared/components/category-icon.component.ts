@@ -79,6 +79,6 @@ export class CategoryIconComponent {
   }
 
   get categoryName(): string {
-    return getCategoryById(this.categoryId)?.name || 'Sconosciuto';
+    return getCategoryById(this.categoryId)?.name || 'Unknown';
   }
 }

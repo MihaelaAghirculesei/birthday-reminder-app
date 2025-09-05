@@ -23,10 +23,19 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
   ],
   template: `
     <div class="dashboard-container">
-      <h2 class="dashboard-title">
-        <calendar-icon size="48" strokeWidth="2" cssClass="hero-icon"></calendar-icon>
-        Dashboard & Statistics
-      </h2>
+      <div class="dashboard-section">
+        <div class="dashboard-section-header">
+          <div class="dashboard-section-title-wrapper">
+            <h3 class="dashboard-section-title">
+              <div class="dashboard-title-icon-wrapper">
+                <calendar-icon size="38" strokeWidth="2" cssClass="dashboard-hero-icon"></calendar-icon>
+              </div>
+              Dashboard & Statistics
+            </h3>
+            <p class="dashboard-section-subtitle">Overview of your birthday collection</p>
+          </div>
+        </div>
+      </div>
 
       <div class="stats-row">
         <mat-card class="stat-card">
@@ -154,17 +163,69 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       </div>
 
       <div class="categories-section" *ngIf="(categoriesStats$ | async)?.length! > 0">
-        <h3 class="section-title">
-          <mat-icon>category</mat-icon>
-          Categories Overview
-        </h3>
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <h3 class="section-title">
+              <div class="title-icon-wrapper">
+                <mat-icon>category</mat-icon>
+              </div>
+              Categories Overview
+            </h3>
+            <p class="section-subtitle">Click any category to filter your birthdays</p>
+          </div>
+          <button *ngIf="selectedCategory" 
+                  mat-fab 
+                  color="primary" 
+                  class="clear-all-btn"
+                  (click)="clearCategoryFilter()"
+                  matTooltip="Clear all filters">
+            <mat-icon>clear_all</mat-icon>
+          </button>
+        </div>
+        
         <div class="categories-grid">
-          <div *ngFor="let categoryStats of categoriesStats$ | async" class="category-stat-card">
+          <div *ngFor="let categoryStats of categoriesStats$ | async" 
+               class="category-stat-card"
+               [class.selected]="isCategorySelected(categoryStats.id)"
+               (click)="selectCategory(categoryStats.id)">
+            <div class="category-card-background"></div>
             <div class="category-stat-content">
-              <category-icon [categoryId]="categoryStats.id" cssClass="category-stat-icon"></category-icon>
+              <div class="category-icon-section">
+                <category-icon [categoryId]="categoryStats.id" cssClass="category-stat-icon"></category-icon>
+                <div class="selection-indicator" *ngIf="isCategorySelected(categoryStats.id)">
+                  <mat-icon>check_circle</mat-icon>
+                </div>
+              </div>
               <div class="category-stat-info">
                 <div class="category-stat-name">{{ categoryStats.name }}</div>
-                <div class="category-stat-count">{{ categoryStats.count }} persone</div>
+                <div class="category-stat-count">{{ categoryStats.count }} {{ categoryStats.count === 1 ? 'person' : 'people' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="filter-info" *ngIf="selectedCategory">
+          <div class="filter-text">
+            <mat-icon>filter_alt</mat-icon>
+            Showing {{ (birthdayService.filteredBirthdays$ | async)?.length }} birthdays from selected category
+          </div>
+          <button mat-stroked-button (click)="clearCategoryFilter()" class="clear-filter-btn">
+            <mat-icon>clear</mat-icon>
+            Clear Filter
+          </button>
+        </div>
+        
+        <!-- Lista filtrata in stile dashboard -->
+        <div class="filtered-dashboard-grid" *ngIf="selectedCategory && (birthdayService.filteredBirthdays$ | async)?.length! > 0">
+          <div *ngFor="let birthday of getSortedFilteredBirthdays(birthdayService.filteredBirthdays$ | async)" class="filtered-birthday-card">
+            <div class="filtered-card-content">
+              <div class="filtered-name-section">
+                <span class="filtered-name">{{ birthday.name }}</span>
+                <span class="filtered-date">{{ birthday.birthDate | date:'MMM dd' }}</span>
+              </div>
+              <div class="filtered-icons-section">
+                <category-icon [categoryId]="birthday.category || defaultCategory" class="filtered-category-icon"></category-icon>
+                <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign" class="filtered-zodiac-icon"></zodiac-icon>
               </div>
             </div>
           </div>
@@ -211,28 +272,68 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       animation: fadeInUp 0.8s ease-out;
     }
 
-    .dashboard-title {
+    .dashboard-section {
+      margin-bottom: 32px;
+      position: relative;
+    }
+    
+    .dashboard-section-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 32px;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -16px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+        border-radius: 1px;
+      }
+    }
+    
+    .dashboard-section-title-wrapper {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .dashboard-section-title {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 16px;
-      margin-bottom: 40px;
-      font-size: 2.5rem;
+      font-size: 2rem;
       font-weight: 800;
-      background: linear-gradient(135deg, var(--text-inverse) 0%, rgba(255,255,255,0.8) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      text-align: center;
-
-      mat-icon {
-        font-size: 3rem;
-        width: 3rem;
-        height: 3rem;
-        color: rgba(255,255,255,0.9);
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      color: var(--text-inverse);
+      margin: 0 0 8px 0;
+      letter-spacing: -0.02em;
+    }
+    
+    .dashboard-title-icon-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+      
+      .dashboard-hero-icon {
+        color: rgb(30,41,59);
       }
+    }
+    
+    .dashboard-section-subtitle {
+      color: var(--text-inverse);
+      font-size: 1rem;
+      margin: 0;
+      font-weight: 500;
+      opacity: 0.9;
     }
 
     .stats-row {
@@ -701,23 +802,91 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
     
     .categories-section {
       margin-top: 32px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -16px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+        border-radius: 1px;
+      }
+    }
+    
+    .section-title-wrapper {
+      flex: 1;
+      text-align: center;
     }
     
     .section-title {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 24px;
+      justify-content: center;
+      gap: 16px;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-inverse);
+      margin: 0 0 8px 0;
+      letter-spacing: -0.02em;
+    }
+    
+    .title-icon-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
       
       mat-icon {
-        color: var(--primary);
-        font-size: 1.8rem;
-        width: 1.8rem;
-        height: 1.8rem;
+        color: white;
+        font-size: 38px;
+        width: 38px;
+        height: 38px;
       }
+    }
+    
+    .section-subtitle {
+      color: var(--text-inverse);
+      font-size: 1rem;
+      margin: 0;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+    
+    .clear-all-btn {
+      position: relative;
+      background: linear-gradient(135deg, var(--warning) 0%, #ff6b6b 100%) !important;
+      box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3) !important;
+      animation: pulse-warning 2s infinite;
+      
+      mat-icon {
+        color: white !important;
+      }
+      
+      &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4) !important;
+      }
+    }
+    
+    @keyframes pulse-warning {
+      0%, 100% { box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3); }
+      50% { box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5); }
     }
     
     .categories-grid {
@@ -729,45 +898,319 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
     
     .category-stat-card {
       background: var(--surface) !important;
-      border-radius: var(--radius) !important;
-      box-shadow: var(--shadow) !important;
-      border: 1px solid var(--border-light) !important;
-      padding: 16px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 20px !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important;
+      border: 2px solid transparent !important;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
       
       &:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-elevated) !important;
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.15) !important;
+        border-color: var(--primary) !important;
+        
+        &::before {
+          opacity: 1;
+        }
+        
+        .category-card-background {
+          transform: scale(1.1);
+          opacity: 0.15;
+        }
+      }
+      
+      &.selected {
+        border: 2px solid var(--primary) !important;
+        background: linear-gradient(135deg, var(--primary-light) 0%, rgba(102, 126, 234, 0.05) 100%) !important;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25) !important;
+        transform: translateY(-4px) scale(1.05);
+        
+        &::before {
+          opacity: 1;
+        }
+        
+        .category-stat-name {
+          color: var(--primary);
+          font-weight: 800;
+        }
+        
+        .category-card-background {
+          opacity: 0.2;
+          transform: scale(1.2);
+        }
       }
     }
     
+    .category-card-background {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0.05;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 0;
+    }
+    
     .category-stat-content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
       display: flex;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .category-icon-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
     }
     
     .category-stat-icon {
-      font-size: 32px !important;
-      width: 32px !important;
-      height: 32px !important;
+      font-size: 48px !important;
+      width: 48px !important;
+      height: 48px !important;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+    
+    .selection-indicator {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--success);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      
+      mat-icon {
+        color: white !important;
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+      }
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0) rotate(180deg); opacity: 0; }
+      50% { transform: scale(1.3) rotate(90deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
     
     .category-stat-info {
       flex: 1;
+      text-align: left;
     }
     
     .category-stat-name {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 1.125rem;
+      font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
     }
     
     .category-stat-count {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      opacity: 0.8;
+      text-transform: lowercase;
+      
+      &::first-letter {
+        text-transform: uppercase;
+      }
+    }
+    
+    .filter-icon {
+      color: var(--primary) !important;
+      font-size: 24px !important;
+      width: 24px !important;
+      height: 24px !important;
+      animation: checkmark 0.3s ease-in-out;
+    }
+    
+    @keyframes checkmark {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    .filter-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--primary-light);
+      border: 1px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .filter-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      font-weight: 600;
+      
+      mat-icon {
+        color: var(--primary) !important;
+      }
+    }
+    
+    .clear-filter-btn {
+      color: var(--primary) !important;
+      border-color: var(--primary) !important;
+      
+      mat-icon {
+        margin-right: 4px;
+      }
+      
+      &:hover {
+        background: var(--primary) !important;
+        color: white !important;
+      }
+    }
+    
+    .filtered-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+      animation: slideInUp 0.5s ease-out;
+    }
+    
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .filtered-birthday-card {
+      background: var(--surface) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow) !important;
+      border: 1px solid var(--border-light) !important;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+      
+      &:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: var(--shadow-elevated) !important;
+        
+        &::before {
+          transform: scaleX(1);
+        }
+      }
+    }
+    
+    .filtered-card-content {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      height: 100%;
+    }
+    
+    .filtered-name-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    
+    .filtered-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    
+    .filtered-date {
       font-size: 0.875rem;
       color: var(--text-secondary);
-      font-weight: 500;
+      font-weight: 600;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .filtered-icons-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .filtered-category-icon {
+      font-size: 48px !important;
+      width: 48px !important;
+      height: 48px !important;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+    
+    .filtered-zodiac-icon {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 32px !important;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
     }
 
     .sync-row {
@@ -1176,12 +1619,13 @@ export class DashboardComponent implements OnInit {
   chartData$: Observable<any[]>;
   maxCount$: Observable<number>;
   categoriesStats$: Observable<any[]>;
+  selectedCategory: string | null = null;
   currentMonth = new Date().getMonth();
   defaultCategory = DEFAULT_CATEGORY;
   isAddingTestData = false;
   isClearingData = false;
 
-  constructor(private birthdayService: BirthdayService) {
+  constructor(public birthdayService: BirthdayService) {
     this.totalBirthdays$ = this.birthdayService.birthdays$.pipe(
       map(birthdays => birthdays.length)
     );
@@ -1262,5 +1706,26 @@ export class DashboardComponent implements OnInit {
     } finally {
       this.isClearingData = false;
     }
+  }
+
+  selectCategory(categoryId: string): void {
+    this.selectedCategory = this.selectedCategory === categoryId ? null : categoryId;
+    this.birthdayService.setSelectedCategory(this.selectedCategory);
+  }
+
+  clearCategoryFilter(): void {
+    this.selectedCategory = null;
+    this.birthdayService.setSelectedCategory(null);
+  }
+
+  isCategorySelected(categoryId: string): boolean {
+    return this.selectedCategory === categoryId;
+  }
+
+  getSortedFilteredBirthdays(birthdays: any[] | null): any[] {
+    if (!birthdays) return [];
+    
+    return this.birthdayService.getNext5Birthdays()
+      .filter(b => birthdays.some(filtered => filtered.id === b.id));
   }
 }
