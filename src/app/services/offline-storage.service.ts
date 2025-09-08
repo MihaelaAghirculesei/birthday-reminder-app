@@ -66,10 +66,8 @@ export class IndexedDBStorageService implements OfflineStorageService {
         const transaction = db.transaction([this.storeName], 'readwrite');
         const store = transaction.objectStore(this.storeName);
 
-        // Clear existing data
         store.clear();
 
-        // Add all birthdays
         birthdays.forEach(birthday => {
           store.add({
             ...birthday,

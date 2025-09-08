@@ -99,82 +99,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         </mat-card>
       </div>
 
-      <div class="content-row">
-        <mat-card class="next-birthdays-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>upcoming</mat-icon>
-              Next 5 Birthdays
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div *ngIf="(next5Birthdays$ | async)?.length === 0; else birthdaysList" class="no-data">
-              <mat-icon>cake</mat-icon>
-              <p>No upcoming birthdays</p>
-            </div>
-            
-            <ng-template #birthdaysList>
-              <div class="dashboard-birthday-list">
-                <div *ngFor="let birthday of next5Birthdays$ | async; let last = last" class="dashboard-birthday-item">
-                  <div class="dashboard-avatar">
-                    <img *ngIf="birthday.photo" 
-                         [src]="birthday.photo" 
-                         [alt]="birthday.name"
-                         class="dashboard-photo">
-                    <mat-icon *ngIf="!birthday.photo" color="primary" class="dashboard-default-icon">face</mat-icon>
-                  </div>
-                  
-                  <div class="dashboard-birthday-content">
-                    <div class="dashboard-name">{{ birthday.name }}</div>
-                    <div class="dashboard-birthday-info">
-                      <div class="dashboard-date-section">
-                        <span class="dashboard-date">{{ birthday.birthDate | date:'MMM dd' }}</span>
-                        <div class="dashboard-icons">
-                          <category-icon [categoryId]="birthday.category || defaultCategory" class="dashboard-category-inline"></category-icon>
-                          <zodiac-icon [zodiacSign]="birthday.zodiacSign" *ngIf="birthday.zodiacSign" class="dashboard-zodiac-inline"></zodiac-icon>
-                        </div>
-                      </div>
-                      <div class="birthday-days-circle" [class]="getDaysChipClass(birthday.daysUntil)">
-                        <div class="days-circle-content">
-                          <div class="days-number">{{ getDaysText(birthday.daysUntil) }}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <mat-divider *ngIf="!last" class="dashboard-divider"></mat-divider>
-                </div>
-              </div>
-            </ng-template>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="chart-card">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>bar_chart</mat-icon>
-              Birthdays by Month
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="chart-container">
-              <div *ngFor="let monthData of chartData$ | async" class="chart-bar">
-                <div class="bar-container">
-                  <div class="bar" 
-                       [style.height.%]="getBarHeight(monthData.count, maxCount$ | async)"
-                       [class.current-month]="monthData.monthIndex === currentMonth">
-                  </div>
-                  <div class="bar-value" *ngIf="monthData.count > 0">{{ monthData.count }}</div>
-                </div>
-                <div class="bar-label">{{ monthData.month }}</div>
-              </div>
-            </div>
-            <div class="chart-legend" *ngIf="(totalBirthdays$ | async) === 0">
-              <p class="no-data-text">Add some birthdays to see the chart!</p>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
 
       <div class="categories-section" *ngIf="(categoriesStats$ | async)?.length! > 0">
         <div class="section-header">
@@ -245,8 +169,100 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         </div>
       </div>
 
+      <div class="full-width-section" *ngIf="(allBirthdays$ | async)?.length! > 0">
+        <mat-card class="birthday-list-card">
+          <mat-card-header>
+            <mat-card-title>📅 All Upcoming Birthdays</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="dashboard-birthday-list scrollable">
+              <div *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday" 
+                   class="dashboard-birthday-item"
+                   tabindex="0">
+                
+                <div class="dashboard-avatar" *ngIf="birthday.photoUrl">
+                  <img [src]="birthday.photoUrl" [alt]="birthday.name" class="dashboard-photo">
+                </div>
+                <div class="dashboard-avatar" *ngIf="!birthday.photoUrl">
+                  <mat-icon class="dashboard-default-icon">person</mat-icon>
+                </div>
+                
+                <div class="dashboard-birthday-content">
+                  <div class="dashboard-birthday-info">
+                    <div class="dashboard-name">{{ birthday.name }}</div>
+                    <div class="dashboard-age">{{ getAge(birthday.birthDate) }} years old</div>
+                  </div>
+                  
+                  <div class="dashboard-birthday-details">
+                    <div class="dashboard-birth-date">
+                      <mat-icon class="small-icon">cake</mat-icon>
+                      {{ birthday.birthDate | date:'EEEE, MMMM dd, yyyy' }}
+                    </div>
+                    <div class="dashboard-notes" *ngIf="birthday.notes">
+                      <mat-icon class="small-icon">note</mat-icon>
+                      {{ birthday.notes }}
+                    </div>
+                  </div>
+                  
+                  <div class="dashboard-icons">
+                    <category-icon [categoryId]="birthday.category || defaultCategory" 
+                                   cssClass="dashboard-category-inline"></category-icon>
+                    <zodiac-icon [zodiacSign]="birthday.zodiacSign" 
+                                 *ngIf="birthday.zodiacSign" 
+                                 cssClass="dashboard-zodiac-inline"></zodiac-icon>
+                  </div>
+                </div>
+                
+                <div class="dashboard-actions">
+                  <div class="birthday-days-circle"
+                       [class]="getDaysChipClass(birthday.daysUntil)">
+                    <div class="days-circle-content">
+                      <div class="days-number">{{ getDaysText(birthday.daysUntil) }}</div>
+                    </div>
+                  </div>
+                  
+                  <button mat-icon-button 
+                          color="warn" 
+                          (click)="deleteBirthday(birthday)"
+                          class="delete-button-circle"
+                          matTooltip="Delete birthday">
+                    <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
       <div class="sync-row">
         <app-google-calendar-sync></app-google-calendar-sync>
+        
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>bar_chart</mat-icon>
+              Monthly Distribution
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <div *ngFor="let monthData of chartData$ | async" class="chart-bar">
+                <div class="bar-container">
+                  <div class="bar" 
+                       [style.height.%]="getBarHeight(monthData.count, maxCount$ | async)"
+                       [class.current-month]="monthData.monthIndex === currentMonth">
+                  </div>
+                  <div class="bar-value" *ngIf="monthData.count > 0">{{ monthData.count }}</div>
+                </div>
+                <div class="bar-label">{{ monthData.month }}</div>
+              </div>
+            </div>
+            <div class="chart-legend" *ngIf="(totalBirthdays$ | async) === 0">
+              <p class="no-data-text">Add some birthdays to see the chart!</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
 
       <div class="test-data-section" *ngIf="(totalBirthdays$ | async) === 0">
@@ -464,14 +480,53 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       }
     }
 
-    .content-row {
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 32px;
-      margin-top: 24px;
+
+    .full-width-section {
+      margin: 32px 0;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      
+      .birthday-list-card {
+        width: 100%;
+        max-width: none;
+      }
     }
 
-    .next-birthdays-card, .chart-card {
+    .birthday-list-card {
+      background: var(--surface) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow) !important;
+      border: 1px solid var(--border-light) !important;
+      overflow: hidden;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-elevated) !important;
+      }
+      
+      .mat-mdc-card-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--text-primary);
+        padding: 32px;
+        
+        .mat-mdc-card-title {
+          font-size: 1.75rem;
+          font-weight: 700;
+          margin: 0;
+          color: var(--text-primary);
+          text-shadow: none;
+        }
+      }
+      
+      .mat-mdc-card-content {
+        padding: 32px !important;
+      }
+    }
+
+    .chart-card {
       background: var(--surface) !important;
       border-radius: var(--radius-lg) !important;
       box-shadow: var(--shadow) !important;
@@ -484,75 +539,12 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         box-shadow: var(--shadow-elevated) !important;
       }
       
-      .mat-mdc-card-header {
-        background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
-        color: var(--text-primary);
-        padding: 24px;
-        
-        .mat-mdc-card-title {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin: 0;
-          color: var(--text-primary);
-          text-shadow: none;
-        }
-      }
-      
       .mat-mdc-card-content {
         padding: 24px !important;
         min-height: 350px !important;
       }
     }
 
-    .birthday-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      padding: 8px 0;
-
-      span {
-        font-weight: 600;
-        color: var(--text-secondary);
-        font-size: 1rem;
-      }
-
-      mat-chip {
-        border-radius: var(--radius-sm) !important;
-        font-weight: 600 !important;
-        padding: 8px 16px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        
-        &.today { 
-          background: var(--warning) !important;
-          color: var(--text-inverse) !important;
-          animation: pulse 2s infinite;
-          box-shadow: 0 4px 12px rgba(252, 70, 107, 0.3);
-        }
-        &.tomorrow { 
-          background: var(--secondary) !important;
-          color: var(--text-inverse) !important;
-          box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
-        }
-        &.soon { 
-          background: var(--success) !important;
-          color: var(--text-inverse) !important;
-          box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
-        }
-        &.later { 
-          background: var(--surface-hover) !important;
-          color: var(--text-secondary) !important;
-          border: 2px solid var(--border) !important;
-        }
-        
-        &:hover {
-          transform: translateY(-2px) scale(1.05);
-        }
-      }
-    }
 
     .chart-container {
       display: flex;
@@ -711,26 +703,169 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
       }
     }
-    
     .dashboard-birthday-list {
       display: flex;
       flex-direction: column;
       gap: 24px;
+      
+      &.scrollable {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 8px;
+        margin-right: -7px;
+        
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: var(--surface-elevated);
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: var(--primary);
+          border-radius: 4px;
+          
+          &:hover {
+            background: var(--secondary);
+          }
+        }
+      }
     }
     
     .dashboard-birthday-item {
       display: flex;
-      align-items: center;
-      gap: 24px;
-      padding: 16px 0;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
       position: relative;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      margin-left: 10px;
+      border-left: 8px solid #4c3fd9;
+      border: 1px solid transparent;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      
+      &:first-child {
+        margin-top: 10px;
+      }
+      
+      &:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border: 1px solid #6c757d;
+        border-left: 8px solid #4c3fd9;
+        background: #f1f3f4;
+      }
+      
+      &:focus, &:focus-within {
+        outline: none;
+        border: 1px solid #6c757d;
+        border-left: 8px solid #4c3fd9;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        background: #ffffff;
+      }
+      
+      &:active {
+        transform: translateY(-1px) scale(1.01);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
     
     .dashboard-birthday-content {
       flex: 1;
       display: flex;
       flex-direction: column;
+      gap: 12px;
+    }
+    
+    .dashboard-birthday-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .dashboard-age {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .dashboard-birthday-details {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
+      margin: 8px 0;
+    }
+    
+    .dashboard-birth-date {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: fit-content;
+      
+      &:hover {
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+      }
+      
+      .small-icon {
+        color: white;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+      }
+    }
+    
+    
+    .dashboard-notes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin: 4px 0;
+      
+      .small-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        color: var(--text-secondary);
+      }
+    }
+    
+    .dashboard-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      height: calc(100% + 5px);
+      justify-content: flex-start;
+    }
+    
+    .delete-button {
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        opacity: 1;
+        transform: scale(1.1);
+      }
     }
     
     .dashboard-zodiac-inline {
@@ -748,68 +883,48 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       color: var(--text-primary);
     }
     
-    .dashboard-birthday-info {
+    .dashboard-icons {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      width: 100%;
-      padding: 8px 0;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    
+    .delete-button-circle {
+      width: 55px !important;
+      height: 55px !important;
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+      color: white !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3) !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-top: 29px !important;
       
-      .dashboard-date-section {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
+      &:hover {
+        transform: translateY(-1px) scale(1.1) !important;
+        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4) !important;
       }
       
-      .dashboard-date {
-        font-weight: 600;
-        color: var(--text-secondary);
-        font-size: 1rem;
+      .delete-icon {
+        width: 34px !important;
+        height: 34px !important;
+        filter: brightness(0) invert(1);
+        transition: all 0.3s ease;
       }
       
-      .dashboard-icons {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      &:hover .delete-icon {
+        filter: brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,255,255,0.8));
       }
       
-      mat-chip {
-        border-radius: var(--radius-sm) !important;
-        font-weight: 600 !important;
-        padding: 8px 16px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        
-        &.today { 
-          background: var(--warning) !important;
-          color: var(--text-inverse) !important;
-          animation: pulse 2s infinite;
-          box-shadow: 0 4px 12px rgba(252, 70, 107, 0.3);
-        }
-        &.tomorrow { 
-          background: var(--secondary) !important;
-          color: var(--text-inverse) !important;
-          box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
-        }
-        &.soon { 
-          background: var(--success) !important;
-          color: var(--text-inverse) !important;
-          box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
-        }
-        &.later { 
-          background: var(--surface-hover) !important;
-          color: var(--text-secondary) !important;
-          border: 2px solid var(--border) !important;
-        }
+      .mat-mdc-button-touch-target {
+        background: transparent !important;
       }
     }
     
-    .dashboard-divider {
-      position: absolute;
-      bottom: 0;
-      left: 240px;
-      right: 0;
-      border-color: var(--border-light) !important;
-    }
     
     .birthday-days-circle {
       width: 90px;
@@ -827,6 +942,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       overflow: visible;
       flex-shrink: 0;
       cursor: pointer;
+      margin: 18px;
       
       &::before {
         content: '';
@@ -1077,6 +1193,12 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         font-size: 38px;
         width: 38px;
         height: 38px;
+      }
+      
+      .title-custom-icon {
+        width: 38px !important;
+        height: 38px !important;
+        filter: brightness(0) invert(1);
       }
     }
     
@@ -1435,12 +1557,26 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
 
     .sync-row {
       margin-top: 32px;
-      display: flex;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: 1fr 500px;
+      gap: 32px;
+      align-items: start;
 
       app-google-calendar-sync {
         width: 100%;
-        max-width: 800px;
+      }
+    }
+    
+    .birthday-list-card {
+      .mat-mdc-card-content {
+        max-height: 600px !important;
+      }
+    }
+    
+    .chart-card {
+      .mat-mdc-card-content {
+        min-height: 180px !important;
+        max-height: 300px !important;
       }
     }
 
@@ -1541,6 +1677,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         }
       }
     }
+    
 
     @media (max-width: 768px) {
       .dashboard-container {
@@ -1580,25 +1717,18 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         }
       }
 
-      .content-row {
+      .sync-row {
         grid-template-columns: 1fr;
         gap: 16px;
         margin-top: 16px;
       }
 
-      .next-birthdays-card, .chart-card {
+      .birthday-list-card, .chart-card {
         .mat-mdc-card-content {
           padding: 16px !important;
           min-height: 280px !important;
         }
         
-        .mat-mdc-card-header {
-          padding: 16px;
-          
-          .mat-mdc-card-title {
-            font-size: 1.2rem;
-          }
-        }
       }
 
       .chart-container {
@@ -1669,74 +1799,95 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       }
 
       .dashboard-birthday-item {
-        padding: 12px 0;
-        gap: 16px;
+        padding: 16px;
+        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        
+        &:hover {
+          transform: translateY(-1px) scale(1.01);
+          border: 1px solid #6c757d;
+          border-left: 8px solid #4c3fd9;
+        }
+        
+        &:focus, &:focus-within {
+          border: 1px solid #6c757d;
+          border-left: 8px solid #4c3fd9;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+          background: #ffffff;
+        }
       }
 
       .dashboard-avatar {
-        width: 80px !important;
-        height: 80px !important;
-        min-width: 80px !important;
-        min-height: 80px !important;
-        border: 2px solid var(--primary);
+        width: 60px !important;
+        height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
         
         .dashboard-default-icon {
-          font-size: 40px !important;
-          width: 40px !important;
-          height: 40px !important;
+          font-size: 30px !important;
+          width: 30px !important;
+          height: 30px !important;
         }
       }
 
       .dashboard-birthday-content {
-        gap: 4px;
+        width: 100%;
+        gap: 8px;
       }
 
       .dashboard-name {
-        font-size: 1rem;
+        font-size: 1.1rem;
+      }
+      
+      .dashboard-age {
+        font-size: 0.8rem;
       }
 
-      .dashboard-birthday-info {
-        padding: 4px 0;
-        
-        .dashboard-date {
-          font-size: 0.9rem;
-        }
+      .dashboard-birthday-details {
+        gap: 6px;
+        margin: 6px 0;
+      }
+      
+      .dashboard-birth-date {
+        font-size: 0.8rem;
+      }
+      
+      
+      .dashboard-notes {
+        font-size: 0.8rem;
+      }
+
+      .dashboard-actions {
+        align-self: flex-end;
+        flex-direction: row;
+        gap: 12px;
         
         .birthday-days-circle {
-          width: 70px;
-          height: 70px;
+          width: 60px;
+          height: 60px;
           
           .days-number {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
           }
         }
-      }
-
-      .dashboard-zodiac-inline {
-        margin: 0 4px;
-      }
-
-      .dashboard-divider {
-        left: 96px;
       }
     }
     
     @media (min-width: 769px) and (max-width: 1023px) {
-      .content-row {
+      .sync-row {
         grid-template-columns: 1fr;
         gap: 24px;
       }
 
-      .next-birthdays-card, .chart-card {
+      .birthday-list-card, .chart-card {
         .mat-mdc-card-content {
           padding: 20px !important;
           min-height: 320px !important;
         }
       }
 
-      .sync-row app-google-calendar-sync {
-        max-width: 600px;
-      }
     }
 
     @media (max-width: 480px) {
@@ -1838,6 +1989,7 @@ export class DashboardComponent implements OnInit {
   chartData$: Observable<any[]>;
   maxCount$: Observable<number>;
   categoriesStats$: Observable<any[]>;
+  allBirthdays$: Observable<any[]>;
   selectedCategory: string | null = null;
   currentMonth = new Date().getMonth();
   defaultCategory = DEFAULT_CATEGORY;
@@ -1890,6 +2042,21 @@ export class DashboardComponent implements OnInit {
           count: birthdays.filter(b => (b.category || DEFAULT_CATEGORY) === category.id).length
         })).filter(stat => stat.count > 0);
         return stats;
+      })
+    );
+
+    this.allBirthdays$ = this.birthdayService.birthdays$.pipe(
+      map(birthdays => {
+        if (!birthdays || birthdays.length === 0) {
+          return [];
+        }
+        
+        return birthdays
+          .map(birthday => ({
+            ...birthday,
+            daysUntil: this.birthdayService.getDaysUntilBirthday(birthday.birthDate)
+          }))
+          .sort((a, b) => a.daysUntil - b.daysUntil);
       })
     );
   }
@@ -1956,5 +2123,26 @@ export class DashboardComponent implements OnInit {
     
     return this.birthdayService.getNext5Birthdays()
       .filter(b => birthdays.some(filtered => filtered.id === b.id));
+  }
+
+  trackByBirthday(index: number, birthday: any): any {
+    return birthday.id || index;
+  }
+
+  getAge(birthDate: string): number {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age;
+  }
+
+  deleteBirthday(birthday: any): void {
+    this.birthdayService.deleteBirthday(birthday.id);
   }
 }

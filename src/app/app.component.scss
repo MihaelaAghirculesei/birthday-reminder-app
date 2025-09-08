@@ -83,9 +83,12 @@
     justify-content: center;
     gap: 20px;
     
-    calendar-icon {
-      color: rgba(255,255,255,0.95);
+    .app-logo {
+      width: 48px;
+      height: 48px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
       animation: fadeInUp 0.8s ease-out 0.2s both;
+      transition: transform 0.3s ease;
       
       &:hover {
         transform: scale(1.1) rotate(5deg);

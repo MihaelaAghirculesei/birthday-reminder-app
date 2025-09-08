@@ -169,6 +169,15 @@ body {
   }
 }
 
+.mat-mdc-card-content {
+  margin-left: 10px !important;
+  margin-bottom: 15px !important;
+}
+
 .mat-mdc-card-content * {
   color: var(--text-primary) !important;
+}
+
+.dashboard-birthday-item.ng-star-inserted {
+  margin: 10px !important;
 }
