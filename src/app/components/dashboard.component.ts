@@ -180,10 +180,10 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                    class="dashboard-birthday-item"
                    tabindex="0">
                 
-                <div class="dashboard-avatar" *ngIf="birthday.photoUrl">
-                  <img [src]="birthday.photoUrl" [alt]="birthday.name" class="dashboard-photo">
+                <div class="dashboard-avatar" *ngIf="birthday.photo">
+                  <img [src]="birthday.photo" [alt]="birthday.name" class="dashboard-photo">
                 </div>
-                <div class="dashboard-avatar" *ngIf="!birthday.photoUrl">
+                <div class="dashboard-avatar" *ngIf="!birthday.photo">
                   <mat-icon class="dashboard-default-icon">person</mat-icon>
                 </div>
                 
