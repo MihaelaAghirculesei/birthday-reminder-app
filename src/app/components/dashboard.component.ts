@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Observable, map } from 'rxjs';
 import { MaterialModule } from '../shared/material.module';
 import { CalendarIconComponent } from '../shared/icons/calendar-icon.component';
@@ -15,6 +16,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MaterialModule,
     CalendarIconComponent,
     ZodiacIconComponent,
@@ -169,13 +171,23 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         </div>
       </div>
 
-      <div class="full-width-section" *ngIf="(allBirthdays$ | async)?.length! > 0">
+      <div class="full-width-section" *ngIf="(birthdayService.birthdays$ | async)?.length! > 0">
         <mat-card class="birthday-list-card">
           <mat-card-header>
             <mat-card-title>📅 All Upcoming Birthdays</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <div class="dashboard-birthday-list scrollable">
+            <div class="dashboard-search-container">
+              <mat-form-field appearance="outline" class="dashboard-search-field">
+                <mat-label>Search by name</mat-label>
+                <input matInput 
+                       placeholder="Type to search..." 
+                       (input)="onDashboardSearchChange($event)"
+                       [value]="dashboardSearchTerm">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="dashboard-birthday-list scrollable" *ngIf="(allBirthdays$ | async)?.length! > 0">
               <div *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday" 
                    class="dashboard-birthday-item"
                    tabindex="0">
@@ -230,6 +242,15 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                   </button>
                 </div>
               </div>
+            </div>
+            
+            <div class="no-search-results" *ngIf="(allBirthdays$ | async)?.length === 0 && dashboardSearchTerm.trim()">
+              <mat-icon class="large-search-icon">search_off</mat-icon>
+              <p>No birthdays found for "<strong>{{ dashboardSearchTerm }}</strong>"</p>
+              <button mat-button color="primary" (click)="clearDashboardSearch()">
+                <mat-icon>clear</mat-icon>
+                Clear search
+              </button>
             </div>
           </mat-card-content>
         </mat-card>
@@ -518,6 +539,47 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           margin: 0;
           color: var(--text-primary);
           text-shadow: none;
+        }
+      }
+      
+      .dashboard-search-container {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: flex-end;
+        
+        .dashboard-search-field {
+          width: 300px;
+        }
+      }
+      
+      ::ng-deep .dashboard-search-field {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--border) !important;
+          border-width: 2px !important;
+        }
+        
+        .mat-mdc-form-field-wrapper {
+          background: var(--surface-elevated) !important;
+          border-radius: var(--radius) !important;
+        }
+        
+        &.mat-focused {
+          .mdc-notched-outline__leading,
+          .mdc-notched-outline__notch,
+          .mdc-notched-outline__trailing {
+            border-color: var(--primary) !important;
+          }
+        }
+        
+        &:hover:not(.mat-focused) {
+          .mdc-notched-outline__leading,
+          .mdc-notched-outline__notch,
+          .mdc-notched-outline__trailing {
+            border-color: var(--primary) !important;
+            opacity: 0.7;
+          }
         }
       }
       
@@ -1873,6 +1935,15 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           }
         }
       }
+      
+      .dashboard-search-container {
+        justify-content: center;
+        
+        .dashboard-search-field {
+          width: 100%;
+          max-width: 400px;
+        }
+      }
     }
     
     @media (min-width: 769px) and (max-width: 1023px) {
@@ -1977,7 +2048,36 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         font-size: 0.75rem;
       }
     }
-  `]
+    
+    
+    .no-search-results {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-secondary);
+      
+      .large-search-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        margin-bottom: 24px;
+        opacity: 0.6;
+      }
+      
+      p {
+        font-size: 1.1rem;
+        margin: 0 0 24px 0;
+        
+        strong {
+          color: var(--primary);
+        }
+      }
+      
+      button {
+        margin-top: 16px;
+      }
+    }
+
+`]
 })
 export class DashboardComponent implements OnInit {
   totalBirthdays$: Observable<number>;
@@ -1989,12 +2089,13 @@ export class DashboardComponent implements OnInit {
   chartData$: Observable<any[]>;
   maxCount$: Observable<number>;
   categoriesStats$: Observable<any[]>;
-  allBirthdays$: Observable<any[]>;
+  allBirthdays$!: Observable<any[]>;
   selectedCategory: string | null = null;
   currentMonth = new Date().getMonth();
   defaultCategory = DEFAULT_CATEGORY;
   isAddingTestData = false;
   isClearingData = false;
+  dashboardSearchTerm = '';
 
   constructor(public birthdayService: BirthdayService) {
     this.totalBirthdays$ = this.birthdayService.birthdays$.pipe(
@@ -2045,20 +2146,7 @@ export class DashboardComponent implements OnInit {
       })
     );
 
-    this.allBirthdays$ = this.birthdayService.birthdays$.pipe(
-      map(birthdays => {
-        if (!birthdays || birthdays.length === 0) {
-          return [];
-        }
-        
-        return birthdays
-          .map(birthday => ({
-            ...birthday,
-            daysUntil: this.birthdayService.getDaysUntilBirthday(birthday.birthDate)
-          }))
-          .sort((a, b) => a.daysUntil - b.daysUntil);
-      })
-    );
+    this.updateAllBirthdays();
   }
 
   ngOnInit() {}
@@ -2144,5 +2232,42 @@ export class DashboardComponent implements OnInit {
 
   deleteBirthday(birthday: any): void {
     this.birthdayService.deleteBirthday(birthday.id);
+  }
+
+  onDashboardSearchChange(event: any): void {
+    this.dashboardSearchTerm = event.target.value;
+    this.updateAllBirthdays();
+  }
+
+  clearDashboardSearch(): void {
+    this.dashboardSearchTerm = '';
+    this.updateAllBirthdays();
+  }
+
+  private updateAllBirthdays(): void {
+    this.allBirthdays$ = this.birthdayService.birthdays$.pipe(
+      map(birthdays => {
+        if (!birthdays || birthdays.length === 0) {
+          return [];
+        }
+        
+        let filteredBirthdays = birthdays
+          .map(birthday => ({
+            ...birthday,
+            daysUntil: this.birthdayService.getDaysUntilBirthday(birthday.birthDate)
+          }))
+          .sort((a, b) => a.daysUntil - b.daysUntil);
+        
+        // Apply search filter
+        if (this.dashboardSearchTerm.trim()) {
+          const searchTerm = this.dashboardSearchTerm.toLowerCase().trim();
+          filteredBirthdays = filteredBirthdays.filter(birthday =>
+            birthday.name.toLowerCase().includes(searchTerm)
+          );
+        }
+        
+        return filteredBirthdays;
+      })
+    );
   }
 }
