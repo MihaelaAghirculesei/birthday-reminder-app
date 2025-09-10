@@ -22,7 +22,7 @@
     left: 0;
     right: 0;
     height: 40vh;
-    background: var(--surface-elevated);
+    background: var(--background-tertiary);
     z-index: 0;
   }
 }
@@ -420,13 +420,13 @@
       margin: 0 0 8px 0;
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--text-inverse);
+      color: #ffffff !important;
     }
     
     p {
       margin: 0;
       font-size: 1rem;
-      color: rgba(255,255,255,0.9);
+      color: #ffffff !important;
       line-height: 1.4;
     }
   }
