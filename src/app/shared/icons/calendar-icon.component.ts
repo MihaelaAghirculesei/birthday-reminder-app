@@ -48,6 +48,23 @@ import { Component, Input } from '@angular/core';
     .primary-icon {
       color: var(--primary);
     }
+
+    .stat-icon {
+      border-radius: 50%;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+      min-height: 80px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-icon.month { 
+      background: linear-gradient(135deg, var(--secondary));
+      color: var(--text-inverse);
+      box-shadow: 0 8px 16px rgba(240, 147, 251, 0.3);
+    }
   `]
 })
 export class CalendarIconComponent {
