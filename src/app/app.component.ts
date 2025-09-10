@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 import { MaterialModule } from './shared/material.module';
 import { DashboardComponent } from './components/dashboard.component';
@@ -24,7 +25,21 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     NetworkStatusComponent
   ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  animations: [
+    trigger('expandCollapse', [
+      transition(':enter', [
+        style({ opacity: 0, height: '0px', overflow: 'hidden' }),
+        animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', 
+                style({ opacity: 1, height: '*', overflow: 'hidden' }))
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, height: '*', overflow: 'hidden' }),
+        animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', 
+                style({ opacity: 0, height: '0px', overflow: 'hidden' }))
+      ])
+    ])
+  ]
 })
 export class AppComponent implements OnInit {
   title = 'Birthday Reminder App';
@@ -32,6 +47,7 @@ export class AppComponent implements OnInit {
   birthdays$: Observable<Birthday[]>;
   selectedPhoto: string | null = null;
   isAddingTestData = false;
+  isAddBirthdayExpanded = false;
 
 
   constructor(
@@ -87,6 +103,10 @@ export class AppComponent implements OnInit {
     } finally {
       this.isAddingTestData = false;
     }
+  }
+
+  toggleAddBirthdaySection(): void {
+    this.isAddBirthdayExpanded = !this.isAddBirthdayExpanded;
   }
 
   private pastDateValidator(control: any) {
