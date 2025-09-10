@@ -173,12 +173,12 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
 
       <div class="full-width-section" *ngIf="(birthdayService.birthdays$ | async)?.length! > 0">
         <mat-card class="birthday-list-card">
-          <mat-card-header>
-            <mat-card-title>📅 All Upcoming Birthdays</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="dashboard-search-container">
-              <mat-form-field appearance="outline" class="dashboard-search-field">
+          <mat-card-header class="birthday-list-header">
+            <div class="header-title-section">
+              <mat-card-title>📅 All Upcoming Birthdays</mat-card-title>
+            </div>
+            <div class="header-search-section">
+              <mat-form-field appearance="fill" class="dashboard-search-field">
                 <mat-label>Search by name</mat-label>
                 <input matInput 
                        placeholder="Type to search..." 
@@ -187,6 +187,8 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                 <mat-icon matSuffix>search</mat-icon>
               </mat-form-field>
             </div>
+          </mat-card-header>
+          <mat-card-content>
             <div class="dashboard-birthday-list scrollable" *ngIf="(allBirthdays$ | async)?.length! > 0">
               <div *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday" 
                    class="dashboard-birthday-item"
@@ -528,10 +530,20 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         box-shadow: var(--shadow-elevated) !important;
       }
       
-      .mat-mdc-card-header {
+      .birthday-list-header {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: var(--text-primary);
         padding: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      
+      .header-title-section {
+        flex: 1;
+        min-width: 300px;
         
         .mat-mdc-card-title {
           font-size: 1.75rem;
@@ -542,44 +554,68 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         }
       }
       
-      .dashboard-search-container {
-        margin-bottom: 24px;
-        display: flex;
-        justify-content: flex-end;
+      .header-search-section {
+        flex-shrink: 0;
         
         .dashboard-search-field {
           width: 300px;
         }
       }
       
-      ::ng-deep .dashboard-search-field {
-        .mdc-notched-outline__leading,
-        .mdc-notched-outline__notch,
-        .mdc-notched-outline__trailing {
-          border-color: var(--border) !important;
-          border-width: 2px !important;
+      .header-search-section {
+        * {
+          color: #000000 !important;
+        }
+      }
+      
+      ::ng-deep .header-search-section .dashboard-search-field {
+        margin-bottom: 24px;
+        
+        .mat-mdc-text-field-wrapper {
+          background: transparent !important;
+          box-shadow: none !important;
+          border: none !important;
         }
         
-        .mat-mdc-form-field-wrapper {
+        .mat-mdc-form-field-flex {
           background: var(--surface-elevated) !important;
           border-radius: var(--radius) !important;
+          padding-left: 26px !important;
+          border: 2px solid var(--border) !important;
         }
         
-        &.mat-focused {
-          .mdc-notched-outline__leading,
-          .mdc-notched-outline__notch,
-          .mdc-notched-outline__trailing {
-            border-color: var(--primary) !important;
-          }
+        .mat-mdc-form-field-underline,
+        .mdc-line-ripple {
+          display: none !important;
         }
         
-        &:hover:not(.mat-focused) {
-          .mdc-notched-outline__leading,
-          .mdc-notched-outline__notch,
-          .mdc-notched-outline__trailing {
-            border-color: var(--primary) !important;
-            opacity: 0.7;
-          }
+        .mat-mdc-input-element {
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+        }
+        
+        input[matInput] {
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+        }
+        
+        input {
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+        }
+        
+        .mat-mdc-form-field-infix input {
+          color: #000000 !important;
+          -webkit-text-fill-color: #000000 !important;
+        }
+        
+        &.mat-focused .mat-mdc-form-field-flex {
+          border-color: var(--primary) !important;
+        }
+        
+        &:hover:not(.mat-focused) .mat-mdc-form-field-flex {
+          border-color: var(--primary) !important;
+          opacity: 0.7;
         }
       }
       
@@ -1936,16 +1972,47 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         }
       }
       
-      .dashboard-search-container {
-        justify-content: center;
+      .birthday-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
         
-        .dashboard-search-field {
+        .header-title-section {
+          min-width: auto;
           width: 100%;
-          max-width: 400px;
+        }
+        
+        .header-search-section {
+          width: 100%;
+          
+          .dashboard-search-field {
+            width: 100%;
+            max-width: 400px;
+          }
         }
       }
     }
     
+    @media (max-width: 900px) {
+      .birthday-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        
+        .header-title-section {
+          min-width: auto;
+        }
+        
+        .header-search-section {
+          width: 100%;
+          
+          .dashboard-search-field {
+            width: 100%;
+            max-width: 400px;
+          }
+        }
+      }
+    }
+
     @media (min-width: 769px) and (max-width: 1023px) {
       .sync-row {
         grid-template-columns: 1fr;
@@ -2258,7 +2325,6 @@ export class DashboardComponent implements OnInit {
           }))
           .sort((a, b) => a.daysUntil - b.daysUntil);
         
-        // Apply search filter
         if (this.dashboardSearchTerm.trim()) {
           const searchTerm = this.dashboardSearchTerm.toLowerCase().trim();
           filteredBirthdays = filteredBirthdays.filter(birthday =>
