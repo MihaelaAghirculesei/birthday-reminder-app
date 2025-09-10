@@ -5,14 +5,11 @@ import { Observable } from 'rxjs';
 
 import { MaterialModule } from './shared/material.module';
 import { DashboardComponent } from './components/dashboard.component';
-import { CalendarIconComponent } from './shared/icons/calendar-icon.component';
 import { PhotoUploadComponent } from './shared/components/photo-upload.component';
-import { ZodiacIconComponent } from './shared/components/zodiac-icon.component';
 import { NetworkStatusComponent } from './shared/components/network-status.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
-import { MONTHS, SORT_OPTIONS } from './shared/constants';
 import { getZodiacSign } from './shared/utils/zodiac.util';
 
 @Component({
@@ -23,9 +20,7 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     ReactiveFormsModule,
     MaterialModule,
     DashboardComponent,
-    CalendarIconComponent,
     PhotoUploadComponent,
-    ZodiacIconComponent,
     NetworkStatusComponent
   ],
   templateUrl: './app.component.html',
@@ -35,16 +30,9 @@ export class AppComponent implements OnInit {
   title = 'Birthday Reminder App';
   birthdayForm: FormGroup;
   birthdays$: Observable<Birthday[]>;
-  filteredBirthdays$: Observable<Birthday[]>;
   selectedPhoto: string | null = null;
   isAddingTestData = false;
 
-  searchTerm$ = this.birthdayService.searchTerm$;
-  selectedMonth$ = this.birthdayService.selectedMonth$;
-  sortOrder$ = this.birthdayService.sortOrder$;
-  
-  months = MONTHS.FULL;
-  sortOptions = SORT_OPTIONS;
 
   constructor(
     private fb: FormBuilder,
@@ -59,7 +47,6 @@ export class AppComponent implements OnInit {
     });
 
     this.birthdays$ = this.birthdayService.birthdays$;
-    this.filteredBirthdays$ = this.birthdayService.filteredBirthdays$;
   }
 
   ngOnInit() {}
@@ -81,33 +68,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  deleteBirthday(id: string) {
-    this.birthdayService.deleteBirthday(id);
-  }
-
-  getNextBirthdayText(birthDate: Date): string {
-    return this.birthdayService.getNextBirthdayText(birthDate);
-  }
-
-  calculateAge(birthDate: Date): number {
-    return this.birthdayService.calculateAge(birthDate);
-  }
-
-  onSearchChange(event: any): void {
-    this.birthdayService.setSearchTerm(event.target.value);
-  }
-
-  onMonthChange(month: number | null): void {
-    this.birthdayService.setSelectedMonth(month);
-  }
-
-  onSortChange(sortOrder: string): void {
-    this.birthdayService.setSortOrder(sortOrder);
-  }
-
-  clearFilters(): void {
-    this.birthdayService.clearFilters();
-  }
 
   onPhotoSelected(photo: string): void {
     this.selectedPhoto = photo;
@@ -119,10 +79,6 @@ export class AppComponent implements OnInit {
     this.birthdayForm.patchValue({ photo: null });
   }
 
-  getMonthName(monthIndex: number | null): string {
-    if (monthIndex === null || monthIndex < 0) return '';
-    return this.months[monthIndex] || '';
-  }
 
   async addTestData(): Promise<void> {
     this.isAddingTestData = true;
