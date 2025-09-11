@@ -203,45 +203,101 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                 
                 <div class="dashboard-birthday-content">
                   <div class="dashboard-birthday-info">
-                    <div class="dashboard-name">{{ birthday.name }}</div>
+                    <div class="dashboard-name" *ngIf="!isEditing(birthday.id)">{{ birthday.name }}</div>
+                    <input *ngIf="isEditing(birthday.id)" 
+                           type="text" 
+                           [(ngModel)]="editingBirthdayData.name"
+                           class="edit-name-input"
+                           placeholder="Name">
                     <div class="dashboard-age">{{ getAge(birthday.birthDate) }} years old</div>
                   </div>
                   
                   <div class="dashboard-birthday-details">
-                    <div class="dashboard-birth-date">
+                    <div class="dashboard-birth-date" *ngIf="!isEditing(birthday.id)">
                       <mat-icon class="small-icon">cake</mat-icon>
                       {{ birthday.birthDate | date:'EEEE, MMMM dd, yyyy' }}
                     </div>
-                    <div class="dashboard-notes" *ngIf="birthday.notes">
+                    <div class="dashboard-birth-date-edit" *ngIf="isEditing(birthday.id)">
+                      <mat-icon class="small-icon">cake</mat-icon>
+                      <input type="date" 
+                             [(ngModel)]="editingBirthdayData.birthDate"
+                             class="edit-date-input"
+                             placeholder="Birth Date">
+                    </div>
+                    <div class="dashboard-notes" *ngIf="birthday.notes && !isEditing(birthday.id)">
                       <mat-icon class="small-icon">note</mat-icon>
                       {{ birthday.notes }}
                     </div>
+                    <div class="dashboard-notes-edit" *ngIf="isEditing(birthday.id)">
+                      <mat-icon class="small-icon">note</mat-icon>
+                      <input type="text" 
+                             [(ngModel)]="editingBirthdayData.notes"
+                             class="edit-notes-input"
+                             placeholder="Notes">
+                    </div>
                   </div>
                   
-                  <div class="dashboard-icons">
+                  <div class="dashboard-icons" *ngIf="!isEditing(birthday.id)">
                     <category-icon [categoryId]="birthday.category || defaultCategory" 
                                    cssClass="dashboard-category-inline"></category-icon>
                     <zodiac-icon [zodiacSign]="birthday.zodiacSign" 
                                  *ngIf="birthday.zodiacSign" 
                                  cssClass="dashboard-zodiac-inline"></zodiac-icon>
                   </div>
+                  
+                  <div class="dashboard-category-edit" *ngIf="isEditing(birthday.id)">
+                    <mat-icon class="small-icon">category</mat-icon>
+                    <select [(ngModel)]="editingBirthdayData.category" class="edit-category-select">
+                      <option *ngFor="let category of getBirthdayCategories()" [value]="category.id">
+                        {{ category.name }}
+                      </option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div class="dashboard-actions">
                   <div class="birthday-days-circle"
-                       [class]="getDaysChipClass(birthday.daysUntil)">
+                       [class]="getDaysChipClass(birthday.daysUntil)" *ngIf="!isEditing(birthday.id)">
                     <div class="days-circle-content">
                       <div class="days-number">{{ getDaysText(birthday.daysUntil) }}</div>
                     </div>
                   </div>
                   
-                  <button mat-icon-button 
-                          color="warn" 
-                          (click)="deleteBirthday(birthday)"
-                          class="delete-button-circle"
-                          matTooltip="Delete birthday">
-                    <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
-                  </button>
+                  <ng-container *ngIf="!isEditing(birthday.id)">
+                    <button mat-icon-button 
+                            color="primary" 
+                            (click)="editBirthday(birthday)"
+                            class="edit-button-circle"
+                            matTooltip="Edit birthday">
+                      <mat-icon class="edit-icon">edit</mat-icon>
+                    </button>
+                    
+                    <button mat-icon-button 
+                            color="warn" 
+                            (click)="deleteBirthday(birthday)"
+                            class="delete-button-circle"
+                            matTooltip="Delete birthday">
+                      <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
+                    </button>
+                  </ng-container>
+                  
+                  <ng-container *ngIf="isEditing(birthday.id)">
+                    <button mat-icon-button 
+                            color="primary" 
+                            (click)="saveEditingBirthday(birthday)"
+                            class="save-button-circle"
+                            matTooltip="Save changes">
+                      <mat-icon class="save-icon">check</mat-icon>
+                    </button>
+                    
+                    <button mat-icon-button 
+                            color="warn" 
+                            (click)="cancelEditingBirthday()"
+                            class="cancel-button-circle"
+                            matTooltip="Cancel">
+                      <mat-icon class="cancel-icon">close</mat-icon>
+                    </button>
+                  </ng-container>
                 </div>
               </div>
             </div>
@@ -986,6 +1042,169 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       align-items: center;
       gap: 12px;
       margin-top: 8px;
+    }
+    
+    .edit-button-circle {
+      width: 55px !important;
+      height: 55px !important;
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+      color: white !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3) !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-top: 29px !important;
+      margin-right: 8px !important;
+      
+      &:hover {
+        transform: translateY(-1px) scale(1.1) !important;
+        box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4) !important;
+      }
+      
+      .edit-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        color: white !important;
+        transition: all 0.3s ease;
+      }
+      
+      &:hover .edit-icon {
+        filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
+      }
+      
+      .mat-mdc-button-touch-target {
+        background: transparent !important;
+      }
+    }
+
+    .save-button-circle {
+      width: 55px !important;
+      height: 55px !important;
+      background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+      color: white !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-top: 29px !important;
+      margin-right: 8px !important;
+      
+      &:hover {
+        transform: translateY(-1px) scale(1.1) !important;
+        box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4) !important;
+      }
+      
+      .save-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        color: white !important;
+        transition: all 0.3s ease;
+      }
+      
+      &:hover .save-icon {
+        filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
+      }
+      
+      .mat-mdc-button-touch-target {
+        background: transparent !important;
+      }
+    }
+
+    .cancel-button-circle {
+      width: 55px !important;
+      height: 55px !important;
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+      color: white !important;
+      border-radius: 50% !important;
+      box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3) !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-top: 29px !important;
+      
+      &:hover {
+        transform: translateY(-1px) scale(1.1) !important;
+        box-shadow: 0 6px 12px rgba(108, 117, 125, 0.4) !important;
+      }
+      
+      .cancel-icon {
+        font-size: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        color: white !important;
+        transition: all 0.3s ease;
+      }
+      
+      &:hover .cancel-icon {
+        filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
+      }
+      
+      .mat-mdc-button-touch-target {
+        background: transparent !important;
+      }
+    }
+
+    .edit-name-input, .edit-notes-input, .edit-date-input, .edit-category-select {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border: 2px solid #007bff !important;
+      border-radius: 6px !important;
+      padding: 8px 12px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+      width: 100% !important;
+      transition: all 0.3s ease !important;
+      
+      &:focus {
+        outline: none !important;
+        border-color: #0056b3 !important;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25) !important;
+        background: white !important;
+      }
+      
+      &::placeholder {
+        color: #6c757d !important;
+      }
+    }
+
+    .edit-name-input {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      margin-bottom: 4px !important;
+    }
+
+    .dashboard-notes-edit {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+
+    .dashboard-birth-date-edit {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      margin-bottom: 8px !important;
+    }
+
+    .dashboard-category-edit {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      margin-top: 8px !important;
+    }
+
+    .edit-category-select {
+      cursor: pointer !important;
     }
     
     .delete-button-circle {
@@ -2163,6 +2382,8 @@ export class DashboardComponent implements OnInit {
   isAddingTestData = false;
   isClearingData = false;
   dashboardSearchTerm = '';
+  editingBirthdayId: string | null = null;
+  editingBirthdayData: any = {};
 
   constructor(public birthdayService: BirthdayService) {
     this.totalBirthdays$ = this.birthdayService.birthdays$.pipe(
@@ -2299,6 +2520,52 @@ export class DashboardComponent implements OnInit {
 
   deleteBirthday(birthday: any): void {
     this.birthdayService.deleteBirthday(birthday.id);
+  }
+
+  editBirthday(birthday: any): void {
+    this.editingBirthdayId = birthday.id;
+    this.editingBirthdayData = {
+      name: birthday.name,
+      notes: birthday.notes || '',
+      birthDate: this.formatDateForInput(birthday.birthDate),
+      category: birthday.category || this.defaultCategory
+    };
+  }
+
+  formatDateForInput(date: Date): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  saveEditingBirthday(birthday: any): void {
+    if (this.editingBirthdayId !== birthday.id) return;
+
+    const updatedBirthday = {
+      ...birthday,
+      name: this.editingBirthdayData.name.trim() || birthday.name,
+      notes: this.editingBirthdayData.notes.trim(),
+      birthDate: new Date(this.editingBirthdayData.birthDate),
+      category: this.editingBirthdayData.category
+    };
+    
+    this.birthdayService.updateBirthday(updatedBirthday);
+    this.cancelEditingBirthday();
+  }
+
+  cancelEditingBirthday(): void {
+    this.editingBirthdayId = null;
+    this.editingBirthdayData = {};
+  }
+
+  isEditing(birthdayId: string): boolean {
+    return this.editingBirthdayId === birthdayId;
+  }
+
+  getBirthdayCategories() {
+    return BIRTHDAY_CATEGORIES;
   }
 
   onDashboardSearchChange(event: any): void {
