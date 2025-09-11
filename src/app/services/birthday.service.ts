@@ -89,6 +89,8 @@ export class BirthdayService {
   }
 
   async addBirthday(birthday: Omit<Birthday, 'id'>): Promise<void> {
+    await this.initializeService();
+    
     const newBirthday: Birthday = {
       ...birthday,
       id: this.generateId(),
@@ -112,6 +114,8 @@ export class BirthdayService {
   }
 
   async deleteBirthday(id: string): Promise<void> {
+    await this.initializeService();
+    
     const birthdayToDelete = this.birthdays.find(b => b.id === id);
     
     if (birthdayToDelete?.googleCalendarEventId && this.googleCalendarService.isEnabled()) {
@@ -129,6 +133,8 @@ export class BirthdayService {
   }
 
   async updateBirthday(updatedBirthday: Birthday): Promise<void> {
+    await this.initializeService();
+    
     const index = this.birthdays.findIndex(b => b.id === updatedBirthday.id);
     if (index !== -1) {
       if (updatedBirthday.googleCalendarEventId && this.googleCalendarService.isEnabled()) {
@@ -483,6 +489,166 @@ export class BirthdayService {
         reminderDays: 7,
         category: 'other',
         photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Emma Thompson',
+        birthDate: new Date(1986, 1, 14),
+        notes: 'Marketing specialist and yoga instructor',
+        reminderDays: 5,
+        category: 'colleagues',
+        photo: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Lucas Anderson',
+        birthDate: new Date(1992, 2, 3),
+        notes: 'Graphic designer and coffee lover',
+        reminderDays: 10,
+        category: 'friends',
+        photo: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Isabella Martinez',
+        birthDate: new Date(1988, 2, 22),
+        notes: 'Architect and nature lover',
+        reminderDays: 7,
+        category: 'romantic',
+        photo: 'https://images.unsplash.com/photo-1494790108755-2616c96ae5f5?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Noah Campbell',
+        birthDate: new Date(1991, 3, 5),
+        notes: 'Teacher and chess player',
+        reminderDays: 14,
+        category: 'family',
+        photo: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Mia Rodriguez',
+        birthDate: new Date(1993, 3, 18),
+        notes: 'Journalist and film critic',
+        reminderDays: 3,
+        category: 'acquaintances',
+        photo: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Oliver Johnson',
+        birthDate: new Date(1987, 5, 7),
+        notes: 'Veterinarian and animal lover',
+        reminderDays: 7,
+        category: 'friends',
+        photo: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Ava Wilson',
+        birthDate: new Date(1990, 5, 28),
+        notes: 'Nurse and marathon runner',
+        reminderDays: 5,
+        category: 'colleagues',
+        photo: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Ethan Davis',
+        birthDate: new Date(1985, 6, 11),
+        notes: 'Chef and wine enthusiast',
+        reminderDays: 10,
+        category: 'family',
+        photo: 'https://images.unsplash.com/photo-1566492031773-4f4e44671d66?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Charlotte Brown',
+        birthDate: new Date(1994, 6, 24),
+        notes: 'Fashion designer and art collector',
+        reminderDays: 3,
+        category: 'romantic',
+        photo: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Mason Taylor',
+        birthDate: new Date(1989, 7, 9),
+        notes: 'Financial advisor and golfer',
+        reminderDays: 14,
+        category: 'acquaintances',
+        photo: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Amelia Garcia',
+        birthDate: new Date(1991, 7, 31),
+        notes: 'Psychologist and meditation teacher',
+        reminderDays: 7,
+        category: 'other',
+        photo: 'https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'James Miller',
+        birthDate: new Date(1986, 9, 2),
+        notes: 'Mechanic and motorcycle enthusiast',
+        reminderDays: 5,
+        category: 'friends',
+        photo: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Harper Wilson',
+        birthDate: new Date(1992, 9, 19),
+        notes: 'Photographer and travel blogger',
+        reminderDays: 10,
+        category: 'colleagues',
+        photo: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Benjamin Jones',
+        birthDate: new Date(1988, 10, 6),
+        notes: 'Software architect and gamer',
+        reminderDays: 7,
+        category: 'family',
+        photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Evelyn Moore',
+        birthDate: new Date(1993, 10, 23),
+        notes: 'Interior designer and plant enthusiast',
+        reminderDays: 3,
+        category: 'romantic',
+        photo: 'https://images.unsplash.com/photo-1488508872907-592763824245?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'William Clark',
+        birthDate: new Date(1987, 11, 4),
+        notes: 'Dentist and tennis player',
+        reminderDays: 14,
+        category: 'acquaintances',
+        photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Abigail Lewis',
+        birthDate: new Date(1990, 11, 27),
+        notes: 'Librarian and book club organizer',
+        reminderDays: 5,
+        category: 'other',
+        photo: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Henry Walker',
+        birthDate: new Date(1985, 1, 8),
+        notes: 'Real estate agent and history buff',
+        reminderDays: 7,
+        category: 'friends',
+        photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Elizabeth Hall',
+        birthDate: new Date(1991, 3, 12),
+        notes: 'Pharmacist and fitness coach',
+        reminderDays: 10,
+        category: 'colleagues',
+        photo: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=300&h=300&fit=crop&crop=face'
+      },
+      {
+        name: 'Sebastian Young',
+        birthDate: new Date(1989, 7, 16),
+        notes: 'Music producer and DJ',
+        reminderDays: 3,
+        category: 'family',
+        photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&h=300&fit=crop&crop=face'
       }
     ];
 
