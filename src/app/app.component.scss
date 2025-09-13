@@ -109,13 +109,13 @@
 
 .content-sections {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1fr;
+  gap: 32px;
   align-items: start;
-  
-  @media (max-width: 1200px) {
+
+  @media (min-width: 1200px) {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 40px;
   }
 }
 
@@ -137,13 +137,15 @@
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: var(--text-primary);
     padding: 20px 32px;
-    
+    transition: all 0.3s ease;
+
     .mat-mdc-card-title {
       font-size: 1.75rem;
       font-weight: 700;
       margin: 0;
       color: var(--text-primary);
       text-shadow: none;
+      transition: all 0.3s ease;
     }
     
     &.collapsible-header {
@@ -201,13 +203,22 @@
 
 .full-width {
   width: 100%;
-  
+
   .mat-mdc-form-field {
     border-radius: var(--radius-sm) !important;
-    
+    transition: all 0.3s ease;
+
     .mat-mdc-text-field-wrapper {
       border-radius: var(--radius-sm) !important;
       background-color: var(--surface-elevated) !important;
+      transition: all 0.3s ease;
+    }
+
+    &:hover:not(.mat-focused) {
+      .mat-mdc-text-field-wrapper {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transform: translateY(-1px);
+      }
     }
   }
 }
@@ -241,14 +252,6 @@
   }
 }
 
-
-
-
-
-
-
-
-
 @keyframes gradientShift {
   0%, 100% {
     background-position: 0% 50%;
@@ -281,11 +284,6 @@
 }
 
 @media (max-width: 1200px) {
-  .content-sections {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  
   .app-header .hero-title {
     font-size: 3rem;
   }
@@ -330,6 +328,13 @@
     .hero-title {
       font-size: 1.7rem;
       gap: 8px;
+      flex-direction: column;
+      text-align: center;
+
+      .app-logo {
+        width: 40px;
+        height: 40px;
+      }
     }
     
     .hero-subtitle {
@@ -348,11 +353,10 @@
     gap: 16px;
   }
   
-  .add-birthday-card,
-  
-  
-  
-  
+  .add-birthday-card .mat-mdc-card-content {
+    padding: 24px !important;
+  }
+
   .birthday-form {
     gap: 14px;
     
