@@ -176,6 +176,15 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           <mat-card-header class="birthday-list-header">
             <div class="header-title-section">
               <mat-card-title>📅 All Upcoming Birthdays</mat-card-title>
+              <button mat-raised-button
+                      color="accent"
+                      *ngIf="lastAction"
+                      (click)="undoLastAction()"
+                      class="undo-button-enhanced"
+                      matTooltip="Undo last action">
+                <mat-icon>undo</mat-icon>
+                UNDO
+              </button>
             </div>
             <div class="header-search-section">
               <mat-form-field appearance="fill" class="dashboard-search-field">
@@ -603,13 +612,43 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       .header-title-section {
         flex: 1;
         min-width: 300px;
-        
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
         .mat-mdc-card-title {
           font-size: 1.75rem;
           font-weight: 700;
           margin: 0;
           color: var(--text-primary);
           text-shadow: none;
+        }
+      }
+
+      .undo-button-enhanced {
+        background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%) !important;
+        color: white !important;
+        font-weight: 600 !important;
+        border-radius: 25px !important;
+        animation: pulse-undo 2s infinite;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
+
+        mat-icon {
+          margin-right: 8px;
+        }
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6) !important;
+        }
+      }
+
+      @keyframes pulse-undo {
+        0%, 100% {
+          box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        50% {
+          box-shadow: 0 6px 25px rgba(255, 107, 107, 0.7);
         }
       }
       
@@ -2392,6 +2431,7 @@ export class DashboardComponent implements OnInit {
   dashboardSearchTerm = '';
   editingBirthdayId: string | null = null;
   editingBirthdayData: any = {};
+  lastAction: {type: string, data: any} | null = null;
 
   constructor(public birthdayService: BirthdayService) {
     this.totalBirthdays$ = this.birthdayService.birthdays$.pipe(
@@ -2527,6 +2567,8 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteBirthday(birthday: any): void {
+    this.lastAction = { type: 'delete', data: { ...birthday } };
+    console.log('Saved for undo:', this.lastAction);
     this.birthdayService.deleteBirthday(birthday.id);
   }
 
@@ -2584,6 +2626,15 @@ export class DashboardComponent implements OnInit {
       birthDate: this.formatDateForInput(birthday.birthDate),
       category: birthday.category || this.defaultCategory
     };
+  }
+
+  undoLastAction(): void {
+    if (!this.lastAction) return;
+
+    if (this.lastAction.type === 'delete') {
+      this.birthdayService.addBirthday(this.lastAction.data);
+    }
+    this.lastAction = null;
   }
 
   onDashboardSearchChange(event: any): void {
