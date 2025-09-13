@@ -8,6 +8,7 @@ import { MaterialModule } from './shared/material.module';
 import { DashboardComponent } from './components/dashboard.component';
 import { PhotoUploadComponent } from './shared/components/photo-upload.component';
 import { NetworkStatusComponent } from './shared/components/network-status.component';
+import { NotificationComponent } from './shared/components/notification.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
@@ -22,7 +23,8 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     MaterialModule,
     DashboardComponent,
     PhotoUploadComponent,
-    NetworkStatusComponent
+    NetworkStatusComponent,
+    NotificationComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

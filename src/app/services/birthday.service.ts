@@ -8,6 +8,7 @@ import { DEFAULT_CATEGORY } from '../shared/constants/categories';
 import { IndexedDBStorageService } from './offline-storage.service';
 import { NetworkService } from './network.service';
 import { GoogleCalendarService } from './google-calendar.service';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -80,7 +81,8 @@ export class BirthdayService {
     @Inject(PLATFORM_ID) private platformId: Object,
     private offlineStorage: IndexedDBStorageService,
     private networkService: NetworkService,
-    private googleCalendarService: GoogleCalendarService
+    private googleCalendarService: GoogleCalendarService,
+    private notificationService: NotificationService
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.initializeService();
@@ -109,8 +111,9 @@ export class BirthdayService {
     
     this.birthdays.push(newBirthday);
     this.updateBirthdaysSubject();
-    
+
     await this.saveToStorage(newBirthday, 'add');
+    this.notificationService.show(`${newBirthday.name} added successfully!`, 'success');
   }
 
   async deleteBirthday(id: string): Promise<void> {
@@ -128,8 +131,9 @@ export class BirthdayService {
     
     this.birthdays = this.birthdays.filter(b => b.id !== id);
     this.updateBirthdaysSubject();
-    
+
     await this.saveToStorage({ id } as Birthday, 'delete');
+    this.notificationService.show(`Birthday deleted successfully!`, 'success');
   }
 
   async updateBirthday(updatedBirthday: Birthday): Promise<void> {
@@ -147,8 +151,9 @@ export class BirthdayService {
       
       this.birthdays[index] = updatedBirthday;
       this.updateBirthdaysSubject();
-      
+
       await this.saveToStorage(updatedBirthday, 'update');
+      this.notificationService.show(`${updatedBirthday.name} updated successfully!`, 'success');
     }
   }
 
