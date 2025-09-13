@@ -216,9 +216,10 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                          *ngIf="!isEditing(birthday.id)"
                          (dblclick)="quickEditName(birthday)"
                          title="Double-click to edit">{{ birthday.name }}</div>
-                    <input *ngIf="isEditing(birthday.id)" 
-                           type="text" 
+                    <input *ngIf="isEditing(birthday.id)"
+                           type="text"
                            [(ngModel)]="editingBirthdayData.name"
+                           (input)="onEditInputChange(birthday)"
                            class="edit-name-input"
                            placeholder="Name">
                     <div class="dashboard-age">{{ getAge(birthday.birthDate) }} years old</div>
@@ -231,8 +232,9 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                     </div>
                     <div class="dashboard-birth-date-edit" *ngIf="isEditing(birthday.id)">
                       <mat-icon class="small-icon">cake</mat-icon>
-                      <input type="date" 
+                      <input type="date"
                              [(ngModel)]="editingBirthdayData.birthDate"
+                             (input)="onEditInputChange(birthday)"
                              class="edit-date-input"
                              placeholder="Birth Date">
                     </div>
@@ -242,8 +244,9 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                     </div>
                     <div class="dashboard-notes-edit" *ngIf="isEditing(birthday.id)">
                       <mat-icon class="small-icon">note</mat-icon>
-                      <input type="text" 
+                      <input type="text"
                              [(ngModel)]="editingBirthdayData.notes"
+                             (input)="onEditInputChange(birthday)"
                              class="edit-notes-input"
                              placeholder="Notes">
                     </div>
@@ -259,7 +262,9 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                   
                   <div class="dashboard-category-edit" *ngIf="isEditing(birthday.id)">
                     <mat-icon class="small-icon">category</mat-icon>
-                    <select [(ngModel)]="editingBirthdayData.category" class="edit-category-select">
+                    <select [(ngModel)]="editingBirthdayData.category"
+                            (change)="onEditInputChange(birthday)"
+                            class="edit-category-select">
                       <option *ngFor="let category of getBirthdayCategories()" [value]="category.id">
                         {{ category.name }}
                       </option>
@@ -2432,6 +2437,7 @@ export class DashboardComponent implements OnInit {
   editingBirthdayId: string | null = null;
   editingBirthdayData: any = {};
   lastAction: {type: string, data: any} | null = null;
+  autoSaveTimer: any = null;
 
   constructor(public birthdayService: BirthdayService) {
     this.totalBirthdays$ = this.birthdayService.birthdays$.pipe(
@@ -2606,6 +2612,10 @@ export class DashboardComponent implements OnInit {
   }
 
   cancelEditingBirthday(): void {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
     this.editingBirthdayId = null;
     this.editingBirthdayData = {};
   }
@@ -2635,6 +2645,30 @@ export class DashboardComponent implements OnInit {
       this.birthdayService.addBirthday(this.lastAction.data);
     }
     this.lastAction = null;
+  }
+
+  onEditInputChange(birthday: any): void {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+
+    this.autoSaveTimer = setTimeout(() => {
+      this.autoSaveBirthday(birthday);
+    }, 2000);
+  }
+
+  private autoSaveBirthday(birthday: any): void {
+    if (this.editingBirthdayId === birthday.id && this.editingBirthdayData.name?.trim()) {
+      const updatedBirthday = {
+        ...birthday,
+        name: this.editingBirthdayData.name.trim(),
+        notes: this.editingBirthdayData.notes?.trim() || '',
+        birthDate: new Date(this.editingBirthdayData.birthDate),
+        category: this.editingBirthdayData.category
+      };
+      this.birthdayService.updateBirthday(updatedBirthday);
+      console.log('Auto-saved:', updatedBirthday.name);
+    }
   }
 
   onDashboardSearchChange(event: any): void {
