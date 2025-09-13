@@ -203,7 +203,10 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                 
                 <div class="dashboard-birthday-content">
                   <div class="dashboard-birthday-info">
-                    <div class="dashboard-name" *ngIf="!isEditing(birthday.id)">{{ birthday.name }}</div>
+                    <div class="dashboard-name"
+                         *ngIf="!isEditing(birthday.id)"
+                         (dblclick)="quickEditName(birthday)"
+                         title="Double-click to edit">{{ birthday.name }}</div>
                     <input *ngIf="isEditing(birthday.id)" 
                            type="text" 
                            [(ngModel)]="editingBirthdayData.name"
@@ -1035,6 +1038,12 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-primary);
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--primary);
+      }
     }
     
     .dashboard-icons {
@@ -2362,7 +2371,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         margin-top: 16px;
       }
     }
-
 `]
 })
 export class DashboardComponent implements OnInit {
@@ -2566,6 +2574,16 @@ export class DashboardComponent implements OnInit {
 
   getBirthdayCategories() {
     return BIRTHDAY_CATEGORIES;
+  }
+
+  quickEditName(birthday: any): void {
+    this.editingBirthdayId = birthday.id;
+    this.editingBirthdayData = {
+      name: birthday.name,
+      notes: birthday.notes || '',
+      birthDate: this.formatDateForInput(birthday.birthDate),
+      category: birthday.category || this.defaultCategory
+    };
   }
 
   onDashboardSearchChange(event: any): void {
