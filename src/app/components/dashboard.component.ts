@@ -636,7 +636,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       .birthday-list-header {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: var(--text-primary);
-        padding: 32px;
+        padding: 19px 32px 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -689,7 +689,9 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       
       .header-search-section {
         flex-shrink: 0;
-        
+        display: flex;
+        align-items: center;
+
         .dashboard-search-field {
           width: 300px;
         }
@@ -702,19 +704,44 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       }
       
       ::ng-deep .header-search-section .dashboard-search-field {
-        margin-bottom: 24px;
-        
+        margin-bottom: 0;
+        margin-right: 5px !important;
+
+        &.mat-mdc-form-field {
+          padding-bottom: 0 !important;
+          line-height: normal !important;
+        }
+
         .mat-mdc-text-field-wrapper {
           background: transparent !important;
           box-shadow: none !important;
           border: none !important;
         }
-        
+
+        .mat-mdc-form-field-wrapper {
+          padding-bottom: 0 !important;
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+          display: none !important;
+        }
+
         .mat-mdc-form-field-flex {
-          background: var(--surface-elevated) !important;
-          border-radius: var(--radius) !important;
-          padding-left: 26px !important;
-          border: 2px solid var(--border) !important;
+          background: #e9ecef !important;
+          border-radius: 12px !important;
+          padding: 5px 42px 5px 26px !important;
+          margin-top: 5px !important;
+          border: 4px solid #6c757d !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          width: 264px !important;
+        }
+
+        &:hover .mat-mdc-form-field-flex {
+          background: #ced4da !important;
+          border: 4px solid #495057 !important;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+          transform: translateY(-2px) scale(1.02) !important;
         }
         
         .mat-mdc-form-field-underline,
@@ -2345,35 +2372,15 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
-        
+
         .header-title-section {
           min-width: auto;
           width: 100%;
         }
-        
+
         .header-search-section {
           width: 100%;
-          
-          .dashboard-search-field {
-            width: 100%;
-            max-width: 400px;
-          }
-        }
-      }
-    }
-    
-    @media (max-width: 900px) {
-      .birthday-list-header {
-        flex-direction: column;
-        align-items: flex-start;
-        
-        .header-title-section {
-          min-width: auto;
-        }
-        
-        .header-search-section {
-          width: 100%;
-          
+
           .dashboard-search-field {
             width: 100%;
             max-width: 400px;
