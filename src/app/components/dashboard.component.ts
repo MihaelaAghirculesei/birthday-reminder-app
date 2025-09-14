@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, map } from 'rxjs';
@@ -255,21 +255,60 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                   </div>
                   
                   <div class="dashboard-icons" *ngIf="!isEditing(birthday.id)">
-                    <category-icon [categoryId]="birthday.category || defaultCategory"
-                                   cssClass="dashboard-category-inline"></category-icon>
-                    <zodiac-icon [zodiacSign]="birthday.zodiacSign"
-                                 *ngIf="birthday.zodiacSign"
-                                 cssClass="dashboard-zodiac-inline"></zodiac-icon>
-                    <div class="remember-photo-icon"
-                         *ngIf="birthday.rememberPhoto"
-                         [matTooltip]="getRememberPhotoTooltip()"
-                         matTooltipPosition="below"
-                         (click)="downloadRememberPhoto(birthday)"
-                         (dblclick)="shareRememberPhoto(birthday)"
-                         tabindex="0">
-                      <img [src]="birthday.rememberPhoto"
-                           [alt]="birthday.name + ' remember photo'"
-                           class="remember-photo-mini">
+                    <div class="dashboard-icons-left">
+                      <category-icon [categoryId]="birthday.category || defaultCategory"
+                                     cssClass="dashboard-category-inline"></category-icon>
+                      <zodiac-icon [zodiacSign]="birthday.zodiacSign"
+                                   *ngIf="birthday.zodiacSign"
+                                   cssClass="dashboard-zodiac-inline"></zodiac-icon>
+                      <div class="remember-photo-icon"
+                           *ngIf="birthday.rememberPhoto"
+                           [matTooltip]="getRememberPhotoTooltip()"
+                           matTooltipPosition="below"
+                           (click)="downloadRememberPhoto(birthday)"
+                           (dblclick)="shareRememberPhoto(birthday)"
+                           tabindex="0">
+                        <img [src]="birthday.rememberPhoto"
+                             [alt]="birthday.name + ' remember photo'"
+                             class="remember-photo-mini">
+                      </div>
+                    </div>
+                    <div class="dashboard-icons-right">
+                      <ng-container *ngIf="!isEditing(birthday.id)">
+                        <button mat-icon-button
+                                color="primary"
+                                (click)="editBirthday(birthday)"
+                                class="edit-button-circle"
+                                matTooltip="Edit birthday">
+                          <mat-icon class="edit-icon">edit</mat-icon>
+                        </button>
+
+                        <button mat-icon-button
+                                color="warn"
+                                (click)="deleteBirthday(birthday)"
+                                class="delete-button-circle"
+                                matTooltip="Delete birthday">
+                          <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
+                        </button>
+                      </ng-container>
+
+                      <ng-container *ngIf="isEditing(birthday.id)">
+                        <button mat-icon-button
+                                color="primary"
+                                (click)="saveEditingBirthday(birthday)"
+                                class="save-button-circle"
+                                matTooltip="Save changes">
+                          <mat-icon class="save-icon">check</mat-icon>
+                        </button>
+
+                        <button mat-icon-button
+                                color="warn"
+                                (click)="cancelEditingBirthday()"
+                                class="cancel-button-circle"
+                                matTooltip="Cancel">
+                          <mat-icon class="cancel-icon">close</mat-icon>
+                        </button>
+                      </ng-container>
                     </div>
                   </div>
                   
@@ -306,41 +345,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                     </div>
                   </div>
                   
-                  <ng-container *ngIf="!isEditing(birthday.id)">
-                    <button mat-icon-button 
-                            color="primary" 
-                            (click)="editBirthday(birthday)"
-                            class="edit-button-circle"
-                            matTooltip="Edit birthday">
-                      <mat-icon class="edit-icon">edit</mat-icon>
-                    </button>
-                    
-                    <button mat-icon-button 
-                            color="warn" 
-                            (click)="deleteBirthday(birthday)"
-                            class="delete-button-circle"
-                            matTooltip="Delete birthday">
-                      <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
-                    </button>
-                  </ng-container>
-                  
-                  <ng-container *ngIf="isEditing(birthday.id)">
-                    <button mat-icon-button 
-                            color="primary" 
-                            (click)="saveEditingBirthday(birthday)"
-                            class="save-button-circle"
-                            matTooltip="Save changes">
-                      <mat-icon class="save-icon">check</mat-icon>
-                    </button>
-                    
-                    <button mat-icon-button 
-                            color="warn" 
-                            (click)="cancelEditingBirthday()"
-                            class="cancel-button-circle"
-                            matTooltip="Cancel">
-                      <mat-icon class="cancel-icon">close</mat-icon>
-                    </button>
-                  </ng-container>
                 </div>
               </div>
             </div>
@@ -966,20 +970,15 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       align-items: flex-start;
       gap: 16px;
       padding: 16px;
+      margin-left: 10px;
       position: relative;
       background: #f8f9fa;
       border-radius: 8px;
-      margin-bottom: 8px;
-      margin-left: 10px;
       border-left: 8px solid #4c3fd9;
       border: 1px solid transparent;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
-      
-      &:first-child {
-        margin-top: 10px;
-      }
       
       &:hover {
         transform: translateY(-2px) scale(1.02);
@@ -1119,8 +1118,32 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
     .dashboard-icons {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       margin-top: 8px;
+      min-height: 40px;
+
+      * {
+        vertical-align: middle;
+      }
+    }
+
+    .dashboard-icons-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .dashboard-icons-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+
+      button {
+        margin: 0 !important;
+        align-self: center;
+      }
     }
     
     .edit-button-circle {
@@ -2255,7 +2278,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         gap: 12px;
         flex-direction: column;
         align-items: flex-start;
-        margin-bottom: 8px;
         
         &:hover {
           transform: translateY(-1px) scale(1.01);
@@ -2499,7 +2521,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
     }
 `]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   totalBirthdays$: Observable<number>;
   birthdaysThisMonth$: Observable<number>;
   averageAge$: Observable<number>;
@@ -2573,7 +2595,6 @@ export class DashboardComponent implements OnInit {
     this.updateAllBirthdays();
   }
 
-  ngOnInit() {}
 
   getDaysText(days: number): string {
     if (days === 0) return 'Today!';
@@ -2599,7 +2620,6 @@ export class DashboardComponent implements OnInit {
     try {
       await this.birthdayService.addTestBirthdays();
     } catch (error) {
-      console.error('Errore durante l\'aggiunta dei dati test:', error);
     } finally {
       this.isAddingTestData = false;
     }
@@ -2610,7 +2630,6 @@ export class DashboardComponent implements OnInit {
     try {
       await this.birthdayService.clearAllBirthdays();
     } catch (error) {
-      console.error('Errore durante l\'eliminazione dei dati:', error);
     } finally {
       this.isClearingData = false;
     }
@@ -2735,7 +2754,7 @@ export class DashboardComponent implements OnInit {
               title: `Happy Birthday ${birthday.name}!`,
               text: `Today is ${birthday.name}'s birthday! 🎉`,
               files: [file]
-            }).catch(err => console.log('Error sharing:', err));
+            });
           }
         }, 'image/jpeg', 0.9);
       };
@@ -2764,7 +2783,7 @@ export class DashboardComponent implements OnInit {
         const item = new ClipboardItem({ 'image/png': blob });
         navigator.clipboard.write([item]);
       })
-      .catch(err => console.log('Error copying to clipboard:', err));
+;
   }
 
   onRememberPhotoSelected(photoDataUrl: string): void {
