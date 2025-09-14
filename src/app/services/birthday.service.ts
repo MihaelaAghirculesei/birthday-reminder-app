@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, combineLatest, map, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { Birthday } from '../models/birthday.model';
 import { MONTHS } from '../shared/constants';
 import { getZodiacSign } from '../shared/utils/zodiac.util';

@@ -8,9 +8,3 @@ export const MONTHS = {
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ]
 };
-
-export const SORT_OPTIONS = [
-  { value: 'name', label: 'Name' },
-  { value: 'age', label: 'Age (Oldest first)' },
-  { value: 'nextBirthday', label: 'Next Birthday' }
-];

@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import { trigger, style, transition, animate } from '@angular/animations';
 
 import { MaterialModule } from './shared/material.module';
 import { DashboardComponent } from './components/dashboard.component';
@@ -43,7 +43,7 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     ])
   ]
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'Birthday Reminder App';
   birthdayForm: FormGroup;
   birthdays$: Observable<Birthday[]>;
@@ -67,7 +67,6 @@ export class AppComponent implements OnInit {
     this.birthdays$ = this.birthdayService.birthdays$;
   }
 
-  ngOnInit() {}
 
   onSubmit() {
     if (this.birthdayForm.valid) {
