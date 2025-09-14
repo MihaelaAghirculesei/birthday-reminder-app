@@ -5,6 +5,7 @@ export interface Birthday {
   notes?: string;
   reminderDays?: number;
   photo?: string;
+  rememberPhoto?: string;
   zodiacSign?: string;
   googleCalendarEventId?: string;
   category?: string;

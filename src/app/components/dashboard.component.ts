@@ -7,6 +7,7 @@ import { CalendarIconComponent } from '../shared/icons/calendar-icon.component';
 import { ZodiacIconComponent } from '../shared/components/zodiac-icon.component';
 import { CategoryIconComponent } from '../shared/components/category-icon.component';
 import { GoogleCalendarSyncComponent } from './google-calendar-sync.component';
+import { PhotoUploadComponent } from '../shared/components/photo-upload.component';
 import { BirthdayService } from '../services/birthday.service';
 import { Birthday } from '../models/birthday.model';
 import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categories';
@@ -21,7 +22,8 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
     CalendarIconComponent,
     ZodiacIconComponent,
     CategoryIconComponent,
-    GoogleCalendarSyncComponent
+    GoogleCalendarSyncComponent,
+    PhotoUploadComponent
   ],
   template: `
     <div class="dashboard-container">
@@ -253,11 +255,22 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                   </div>
                   
                   <div class="dashboard-icons" *ngIf="!isEditing(birthday.id)">
-                    <category-icon [categoryId]="birthday.category || defaultCategory" 
+                    <category-icon [categoryId]="birthday.category || defaultCategory"
                                    cssClass="dashboard-category-inline"></category-icon>
-                    <zodiac-icon [zodiacSign]="birthday.zodiacSign" 
-                                 *ngIf="birthday.zodiacSign" 
+                    <zodiac-icon [zodiacSign]="birthday.zodiacSign"
+                                 *ngIf="birthday.zodiacSign"
                                  cssClass="dashboard-zodiac-inline"></zodiac-icon>
+                    <div class="remember-photo-icon"
+                         *ngIf="birthday.rememberPhoto"
+                         [matTooltip]="getRememberPhotoTooltip()"
+                         matTooltipPosition="below"
+                         (click)="downloadRememberPhoto(birthday)"
+                         (dblclick)="shareRememberPhoto(birthday)"
+                         tabindex="0">
+                      <img [src]="birthday.rememberPhoto"
+                           [alt]="birthday.name + ' remember photo'"
+                           class="remember-photo-mini">
+                    </div>
                   </div>
                   
                   <div class="dashboard-category-edit" *ngIf="isEditing(birthday.id)">
@@ -269,6 +282,19 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                         {{ category.name }}
                       </option>
                     </select>
+                  </div>
+
+                  <div class="dashboard-photo-edit" *ngIf="isEditing(birthday.id)">
+                    <div class="photo-section-title">
+                      <mat-icon class="small-icon">photo_library</mat-icon>
+                      <span>Remember Photo</span>
+                      <small>(For social sharing/messages)</small>
+                    </div>
+                    <photo-upload
+                      [currentPhoto]="editingBirthdayData.rememberPhoto"
+                      (photoSelected)="onRememberPhotoSelected($event)"
+                      (photoRemoved)="onRememberPhotoRemoved()">
+                    </photo-upload>
                   </div>
                 </div>
                 
@@ -1255,6 +1281,62 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       gap: 8px !important;
       margin-top: 8px !important;
     }
+
+    .dashboard-photo-edit {
+      margin-top: 16px !important;
+      padding-top: 16px !important;
+      border-top: 1px solid var(--border-light) !important;
+    }
+
+    .photo-section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+
+      span {
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      small {
+        color: var(--text-muted);
+        font-style: italic;
+        margin-left: 4px;
+      }
+    }
+
+    .remember-photo-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 3px solid #dc3545;
+      flex-shrink: 0;
+      position: relative;
+
+      &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 8px #dc3545;
+        border-color: #c82333;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 12px #dc3545;
+        border-color: #c82333;
+      }
+    }
+
+    .remember-photo-mini {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
 
     .edit-category-select {
       cursor: pointer !important;
@@ -2584,7 +2666,9 @@ export class DashboardComponent implements OnInit {
       name: birthday.name,
       notes: birthday.notes || '',
       birthDate: this.formatDateForInput(birthday.birthDate),
-      category: birthday.category || this.defaultCategory
+      category: birthday.category || this.defaultCategory,
+      photo: birthday.photo || null,
+      rememberPhoto: birthday.rememberPhoto || null
     };
   }
 
@@ -2628,13 +2712,105 @@ export class DashboardComponent implements OnInit {
     return BIRTHDAY_CATEGORIES;
   }
 
+  getRememberPhotoTooltip(): string {
+    return 'Remember Photo - Click: Download | Double-click: Share';
+  }
+
+  shareRememberPhoto(birthday: any): void {
+    if (!birthday.rememberPhoto) return;
+
+    if (navigator.share) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx?.drawImage(img, 0, 0);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], `${birthday.name}_birthday.jpg`, { type: 'image/jpeg' });
+            navigator.share({
+              title: `Happy Birthday ${birthday.name}!`,
+              text: `Today is ${birthday.name}'s birthday! 🎉`,
+              files: [file]
+            }).catch(err => console.log('Error sharing:', err));
+          }
+        }, 'image/jpeg', 0.9);
+      };
+
+      img.src = birthday.rememberPhoto;
+    } else {
+      this.copyImageToClipboard(birthday.rememberPhoto);
+    }
+  }
+
+  downloadRememberPhoto(birthday: any): void {
+    if (!birthday.rememberPhoto) return;
+
+    const link = document.createElement('a');
+    link.download = `${birthday.name}_birthday_remember.jpg`;
+    link.href = birthday.rememberPhoto;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  private copyImageToClipboard(dataUrl: string): void {
+    fetch(dataUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const item = new ClipboardItem({ 'image/png': blob });
+        navigator.clipboard.write([item]);
+      })
+      .catch(err => console.log('Error copying to clipboard:', err));
+  }
+
+  onRememberPhotoSelected(photoDataUrl: string): void {
+    if (this.editingBirthdayData) {
+      this.editingBirthdayData.rememberPhoto = photoDataUrl;
+      this.saveRememberPhotoChanges();
+    }
+  }
+
+  onRememberPhotoRemoved(): void {
+    if (this.editingBirthdayData) {
+      this.editingBirthdayData.rememberPhoto = null;
+      this.saveRememberPhotoChanges();
+    }
+  }
+
+  private saveRememberPhotoChanges(): void {
+    if (this.editingBirthdayId) {
+      this.birthdayService.birthdays$.subscribe(birthdays => {
+        const birthday = birthdays.find(b => b.id === this.editingBirthdayId);
+        if (birthday) {
+          const updatedBirthday = {
+            ...birthday,
+            name: this.editingBirthdayData.name?.trim() || birthday.name,
+            notes: this.editingBirthdayData.notes?.trim() || birthday.notes || '',
+            birthDate: this.editingBirthdayData.birthDate ? new Date(this.editingBirthdayData.birthDate) : birthday.birthDate,
+            category: this.editingBirthdayData.category || birthday.category,
+            rememberPhoto: this.editingBirthdayData.rememberPhoto
+          };
+
+          this.birthdayService.updateBirthday(updatedBirthday);
+        }
+      }).unsubscribe();
+    }
+  }
+
   quickEditName(birthday: any): void {
     this.editingBirthdayId = birthday.id;
     this.editingBirthdayData = {
       name: birthday.name,
       notes: birthday.notes || '',
       birthDate: this.formatDateForInput(birthday.birthDate),
-      category: birthday.category || this.defaultCategory
+      category: birthday.category || this.defaultCategory,
+      photo: birthday.photo || null,
+      rememberPhoto: birthday.rememberPhoto || null
     };
   }
 
@@ -2658,13 +2834,15 @@ export class DashboardComponent implements OnInit {
   }
 
   private autoSaveBirthday(birthday: any): void {
-    if (this.editingBirthdayId === birthday.id && this.editingBirthdayData.name?.trim()) {
+    if (this.editingBirthdayId === birthday.id && (this.editingBirthdayData.name?.trim() || birthday.name)) {
       const updatedBirthday = {
         ...birthday,
-        name: this.editingBirthdayData.name.trim(),
+        name: this.editingBirthdayData.name?.trim() || birthday.name,
         notes: this.editingBirthdayData.notes?.trim() || '',
-        birthDate: new Date(this.editingBirthdayData.birthDate),
-        category: this.editingBirthdayData.category
+        birthDate: this.editingBirthdayData.birthDate ? new Date(this.editingBirthdayData.birthDate) : birthday.birthDate,
+        category: this.editingBirthdayData.category || birthday.category,
+        photo: this.editingBirthdayData.photo !== undefined ? this.editingBirthdayData.photo : birthday.photo,
+        rememberPhoto: this.editingBirthdayData.rememberPhoto !== undefined ? this.editingBirthdayData.rememberPhoto : birthday.rememberPhoto
       };
       this.birthdayService.updateBirthday(updatedBirthday);
       console.log('Auto-saved:', updatedBirthday.name);

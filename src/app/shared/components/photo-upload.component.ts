@@ -22,7 +22,7 @@ import { MaterialModule } from '../material.module';
 
         <div *ngIf="!currentPhoto" class="photo-placeholder">
           <mat-icon class="upload-icon">add_a_photo</mat-icon>
-          <span class="upload-text">Add Photo</span>
+          <span class="upload-text">Add Remember Photo</span>
           <small class="upload-hint">Click to upload image</small>
         </div>
         
