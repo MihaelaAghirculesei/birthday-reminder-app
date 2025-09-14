@@ -300,9 +300,9 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                 
                 <div class="dashboard-actions">
                   <div class="birthday-days-circle"
-                       [class]="getDaysChipClass(birthday.daysUntil)" *ngIf="!isEditing(birthday.id)">
+                       [class]="getDaysChipClass(birthdayService.getDaysUntilBirthday(birthday.birthDate))" *ngIf="!isEditing(birthday.id)">
                     <div class="days-circle-content">
-                      <div class="days-number">{{ getDaysText(birthday.daysUntil) }}</div>
+                      <div class="days-number">{{ getDaysText(birthdayService.getDaysUntilBirthday(birthday.birthDate)) }}</div>
                     </div>
                   </div>
                   
@@ -2582,9 +2582,9 @@ export class DashboardComponent implements OnInit {
   }
 
   getDaysChipClass(days: number): string {
-    if (days <= 7) return 'red-alert';    
-    if (days <= 30) return 'orange-warning'; 
-    return 'green-safe';                      
+    if (days <= 7) return 'red-alert';
+    if (days <= 15) return 'orange-warning';
+    return 'green-safe';
   }
 
 
@@ -2656,7 +2656,6 @@ export class DashboardComponent implements OnInit {
 
   deleteBirthday(birthday: any): void {
     this.lastAction = { type: 'delete', data: { ...birthday } };
-    console.log('Saved for undo:', this.lastAction);
     this.birthdayService.deleteBirthday(birthday.id);
   }
 
@@ -2845,7 +2844,6 @@ export class DashboardComponent implements OnInit {
         rememberPhoto: this.editingBirthdayData.rememberPhoto !== undefined ? this.editingBirthdayData.rememberPhoto : birthday.rememberPhoto
       };
       this.birthdayService.updateBirthday(updatedBirthday);
-      console.log('Auto-saved:', updatedBirthday.name);
     }
   }
 
@@ -2866,12 +2864,8 @@ export class DashboardComponent implements OnInit {
           return [];
         }
         
-        let filteredBirthdays = birthdays
-          .map(birthday => ({
-            ...birthday,
-            daysUntil: this.birthdayService.getDaysUntilBirthday(birthday.birthDate)
-          }))
-          .sort((a, b) => a.daysUntil - b.daysUntil);
+        let filteredBirthdays = [...birthdays]
+          .sort((a, b) => this.birthdayService.getDaysUntilBirthday(a.birthDate) - this.birthdayService.getDaysUntilBirthday(b.birthDate));
         
         if (this.dashboardSearchTerm.trim()) {
           const searchTerm = this.dashboardSearchTerm.toLowerCase().trim();
