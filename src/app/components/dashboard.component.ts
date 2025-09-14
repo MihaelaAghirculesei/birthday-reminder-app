@@ -916,6 +916,8 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         height: 100%;
         object-fit: cover;
         border-radius: 50%;
+        border: 4px solid #6c757d;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
       
       .dashboard-default-icon {
@@ -970,12 +972,12 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       align-items: flex-start;
       gap: 16px;
       padding: 16px;
-      margin-left: 10px;
+      margin: 0 10px 10px 10px;
       position: relative;
-      background: #f8f9fa;
-      border-radius: 8px;
+      background: #e9ecef;
+      border-radius: 12px;
       border-left: 8px solid #4c3fd9;
-      border: 1px solid transparent;
+      border: 4px solid #6c757d;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
@@ -983,9 +985,13 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       &:hover {
         transform: translateY(-2px) scale(1.02);
         box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        border: 1px solid #6c757d;
+        border: 4px solid #495057;
         border-left: 8px solid #4c3fd9;
-        background: #f1f3f4;
+        background: #ced4da;
+
+        .dashboard-photo {
+          border: 4px solid #495057;
+        }
       }
       
       &:focus, &:focus-within {
@@ -1029,7 +1035,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin: 8px 0;
     }
     
     .dashboard-birth-date {
@@ -1120,11 +1125,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       align-items: center;
       justify-content: space-between;
       margin-top: 8px;
-      min-height: 40px;
-
-      * {
-        vertical-align: middle;
-      }
     }
 
     .dashboard-icons-left {
@@ -1138,12 +1138,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-shrink: 0;
-
-      button {
-        margin: 0 !important;
-        align-self: center;
-      }
     }
     
     .edit-button-circle {
@@ -2321,7 +2315,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
 
       .dashboard-birthday-details {
         gap: 6px;
-        margin: 6px 0;
       }
       
       .dashboard-birth-date {
