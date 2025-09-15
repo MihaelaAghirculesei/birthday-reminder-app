@@ -34,13 +34,13 @@ import { MaterialModule } from '../material.module';
           style="display: none;">
       </div>
       
-      <button *ngIf="currentPhoto" 
-              mat-icon-button 
-              color="warn" 
-              class="remove-photo-btn"
+      <button *ngIf="currentPhoto"
+              mat-icon-button
+              color="warn"
+              class="delete-button-circle"
               (click)="removePhoto($event)"
               matTooltip="Remove photo">
-        <mat-icon>delete</mat-icon>
+        <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
       </button>
     </div>
   `,
@@ -156,20 +156,40 @@ import { MaterialModule } from '../material.module';
         line-height: 1.2;
       }
     }
-    
-    .remove-photo-btn {
-      flex-shrink: 0;
-      width: 36px !important;
-      height: 36px !important;
-      background: var(--warning) !important;
+
+    .delete-button-circle {
+      width: 40px !important;
+      height: 40px !important;
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
       color: white !important;
-      
+      border-radius: 50% !important;
+      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3) !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-top: 8px !important;
+      flex-shrink: 0;
+
       &:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(252, 70, 107, 0.4);
+        transform: translateY(-1px) scale(1.1) !important;
+        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4) !important;
+      }
+
+      .delete-icon {
+        width: 18px !important;
+        height: 18px !important;
+        filter: brightness(0) invert(1);
+        transition: all 0.3s ease;
+        object-fit: contain;
+      }
+
+      &:hover .delete-icon {
+        filter: brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,255,255,0.8));
       }
     }
-    
+
     @media (max-width: 768px) {
       .photo-upload-container {
         flex-direction: column;

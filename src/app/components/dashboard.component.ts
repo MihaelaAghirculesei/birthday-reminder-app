@@ -1393,10 +1393,12 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       }
       
       .delete-icon {
-        width: 34px !important;
-        height: 34px !important;
+        width: 24px !important;
+        height: 24px !important;
         filter: brightness(0) invert(1);
         transition: all 0.3s ease;
+        display: block !important;
+        margin: auto !important;
       }
 
       &:hover .delete-icon {
@@ -2697,9 +2699,11 @@ export class DashboardComponent {
     const updatedBirthday = {
       ...birthday,
       name: this.editingBirthdayData.name.trim() || birthday.name,
-      notes: this.editingBirthdayData.notes.trim(),
+      notes: this.editingBirthdayData.notes?.trim() || '',
       birthDate: new Date(this.editingBirthdayData.birthDate),
-      category: this.editingBirthdayData.category
+      category: this.editingBirthdayData.category,
+      photo: this.editingBirthdayData.photo,
+      rememberPhoto: this.editingBirthdayData.rememberPhoto
     };
     
     this.birthdayService.updateBirthday(updatedBirthday);
@@ -2812,7 +2816,6 @@ export class DashboardComponent {
       }).unsubscribe();
     }
   }
-
 
   undoLastAction(): void {
     if (!this.lastAction) return;
