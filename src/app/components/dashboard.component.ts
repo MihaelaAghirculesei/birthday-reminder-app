@@ -1178,7 +1178,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      margin-top: 29px !important;
       margin-right: 8px !important;
       
       &:hover {
@@ -1211,7 +1210,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      margin-top: 29px !important;
       margin-right: 8px !important;
       
       &:hover {
@@ -1244,7 +1242,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      margin-top: 29px !important;
       
       &:hover {
         transform: translateY(-1px) scale(1.1) !important;
@@ -1385,7 +1382,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      margin-top: 29px !important;
       
       &:hover {
         transform: translateY(-1px) scale(1.1) !important;
