@@ -201,8 +201,9 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
           </mat-card-header>
           <mat-card-content>
             <div class="dashboard-birthday-list scrollable" *ngIf="(allBirthdays$ | async)?.length! > 0">
-              <div *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday" 
+              <div *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday"
                    class="dashboard-birthday-item"
+                   (dblclick)="onCardDoubleClick($event, birthday)"
                    tabindex="0">
                 
                 <div class="dashboard-avatar" *ngIf="birthday.photo">
@@ -215,9 +216,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                 <div class="dashboard-birthday-content">
                   <div class="dashboard-birthday-info">
                     <div class="dashboard-name"
-                         *ngIf="!isEditing(birthday.id)"
-                         (dblclick)="quickEditName(birthday)"
-                         title="Double-click to edit">{{ birthday.name }}</div>
+                         *ngIf="!isEditing(birthday.id)">{{ birthday.name }}</div>
                     <input *ngIf="isEditing(birthday.id)"
                            type="text"
                            [(ngModel)]="editingBirthdayData.name"
@@ -277,7 +276,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                       <ng-container *ngIf="!isEditing(birthday.id)">
                         <button mat-icon-button
                                 color="primary"
-                                (click)="editBirthday(birthday)"
+                                (click)="editBirthday(birthday); $event.stopPropagation()"
                                 class="edit-button-circle"
                                 matTooltip="Edit birthday">
                           <mat-icon class="edit-icon">edit</mat-icon>
@@ -285,7 +284,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
 
                         <button mat-icon-button
                                 color="warn"
-                                (click)="deleteBirthday(birthday)"
+                                (click)="deleteBirthday(birthday); $event.stopPropagation()"
                                 class="delete-button-circle"
                                 matTooltip="Delete birthday">
                           <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
@@ -295,7 +294,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
                       <ng-container *ngIf="isEditing(birthday.id)">
                         <button mat-icon-button
                                 color="primary"
-                                (click)="saveEditingBirthday(birthday)"
+                                (click)="saveEditingBirthday(birthday); $event.stopPropagation()"
                                 class="save-button-circle"
                                 matTooltip="Save changes">
                           <mat-icon class="save-icon">check</mat-icon>
@@ -303,7 +302,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
 
                         <button mat-icon-button
                                 color="warn"
-                                (click)="cancelEditingBirthday()"
+                                (click)="cancelEditingBirthday(); $event.stopPropagation()"
                                 class="cancel-button-circle"
                                 matTooltip="Cancel">
                           <mat-icon class="cancel-icon">close</mat-icon>
@@ -412,7 +411,7 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
 
       <div class="dev-controls" *ngIf="(totalBirthdays$ | async)! > 0" style="margin-top: 16px; text-align: center;">
         <button mat-stroked-button color="warn" (click)="clearAllData()" [disabled]="isClearingData">
-          <mat-icon *ngIf="!isClearingData">delete_sweep</mat-icon>
+          <img src="assets/icons/delete-button.png" alt="Delete" *ngIf="!isClearingData" style="width: 16px; height: 16px; filter: brightness(0) saturate(100%) invert(21%) sepia(97%) saturate(7471%) hue-rotate(357deg) brightness(90%) contrast(108%);">
           <mat-progress-spinner *ngIf="isClearingData" diameter="16" mode="indeterminate"></mat-progress-spinner>
           {{ isClearingData ? 'Clearing...' : 'Clear All Data (Test)' }}
         </button>
@@ -1198,10 +1197,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       &:hover .edit-icon {
         filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
       }
-      
-      .mat-mdc-button-touch-target {
-        background: transparent !important;
-      }
     }
 
     .save-button-circle {
@@ -1235,10 +1230,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       &:hover .save-icon {
         filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
       }
-      
-      .mat-mdc-button-touch-target {
-        background: transparent !important;
-      }
     }
 
     .cancel-button-circle {
@@ -1270,10 +1261,6 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
       
       &:hover .cancel-icon {
         filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
-      }
-      
-      .mat-mdc-button-touch-target {
-        background: transparent !important;
       }
     }
 
@@ -1411,17 +1398,16 @@ import { DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../shared/constants/categ
         filter: brightness(0) invert(1);
         transition: all 0.3s ease;
       }
-      
+
       &:hover .delete-icon {
         filter: brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,255,255,0.8));
       }
-      
-      .mat-mdc-button-touch-target {
-        background: transparent !important;
-      }
     }
-    
-    
+
+    .mat-mdc-button-touch-target {
+      background: transparent !important;
+    }
+
     .birthday-days-circle {
       width: 90px;
       height: 90px;
@@ -2678,6 +2664,13 @@ export class DashboardComponent {
     this.birthdayService.deleteBirthday(birthday.id);
   }
 
+  onCardDoubleClick(event: Event, birthday: any): void {
+    if (!this.isEditing(birthday.id)) {
+      event.stopPropagation();
+      this.editBirthday(birthday);
+    }
+  }
+
   editBirthday(birthday: any): void {
     this.editingBirthdayId = birthday.id;
     this.editingBirthdayData = {
@@ -2820,17 +2813,6 @@ export class DashboardComponent {
     }
   }
 
-  quickEditName(birthday: any): void {
-    this.editingBirthdayId = birthday.id;
-    this.editingBirthdayData = {
-      name: birthday.name,
-      notes: birthday.notes || '',
-      birthDate: this.formatDateForInput(birthday.birthDate),
-      category: birthday.category || this.defaultCategory,
-      photo: birthday.photo || null,
-      rememberPhoto: birthday.rememberPhoto || null
-    };
-  }
 
   undoLastAction(): void {
     if (!this.lastAction) return;
