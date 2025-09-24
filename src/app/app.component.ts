@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 
@@ -51,7 +51,6 @@ export class AppComponent {
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
 
-
   constructor(
     private fb: FormBuilder,
     private birthdayService: BirthdayService
@@ -67,7 +66,6 @@ export class AppComponent {
     this.birthdays$ = this.birthdayService.birthdays$;
   }
 
-
   onSubmit() {
     if (this.birthdayForm.valid) {
       const birthDate = new Date(this.birthdayForm.value.birthDate);
@@ -79,12 +77,10 @@ export class AppComponent {
         zodiacSign: zodiacSign.name
       };
       this.birthdayService.addBirthday(formData);
-      this.birthdayForm.reset();
-      this.birthdayForm.patchValue({ reminderDays: 7 });
+      this.birthdayForm.reset({ reminderDays: 7 });
       this.selectedPhoto = null;
     }
   }
-
 
   onPhotoSelected(photo: string): void {
     this.selectedPhoto = photo;
@@ -95,7 +91,6 @@ export class AppComponent {
     this.selectedPhoto = null;
     this.birthdayForm.patchValue({ photo: null });
   }
-
 
   async addTestData(): Promise<void> {
     this.isAddingTestData = true;
@@ -110,7 +105,7 @@ export class AppComponent {
     this.isAddBirthdayExpanded = !this.isAddBirthdayExpanded;
   }
 
-  private pastDateValidator(control: any) {
+  private pastDateValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
     
     const selectedDate = new Date(control.value);
