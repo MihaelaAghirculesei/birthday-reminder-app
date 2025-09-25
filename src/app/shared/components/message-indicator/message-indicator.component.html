@@ -1,0 +1,28 @@
+<button
+  class="message-indicator-button"
+  [matTooltip]="getTooltipText()"
+  [ngStyle]="{ 'border-color': hasActiveMessages ? '#9b59b6' : '#95a5a6' }"
+  type="button"
+  (click)="debugClick()"
+>
+  <img
+    *ngIf="hasActiveMessages"
+    src="assets/icons/configured-message.png"
+    alt="Message configured"
+    class="configured-message-icon"
+  />
+
+  <img
+    *ngIf="!hasActiveMessages"
+    src="assets/icons/not-configured-message.png"
+    alt="No message configured"
+    class="not-configured-message-icon"
+  />
+
+  <span
+    *ngIf="hasActiveMessages && activeMessageCount > 1"
+    class="message-count"
+  >
+    {{ activeMessageCount }}
+  </span>
+</button>

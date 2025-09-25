@@ -1,0 +1,238 @@
+<div class="message-scheduler">
+  <mat-card class="scheduler-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>schedule_send</mat-icon>
+        Scheduled Messages for {{ birthday?.name }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        Create messages to send automatically on birthday
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-expansion-panel
+        class="new-message-panel"
+        [expanded]="isCreatingMessage"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>add</mat-icon>
+            Create New Message
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <form
+          [formGroup]="messageForm"
+          (ngSubmit)="saveMessage()"
+          class="message-form"
+        >
+          <div class="templates-section">
+            <h4>Predefined Templates</h4>
+            <div class="template-chips">
+              <mat-chip-option
+                *ngFor="let template of templates"
+                (click)="applyTemplate(template)"
+                class="template-chip"
+              >
+                {{ template.title }}
+              </mat-chip-option>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="title-field">
+              <mat-label>Message Title</mat-label>
+              <input
+                matInput
+                formControlName="title"
+                placeholder="e.g. Happy Birthday!"
+              />
+              <mat-icon matSuffix>title</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="time-field">
+              <mat-label>Sending Time</mat-label>
+              <mat-select formControlName="deliveryTime">
+                <mat-option *ngFor="let time of timeSlots" [value]="time">
+                  {{ time }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>access_time</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="priority-field">
+              <mat-label>Priority</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option value="low">
+                  <mat-icon>keyboard_arrow_down</mat-icon> Low
+                </mat-option>
+                <mat-option value="normal">
+                  <mat-icon>remove</mat-icon> Normal
+                </mat-option>
+                <mat-option value="high">
+                  <mat-icon>keyboard_arrow_up</mat-icon> High
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="toggle-field">
+              <mat-slide-toggle formControlName="isActive">
+                Active Message
+              </mat-slide-toggle>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="message-field">
+            <mat-label>Message</mat-label>
+            <textarea
+              matInput
+              formControlName="message"
+              rows="4"
+              placeholder="Write your personalized message..."
+            ></textarea>
+            <mat-hint>
+              Use: {{ "{" }}name{{ "}" }} for name, {{ "{" }}age{{ "}" }} for age, {{ "{" }}zodiac{{ "}" }} for zodiac sign
+            </mat-hint>
+          </mat-form-field>
+
+          <div
+            class="message-preview"
+            *ngIf="messageForm.get('message')?.value"
+          >
+            <h4>Preview:</h4>
+            <div class="preview-content">
+              <strong>{{ messageForm.get("title")?.value }}</strong>
+              <p>{{ getMessagePreview() }}</p>
+              <small
+                >Will be sent at
+                {{ messageForm.get("deliveryTime")?.value }}</small
+              >
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" mat-stroked-button (click)="cancelEdit()">
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              mat-raised-button
+              color="primary"
+              [disabled]="messageForm.invalid"
+            >
+              <mat-icon>save</mat-icon>
+              {{ editingMessage ? "Update" : "Save" }} Message
+            </button>
+          </div>
+        </form>
+      </mat-expansion-panel>
+
+      <div class="messages-list" *ngIf="messages.length > 0">
+        <h3>Scheduled Messages ({{ messages.length }})</h3>
+
+        <div
+          class="message-item"
+          *ngFor="let message of messages; trackBy: trackByMessageId"
+          [class.inactive]="!message.isActive"
+        >
+          <div class="message-header">
+            <div class="message-title-row">
+              <h4>{{ message.title }}</h4>
+              <div class="message-badges">
+                <span
+                  class="priority-badge"
+                  [class]="'priority-' + message.priority"
+                >
+                  {{ message.priority }}
+                </span>
+                <span class="time-badge">{{ message.deliveryTime }}</span>
+                <mat-icon
+                  class="status-icon"
+                  [class.active]="message.isActive"
+                  [matTooltip]="
+                    message.isActive
+                      ? 'Active message'
+                      : 'Disabled message'
+                  "
+                >
+                  {{
+                    message.isActive
+                      ? "notifications_active"
+                      : "notifications_off"
+                  }}
+                </mat-icon>
+              </div>
+            </div>
+
+            <div class="message-meta">
+              <small>Created: {{ formatDate(message.createdDate) }}</small>
+              <small *ngIf="message.lastSentDate">
+                Last sent: {{ formatDate(message.lastSentDate) }}
+              </small>
+            </div>
+          </div>
+
+          <div class="message-content">
+            <p>{{ getProcessedMessage(message) }}</p>
+          </div>
+
+          <div class="message-actions">
+            <button
+              mat-icon-button
+              (click)="editMessage(message)"
+              title="Edit"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              (click)="toggleMessageStatus(message)"
+              [title]="message.isActive ? 'Disable' : 'Enable'"
+            >
+              <mat-icon>{{
+                message.isActive ? "pause" : "play_arrow"
+              }}</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              (click)="testMessage(message)"
+              title="Send test"
+              color="accent"
+            >
+              <mat-icon>send</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              (click)="deleteMessage(message)"
+              title="Delete"
+              color="warn"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="messages.length === 0">
+        <mat-icon>schedule_send</mat-icon>
+        <h3>No scheduled messages</h3>
+        <p>Create your first automatic message for {{ birthday?.name }}</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="startCreatingMessage()"
+        >
+          <mat-icon>add</mat-icon>
+          Create First Message
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

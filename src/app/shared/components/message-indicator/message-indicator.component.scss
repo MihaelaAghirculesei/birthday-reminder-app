@@ -1,0 +1,92 @@
+.message-indicator-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid #9b59b6;
+  background: white;
+  cursor: help;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.configured-message-icon,
+.not-configured-message-icon {
+  width: 32px;
+  height: 32px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.message-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .message-indicator-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .configured-message-icon,
+  .not-configured-message-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .message-count {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    top: -4px;
+    right: -4px;
+  }
+}
+
+:host ::ng-deep .mat-mdc-tooltip {
+  background-color: #f8f4ff !important;
+  color: #2d1838 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #9b59b6 !important;
+}
+
+:host ::ng-deep .mat-mdc-tooltip .mdc-tooltip__surface {
+  background-color: #f8f4ff !important;
+  color: #2d1838 !important;
+}
+
+:host ::ng-deep .mat-mdc-tooltip * {
+  color: #2d1838 !important;
+}

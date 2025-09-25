@@ -1,0 +1,58 @@
+<div class="scheduled-messages-container">
+  <div class="header">
+    <h2>Messaggi Programmati</h2>
+    <button mat-raised-button color="primary" (click)="openScheduleDialog()">
+      <mat-icon>add</mat-icon>
+      Nuovo Messaggio
+    </button>
+  </div>
+
+  <div
+    class="messages-list"
+    *ngIf="scheduledMessages.length > 0; else noMessages"
+  >
+    <mat-card *ngFor="let message of scheduledMessages" class="message-card">
+      <mat-card-header>
+        <mat-card-title>{{ message.title }}</mat-card-title>
+        <mat-card-subtitle
+          >Orario: {{ message.deliveryTime }} | Creato:
+          {{ message.createdDate | date : "dd/MM/yyyy" }}</mat-card-subtitle
+        >
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ message.message }}</p>
+        <div class="message-info">
+          <span class="priority" [class]="'priority-' + message.priority">{{
+            message.priority | titlecase
+          }}</span>
+          <span class="status" [class.active]="message.isActive">{{
+            message.isActive ? "Attivo" : "Disattivo"
+          }}</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button (click)="editMessage(message)">
+          <mat-icon>edit</mat-icon>
+          Modifica
+        </button>
+        <button mat-button color="warn" (click)="deleteMessage(message.id)">
+          <mat-icon>delete</mat-icon>
+          Elimina
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <ng-template #noMessages>
+    <div class="no-messages">
+      <mat-icon class="large-icon">schedule</mat-icon>
+      <h3>Nessun messaggio programmato</h3>
+      <p>Inizia creando il tuo primo messaggio programmato</p>
+      <button mat-raised-button color="primary" (click)="openScheduleDialog()">
+        Crea Messaggio
+      </button>
+    </div>
+  </ng-template>
+</div>

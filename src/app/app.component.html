@@ -78,11 +78,17 @@
               <mat-hint>How many days before do you want to be reminded?</mat-hint>
               <mat-icon matSuffix>notifications</mat-icon>
             </mat-form-field>
+
+            <!-- Message Scheduler Section -->
+            <div *ngIf="getFormPreviewBirthday()" class="message-scheduler-section">
+              <app-message-scheduler [birthday]="getFormPreviewBirthday()"></app-message-scheduler>
+            </div>
+
             <div class="form-actions">
-              <button 
-                mat-raised-button 
-                color="primary" 
-                type="submit" 
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
                 [disabled]="birthdayForm.invalid"
                 class="submit-button">
                 <mat-icon>add</mat-icon>
