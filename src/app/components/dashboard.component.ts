@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, map } from 'rxjs';
@@ -3027,6 +3027,10 @@ export class DashboardComponent {
   }
 
   editBirthday(birthday: any): void {
+    if (this.editingBirthdayId && this.editingBirthdayId !== birthday.id) {
+      this.cancelEditingBirthday();
+    }
+
     this.editingBirthdayId = birthday.id;
     this.editingBirthdayData = {
       name: birthday.name,
@@ -3072,6 +3076,25 @@ export class DashboardComponent {
 
   isEditing(birthdayId: string): boolean {
     return this.editingBirthdayId === birthdayId;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.editingBirthdayId) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest('button, mat-icon')) return;
+
+    const clickedBirthdayItem = target.closest('.dashboard-birthday-item') as HTMLElement;
+
+    if (clickedBirthdayItem) {
+      const isInEditMode = clickedBirthdayItem.querySelector('.edit-name-input, .dashboard-category-edit, .dashboard-photo-edit');
+      if (!isInEditMode) {
+        this.cancelEditingBirthday();
+      }
+    } else {
+      this.cancelEditingBirthday();
+    }
   }
 
   getBirthdayCategories() {
