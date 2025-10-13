@@ -1,0 +1,15 @@
+<div
+  class="remember-photo-icon"
+  *ngIf="photoUrl"
+  [matTooltip]="getTooltip()"
+  matTooltipPosition="below"
+  (click)="onDownload()"
+  (dblclick)="onShare()"
+  tabindex="0"
+>
+  <img
+    [src]="photoUrl"
+    [alt]="birthdayName + ' remember photo'"
+    class="remember-photo-mini"
+  />
+</div>

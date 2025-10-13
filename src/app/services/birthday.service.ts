@@ -236,9 +236,13 @@ export class BirthdayService {
 
   getBirthdaysThisMonth(): Birthday[] {
     const currentMonth = new Date().getMonth();
-    return this.birthdays.filter(birthday => 
+    return this.birthdays.filter(birthday =>
       birthday.birthDate.getMonth() === currentMonth
     );
+  }
+
+  getBirthdaysNext30Days(): Birthday[] {
+    return this.getUpcomingBirthdays(30);
   }
 
   getAverageAge(): number {

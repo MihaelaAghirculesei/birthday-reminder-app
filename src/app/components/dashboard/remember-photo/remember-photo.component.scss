@@ -1,0 +1,29 @@
+.remember-photo-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 3px solid #dc3545;
+  flex-shrink: 0;
+  position: relative;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px #dc3545;
+    border-color: #c82333;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 12px #dc3545;
+    border-color: #c82333;
+  }
+}
+
+.remember-photo-mini {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

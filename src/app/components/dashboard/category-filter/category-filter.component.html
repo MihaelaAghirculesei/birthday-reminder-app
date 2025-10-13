@@ -1,0 +1,55 @@
+<div class="categories-section" *ngIf="categoriesStats.length > 0">
+  <div class="section-header">
+    <div class="section-title-wrapper">
+      <h3 class="section-title">
+        <div class="title-icon-wrapper">
+          <mat-icon>category</mat-icon>
+        </div>
+        Categories Overview
+      </h3>
+      <p class="section-subtitle">Click any category to filter your birthdays</p>
+    </div>
+    <button
+      *ngIf="selectedCategory"
+      mat-fab
+      color="primary"
+      class="clear-all-btn"
+      (click)="clearFilter()"
+      matTooltip="Clear all filters"
+    >
+      <mat-icon>clear_all</mat-icon>
+    </button>
+  </div>
+
+  <div class="categories-grid">
+    <div
+      *ngFor="let categoryStats of categoriesStats"
+      class="category-stat-card"
+      [class.selected]="isCategorySelected(categoryStats.id)"
+      (click)="selectCategory(categoryStats.id)"
+    >
+      <div class="category-card-background"></div>
+      <div class="category-stat-content">
+        <div class="category-icon-section">
+          <category-icon
+            [categoryId]="categoryStats.id"
+            cssClass="category-stat-icon"
+          ></category-icon>
+          <div
+            class="selection-indicator"
+            *ngIf="isCategorySelected(categoryStats.id)"
+          >
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+        <div class="category-stat-info">
+          <div class="category-stat-name">{{ categoryStats.name }}</div>
+          <div class="category-stat-count">
+            {{ categoryStats.count }}
+            {{ categoryStats.count === 1 ? 'person' : 'people' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,511 @@
+// Birthday List Card Styles
+.birthday-list-card {
+  background: var(--surface) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow) !important;
+  border: 1px solid var(--border-light) !important;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-elevated) !important;
+  }
+
+  .mat-mdc-card-content {
+    padding: 32px !important;
+  }
+}
+
+// Birthday List Header
+.birthday-list-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--secondary) 100%
+  );
+  color: var(--text-primary);
+  padding: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+// Header Title Section
+.header-title-section {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .mat-mdc-card-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+    text-shadow: none;
+  }
+}
+
+// Undo Button Enhanced
+.undo-button-enhanced {
+  background: linear-gradient(
+    135deg,
+    #ff6b6b 0%,
+    #feca57 100%
+  ) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: 25px !important;
+  animation: pulse-undo 2s infinite;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6) !important;
+  }
+}
+
+// Pulse Undo Animation
+@keyframes pulse-undo {
+  0%,
+  100% {
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(255, 107, 107, 0.7);
+  }
+}
+
+// Header Search Section
+.header-search-section {
+  flex-shrink: 0;
+
+  .dashboard-search-field {
+    width: 300px;
+  }
+
+  * {
+    color: #000000 !important;
+  }
+}
+
+// Dashboard Search Field Styles
+::ng-deep .header-search-section .dashboard-search-field {
+  margin-bottom: 24px;
+
+  .mat-mdc-text-field-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .mat-mdc-form-field-flex {
+    background: var(--surface-elevated) !important;
+    border-radius: var(--radius) !important;
+    padding-left: 26px !important;
+    border: 2px solid var(--border) !important;
+  }
+
+  .mat-mdc-form-field-underline,
+  .mdc-line-ripple {
+    display: none !important;
+  }
+
+  .mat-mdc-input-element {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+
+  input[matInput] {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+
+  input {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+
+  .mat-mdc-form-field-infix input {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+
+  &.mat-focused .mat-mdc-form-field-flex {
+    border-color: var(--primary) !important;
+  }
+
+  &:hover:not(.mat-focused) .mat-mdc-form-field-flex {
+    border-color: var(--primary) !important;
+    opacity: 0.7;
+  }
+}
+
+// Dashboard Birthday List
+.dashboard-birthday-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &.scrollable {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 8px;
+    margin-right: -7px;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--surface-elevated);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--secondary);
+      }
+    }
+  }
+}
+
+// No Birthdays Styles
+.no-birthdays {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
+  background: var(--surface-elevated);
+  border-radius: var(--radius);
+  border: 2px dashed var(--border);
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 24px;
+    background: var(--primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  p {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 16px;
+  }
+}
+
+// No Data Icon
+.no-data-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 24px;
+  background: var(--primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// No Data Text
+.no-data-text {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 16px;
+}
+
+// Test Data Section
+.test-data-section {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.test-data-card {
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--secondary) 100%
+  ) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-elevated) !important;
+  border: none !important;
+  max-width: 600px;
+  width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .mat-mdc-card-content {
+    padding: 32px !important;
+  }
+}
+
+.test-data-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: var(--text-inverse);
+
+  .test-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    min-height: 80px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .test-info {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-inverse);
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.4;
+    }
+  }
+
+  .add-test-btn {
+    background: var(--text-inverse) !important;
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+    padding: 12px 24px !important;
+    border-radius: var(--radius) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 180px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &:hover:not([disabled]) {
+      background: rgba(255, 255, 255, 0.9) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    &[disabled] {
+      background: rgba(255, 255, 255, 0.7) !important;
+      color: rgba(102, 126, 234, 0.7) !important;
+      cursor: not-allowed;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// Clear Data Section (same as test-data-section)
+.clear-data-section {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.clear-data-card {
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--secondary) 100%
+  ) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-elevated) !important;
+  border: none !important;
+  max-width: 600px;
+  width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  .mat-mdc-card-content {
+    padding: 32px !important;
+  }
+}
+
+.clear-data-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: var(--text-inverse);
+
+  .test-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    min-height: 80px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .test-info {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-inverse);
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.4;
+    }
+  }
+}
+
+// FadeInUp Animation
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Media Queries
+@media (max-width: 768px) {
+  .birthday-list-card,
+  .chart-card {
+    .mat-mdc-card-content {
+      padding: 16px !important;
+      min-height: 280px !important;
+    }
+  }
+
+  .test-data-section {
+    margin-top: 24px;
+    padding: 0 8px;
+  }
+
+  .test-data-card {
+    .mat-mdc-card-content {
+      padding: 24px !important;
+    }
+  }
+
+  .test-data-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+
+    .test-icon {
+      min-width: 64px;
+      min-height: 64px;
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      padding: 12px;
+    }
+
+    .test-info {
+      h3 {
+        font-size: 1.3rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    .add-test-btn {
+      min-width: 160px;
+      height: 44px;
+    }
+  }
+
+  .dashboard-birthday-list {
+    gap: 16px;
+  }
+
+  .birthday-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+
+    .header-title-section {
+      min-width: auto;
+      width: 100%;
+    }
+
+    .header-search-section {
+      width: 100%;
+
+      .dashboard-search-field {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .birthday-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .header-title-section {
+      min-width: auto;
+    }
+
+    .header-search-section {
+      width: 100%;
+
+      .dashboard-search-field {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+  }
+}

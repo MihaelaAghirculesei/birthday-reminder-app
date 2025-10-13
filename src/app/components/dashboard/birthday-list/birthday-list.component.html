@@ -1,0 +1,116 @@
+<mat-card class="birthday-list-card">
+  <mat-card-header class="birthday-list-header">
+    <div class="header-title-section">
+      <mat-card-title>📅 All Upcoming Birthdays</mat-card-title>
+      <button
+        mat-raised-button
+        color="accent"
+        *ngIf="lastAction"
+        (click)="onUndo()"
+        class="undo-button-enhanced"
+        matTooltip="Undo last action"
+      >
+        <mat-icon>undo</mat-icon>
+        UNDO
+      </button>
+    </div>
+    <div class="header-search-section">
+      <mat-form-field appearance="fill" class="dashboard-search-field">
+        <mat-label>Search by name</mat-label>
+        <input
+          matInput
+          placeholder="Type to search..."
+          (input)="onSearchChange($event)"
+          [value]="searchTerm"
+        />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <div
+      class="dashboard-birthday-list scrollable"
+      *ngIf="birthdays.length > 0"
+    >
+      <app-birthday-item
+        *ngFor="let birthday of birthdays; trackBy: trackByBirthday"
+        [birthday]="birthday"
+        [isEditing]="isEditing(birthday.id)"
+        [editingData]="getEditingData()"
+        [daysUntilBirthday]="getDaysUntilBirthday(birthday.birthDate)"
+        (edit)="editBirthday($event)"
+        (delete)="deleteBirthday($event)"
+        (save)="saveBirthday($event)"
+        (cancel)="cancelEdit()"
+        (quickEdit)="quickEditName($event)"
+        (editInputChange)="onEditInputChange($event)"
+        (photoSelected)="onPhotoSelected($event)"
+        (photoRemoved)="onPhotoRemoved()"
+        (rememberPhotoSelected)="onRememberPhotoSelected($event)"
+        (rememberPhotoRemoved)="onRememberPhotoRemoved()"
+      ></app-birthday-item>
+    </div>
+
+    <div class="no-birthdays" *ngIf="birthdays.length === 0 && searchTerm">
+      <mat-icon class="no-data-icon">search_off</mat-icon>
+      <p class="no-data-text">No birthdays found matching "{{ searchTerm }}"</p>
+      <button mat-raised-button color="primary" (click)="onClearSearch()">
+        <mat-icon>clear</mat-icon>
+        Clear Search
+      </button>
+    </div>
+
+    <div class="no-birthdays" *ngIf="birthdays.length === 0 && !searchTerm && totalBirthdays === 0">
+      <mat-icon class="no-data-icon">cake</mat-icon>
+      <p class="no-data-text">No birthdays yet. Add your first one!</p>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<div class="test-data-section" *ngIf="totalBirthdays === 0">
+  <mat-card class="test-data-card">
+    <mat-card-content>
+      <div class="test-data-content">
+        <mat-icon class="test-icon">science</mat-icon>
+        <div class="test-info">
+          <h3>Want to try the app?</h3>
+          <p>Add 10 sample birthdays with photos to test all features</p>
+        </div>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onAddTestData()"
+          [disabled]="isAddingTestData"
+          class="add-test-btn"
+        >
+          <mat-icon>add_circle</mat-icon>
+          {{ isAddingTestData ? 'Adding...' : 'Add Test Data' }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="clear-data-section" *ngIf="totalBirthdays > 0">
+  <mat-card class="clear-data-card">
+    <mat-card-content>
+      <div class="clear-data-content">
+        <mat-icon class="clear-icon">delete_sweep</mat-icon>
+        <div class="clear-info">
+          <h3>Clear All Data</h3>
+          <p>Remove all birthdays from the app</p>
+        </div>
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="onClearAllData()"
+          [disabled]="isClearingData"
+          class="clear-all-btn"
+        >
+          <mat-icon>delete_forever</mat-icon>
+          {{ isClearingData ? 'Clearing...' : 'Clear All' }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

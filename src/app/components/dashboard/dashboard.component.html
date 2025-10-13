@@ -1,0 +1,66 @@
+<div class="dashboard-container">
+  <div class="dashboard-section">
+    <div class="dashboard-section-header">
+      <div class="dashboard-section-title-wrapper">
+        <h3 class="dashboard-section-title">
+          <div class="dashboard-title-icon-wrapper">
+            <calendar-icon
+              size="38"
+              strokeWidth="2"
+              cssClass="dashboard-hero-icon"
+            ></calendar-icon>
+          </div>
+          Dashboard & Statistics
+        </h3>
+        <p class="dashboard-section-subtitle">
+          Overview of your birthday collection
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <app-dashboard-stats
+    [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
+    [birthdaysThisMonth]="(birthdaysThisMonth$ | async) ?? 0"
+    [averageAge]="(averageAge$ | async) ?? 0"
+    [nextBirthdayDays]="(nextBirthdayDays$ | async) ?? 0"
+    [nextBirthdayText]="(nextBirthdayText$ | async) ?? ''"
+  ></app-dashboard-stats>
+
+  <!-- Category Filter Section -->
+  <app-category-filter
+    [categoriesStats]="(categoriesStats$ | async) ?? []"
+    [selectedCategory]="selectedCategory"
+    (categorySelected)="selectCategory($event)"
+    (filterCleared)="clearCategoryFilter()"
+  ></app-category-filter>
+
+  <!-- Birthday List Section -->
+  <app-birthday-list
+    [birthdays]="(allBirthdays$ | async) ?? []"
+    [searchTerm]="dashboardSearchTerm"
+    [lastAction]="lastAction"
+    [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
+    (searchTermChange)="onSearchTermChange($event)"
+    (clearSearch)="onClearSearch()"
+    (undoAction)="undoLastAction()"
+    (addTestData)="addTestData()"
+    (clearAllData)="clearAllData()"
+  ></app-birthday-list>
+
+  <!-- Chart Section -->
+  <div class="full-width-section">
+    <app-birthday-chart
+      [chartData]="(chartData$ | async) ?? []"
+      [maxCount]="(maxCount$ | async) ?? 0"
+      [currentMonth]="currentMonth"
+      [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
+    ></app-birthday-chart>
+  </div>
+
+  <!-- Google Calendar Sync Section -->
+  <div class="full-width-section">
+    <app-google-calendar-sync></app-google-calendar-sync>
+  </div>
+</div>

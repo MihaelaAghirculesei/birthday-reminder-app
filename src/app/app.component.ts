@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 
 import { MaterialModule } from './shared/material.module';
-import { DashboardComponent } from './components/dashboard.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { PhotoUploadComponent } from './shared/components/photo-upload.component';
 import { NetworkStatusComponent } from './shared/components/network-status.component';
 import { NotificationComponent } from './shared/components/notification.component';
