@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
-import { Birthday } from '../models/birthday.model';
+import { Birthday, ScheduledMessage } from '../models/birthday.model';
 import { MONTHS } from '../shared/constants';
 import { getZodiacSign } from '../shared/utils/zodiac.util';
 import { DEFAULT_CATEGORY } from '../shared/constants/categories';
@@ -433,5 +433,59 @@ export class BirthdayService {
       console.error('Error loading test birthdays:', error);
       this.notificationService.show('Error loading test data', 'error');
     }
+  }
+
+  async addMessageToBirthday(birthdayId: string, message: ScheduledMessage): Promise<void> {
+    await this.initializeService();
+
+    const birthday = this.birthdays.find(b => b.id === birthdayId);
+    if (!birthday) {
+      console.error('Birthday not found:', birthdayId);
+      return;
+    }
+
+    if (!birthday.scheduledMessages) {
+      birthday.scheduledMessages = [];
+    }
+
+    birthday.scheduledMessages.push(message);
+    await this.updateBirthday(birthday);
+  }
+
+  async updateMessageInBirthday(birthdayId: string, messageId: string, updates: Partial<ScheduledMessage>): Promise<void> {
+    await this.initializeService();
+
+    const birthday = this.birthdays.find(b => b.id === birthdayId);
+    if (!birthday?.scheduledMessages) {
+      console.error('Birthday or messages not found:', birthdayId);
+      return;
+    }
+
+    const messageIndex = birthday.scheduledMessages.findIndex(m => m.id === messageId);
+    if (messageIndex !== -1) {
+      birthday.scheduledMessages[messageIndex] = {
+        ...birthday.scheduledMessages[messageIndex],
+        ...updates
+      };
+      await this.updateBirthday(birthday);
+    }
+  }
+
+  async deleteMessageFromBirthday(birthdayId: string, messageId: string): Promise<void> {
+    await this.initializeService();
+
+    const birthday = this.birthdays.find(b => b.id === birthdayId);
+    if (!birthday?.scheduledMessages) {
+      console.error('Birthday or messages not found:', birthdayId);
+      return;
+    }
+
+    birthday.scheduledMessages = birthday.scheduledMessages.filter(m => m.id !== messageId);
+    await this.updateBirthday(birthday);
+  }
+
+  getMessagesByBirthday(birthdayId: string): ScheduledMessage[] {
+    const birthday = this.birthdays.find(b => b.id === birthdayId);
+    return birthday?.scheduledMessages || [];
   }
 }

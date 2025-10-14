@@ -178,6 +178,15 @@
       >
       </photo-upload>
     </div>
+
+    <!-- Message Scheduler Section -->
+    <div class="message-scheduler-section" *ngIf="isEditing">
+      <div class="photo-section-title">
+        <mat-icon class="small-icon">schedule_send</mat-icon>
+        <span>Scheduled Messages</span>
+      </div>
+      <app-message-scheduler [birthday]="birthday"></app-message-scheduler>
+    </div>
   </div>
 
   <div class="dashboard-actions">

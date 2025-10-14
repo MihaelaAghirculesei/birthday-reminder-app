@@ -6,6 +6,7 @@ import { ZodiacIconComponent } from '../../../../shared/components/zodiac-icon.c
 import { CategoryIconComponent } from '../../../../shared/components/category-icon.component';
 import { PhotoUploadComponent } from '../../../../shared/components/photo-upload.component';
 import { RememberPhotoComponent } from '../../remember-photo/remember-photo.component';
+import { MessageSchedulerComponent } from '../../../../shared/components/message-scheduler/message-scheduler.component';
 import { Birthday } from '../../../../models/birthday.model';
 import { BIRTHDAY_CATEGORIES } from '../../../../shared/constants/categories';
 
@@ -20,6 +21,7 @@ import { BIRTHDAY_CATEGORIES } from '../../../../shared/constants/categories';
     CategoryIconComponent,
     PhotoUploadComponent,
     RememberPhotoComponent,
+    MessageSchedulerComponent,
   ],
   templateUrl: './birthday-item.component.html',
   styleUrls: ['./birthday-item.component.scss'],

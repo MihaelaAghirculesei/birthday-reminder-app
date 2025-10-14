@@ -16,7 +16,6 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { PhotoUploadComponent } from './shared/components/photo-upload.component';
 import { NetworkStatusComponent } from './shared/components/network-status.component';
 import { NotificationComponent } from './shared/components/notification.component';
-import { MessageSchedulerComponent } from './shared/components/message-scheduler/message-scheduler.component';
 
 import { BirthdayService } from './services/birthday.service';
 import { Birthday } from './models/birthday.model';
@@ -33,7 +32,6 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     PhotoUploadComponent,
     NetworkStatusComponent,
     NotificationComponent,
-    MessageSchedulerComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
@@ -130,26 +128,6 @@ export class AppComponent {
 
   toggleAddBirthdaySection(): void {
     this.isAddBirthdayExpanded = !this.isAddBirthdayExpanded;
-  }
-
-  getFormPreviewBirthday(): Birthday | null {
-    if (!this.birthdayForm.get('name')?.value) return null;
-
-    return {
-      id: 'preview',
-      name: this.birthdayForm.get('name')?.value || '',
-      birthDate: new Date(
-        this.birthdayForm.get('birthDate')?.value || Date.now()
-      ),
-      notes: this.birthdayForm.get('notes')?.value,
-      reminderDays: this.birthdayForm.get('reminderDays')?.value,
-      photo: this.selectedPhoto || undefined,
-      zodiacSign: this.birthdayForm.get('birthDate')?.value
-        ? getZodiacSign(new Date(this.birthdayForm.get('birthDate')?.value))
-            .name
-        : '',
-      scheduledMessages: [],
-    };
   }
 
   private pastDateValidator(control: AbstractControl): ValidationErrors | null {

@@ -58,9 +58,8 @@ export class MessageSchedulerComponent implements OnInit {
 
   loadMessages(): void {
     if (this.birthday) {
-      this.messages = this.scheduledMessageService.getMessagesByBirthday(
-        this.birthday.id
-      );
+      const messages = this.birthdayService.getMessagesByBirthday(this.birthday.id);
+      this.messages = messages || [];
     }
   }
 
@@ -81,10 +80,10 @@ export class MessageSchedulerComponent implements OnInit {
     });
   }
 
-  saveMessage(): void {
+  async saveMessage(): Promise<void> {
     if (this.messageForm.valid && this.birthday) {
       if (this.editingMessage) {
-        this.scheduledMessageService.updateMessage(
+        await this.birthdayService.updateMessageInBirthday(
           this.birthday.id,
           this.editingMessage.id,
           this.messageForm.value
@@ -92,20 +91,11 @@ export class MessageSchedulerComponent implements OnInit {
         this.notificationService.show('Message updated!', 'success');
       } else {
         const newMessage = this.scheduledMessageService.createMessage(
-          this.birthday.id,
           this.messageForm.value
         );
 
-        if (!this.birthday.scheduledMessages) {
-          this.birthday.scheduledMessages = [];
-        }
-        this.birthday.scheduledMessages.push(newMessage);
-
-        this.birthdayService.updateBirthday(this.birthday);
-        this.notificationService.show(
-          'Scheduled message created!',
-          'success'
-        );
+        await this.birthdayService.addMessageToBirthday(this.birthday.id, newMessage);
+        this.notificationService.show('Scheduled message created!', 'success');
       }
 
       this.loadMessages();
@@ -125,9 +115,9 @@ export class MessageSchedulerComponent implements OnInit {
     this.messageForm.reset();
   }
 
-  toggleMessageStatus(message: ScheduledMessage): void {
+  async toggleMessageStatus(message: ScheduledMessage): Promise<void> {
     if (this.birthday) {
-      this.scheduledMessageService.updateMessage(this.birthday.id, message.id, {
+      await this.birthdayService.updateMessageInBirthday(this.birthday.id, message.id, {
         isActive: !message.isActive,
       });
       this.loadMessages();
@@ -145,9 +135,9 @@ export class MessageSchedulerComponent implements OnInit {
     }
   }
 
-  deleteMessage(message: ScheduledMessage): void {
+  async deleteMessage(message: ScheduledMessage): Promise<void> {
     if (confirm(`Delete message "${message.title}"?`) && this.birthday) {
-      this.scheduledMessageService.deleteMessage(this.birthday.id, message.id);
+      await this.birthdayService.deleteMessageFromBirthday(this.birthday.id, message.id);
       this.loadMessages();
       this.notificationService.show('Message deleted', 'success');
     }
@@ -199,7 +189,7 @@ export class MessageSchedulerComponent implements OnInit {
     }).format(new Date(date));
   }
 
-  trackByMessageId(index: number, message: ScheduledMessage): string {
+  trackByMessageId(_index: number, message: ScheduledMessage): string {
     return message.id;
   }
 }

@@ -5,22 +5,10 @@ import { ScheduledMessage } from '../models/birthday.model';
   providedIn: 'root'
 })
 export class ScheduledMessageService {
-  private storageKey = 'scheduledMessages';
-
   constructor() {}
 
-  getAllMessages(): ScheduledMessage[] {
-    const stored = localStorage.getItem(this.storageKey);
-    return stored ? JSON.parse(stored) : [];
-  }
-
-  getMessagesByBirthday(birthdayId: string): ScheduledMessage[] {
-    // For now, return all messages - you can filter by birthdayId later
-    return this.getAllMessages();
-  }
-
-  createMessage(birthdayId: string, messageData: Partial<ScheduledMessage>): ScheduledMessage {
-    const newMessage: ScheduledMessage = {
+  createMessage(messageData: Partial<ScheduledMessage>): ScheduledMessage {
+    return {
       id: this.generateId(),
       title: messageData.title || '',
       message: messageData.message || '',
@@ -30,28 +18,6 @@ export class ScheduledMessageService {
       messageType: messageData.messageType || 'text',
       priority: messageData.priority || 'normal'
     };
-
-    const messages = this.getAllMessages();
-    messages.push(newMessage);
-    this.saveMessages(messages);
-
-    return newMessage;
-  }
-
-  updateMessage(birthdayId: string, messageId: string, updates: Partial<ScheduledMessage>): void {
-    const messages = this.getAllMessages();
-    const index = messages.findIndex(m => m.id === messageId);
-
-    if (index !== -1) {
-      messages[index] = { ...messages[index], ...updates };
-      this.saveMessages(messages);
-    }
-  }
-
-  deleteMessage(birthdayId: string, messageId: string): void {
-    const messages = this.getAllMessages();
-    const filtered = messages.filter(m => m.id !== messageId);
-    this.saveMessages(filtered);
   }
 
   getMessageTemplates() {
@@ -86,11 +52,7 @@ export class ScheduledMessageService {
     return slots;
   }
 
-  private saveMessages(messages: ScheduledMessage[]): void {
-    localStorage.setItem(this.storageKey, JSON.stringify(messages));
-  }
-
   private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 }
