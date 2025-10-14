@@ -1,14 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { MaterialModule } from '../../material.module';
 import { Birthday } from '../../../models/birthday.model';
 
 @Component({
   selector: 'app-message-indicator',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, MaterialModule],
   templateUrl: './message-indicator.component.html',
   styleUrls: ['./message-indicator.component.scss'],
 })

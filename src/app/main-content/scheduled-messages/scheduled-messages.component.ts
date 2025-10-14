@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
+import { MaterialModule } from '../../shared/material.module';
 import { ScheduledMessageService } from '../../services/scheduled-message.service';
 import { NotificationService } from '../../services/notification.service';
 import { ScheduledMessage } from '../../models/birthday.model';
@@ -14,10 +12,7 @@ import { ScheduledMessage } from '../../models/birthday.model';
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
+    MaterialModule,
   ],
   templateUrl: './scheduled-messages.component.html',
   styleUrls: ['./scheduled-messages.component.scss'],
