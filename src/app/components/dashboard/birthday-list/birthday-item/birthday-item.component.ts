@@ -7,6 +7,7 @@ import { CategoryIconComponent } from '../../../../shared/components/category-ic
 import { PhotoUploadComponent } from '../../../../shared/components/photo-upload.component';
 import { RememberPhotoComponent } from '../../remember-photo/remember-photo.component';
 import { MessageSchedulerComponent } from '../../../../shared/components/message-scheduler/message-scheduler.component';
+import { MessageIndicatorComponent } from '../../../../shared/components/message-indicator/message-indicator.component';
 import { Birthday } from '../../../../models/birthday.model';
 import { BIRTHDAY_CATEGORIES } from '../../../../shared/constants/categories';
 
@@ -22,6 +23,7 @@ import { BIRTHDAY_CATEGORIES } from '../../../../shared/constants/categories';
     PhotoUploadComponent,
     RememberPhotoComponent,
     MessageSchedulerComponent,
+    MessageIndicatorComponent,
   ],
   templateUrl: './birthday-item.component.html',
   styleUrls: ['./birthday-item.component.scss'],
