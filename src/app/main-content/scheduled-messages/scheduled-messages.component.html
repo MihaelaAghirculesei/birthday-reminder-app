@@ -1,47 +1,65 @@
 <div class="scheduled-messages-container">
   <div class="header">
     <h2>Messaggi Programmati</h2>
-    <button mat-raised-button color="primary" (click)="openScheduleDialog()">
-      <mat-icon>add</mat-icon>
-      Nuovo Messaggio
-    </button>
+    <p class="subtitle">Tutti i messaggi programmati per i compleanni</p>
   </div>
 
   <div
     class="messages-list"
-    *ngIf="scheduledMessages.length > 0; else noMessages"
+    *ngIf="birthdaysWithMessages.length > 0; else noMessages"
   >
-    <mat-card *ngFor="let message of scheduledMessages" class="message-card">
+    <mat-card *ngFor="let birthday of birthdaysWithMessages" class="birthday-message-card">
       <mat-card-header>
-        <mat-card-title>{{ message.title }}</mat-card-title>
-        <mat-card-subtitle
-          >Orario: {{ message.deliveryTime }} | Creato:
-          {{ message.createdDate | date : "dd/MM/yyyy" }}</mat-card-subtitle
-        >
+        <div class="birthday-header">
+          <div class="birthday-avatar" *ngIf="birthday.photo">
+            <img [src]="birthday.photo" [alt]="birthday.name" />
+          </div>
+          <div class="birthday-avatar" *ngIf="!birthday.photo">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="birthday-info">
+            <mat-card-title>{{ birthday.name }}</mat-card-title>
+            <mat-card-subtitle>
+              {{ birthday.birthDate | date : "dd MMMM yyyy" }}
+            </mat-card-subtitle>
+          </div>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
-        <p>{{ message.message }}</p>
-        <div class="message-info">
-          <span class="priority" [class]="'priority-' + message.priority">{{
-            message.priority | titlecase
-          }}</span>
-          <span class="status" [class.active]="message.isActive">{{
-            message.isActive ? "Attivo" : "Disattivo"
-          }}</span>
+        <div class="messages-for-birthday">
+          <div
+            *ngFor="let message of birthday.scheduledMessages"
+            class="message-item"
+            [class.inactive]="!message.isActive"
+          >
+            <div class="message-header">
+              <span class="message-title">{{ message.title }}</span>
+              <span class="message-time">
+                <mat-icon class="small-icon">schedule</mat-icon>
+                {{ message.deliveryTime }}
+              </span>
+            </div>
+            <div class="message-content">{{ message.message }}</div>
+            <div class="message-footer">
+              <span class="priority" [class]="'priority-' + message.priority">
+                {{ getPriorityLabel(message.priority) }}
+              </span>
+              <span class="status" [class.active]="message.isActive">
+                {{ message.isActive ? "Attivo" : "Disattivo" }}
+              </span>
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteMessage(birthday.id, message.id)"
+                matTooltip="Elimina messaggio"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
         </div>
       </mat-card-content>
-
-      <mat-card-actions align="end">
-        <button mat-button (click)="editMessage(message)">
-          <mat-icon>edit</mat-icon>
-          Modifica
-        </button>
-        <button mat-button color="warn" (click)="deleteMessage(message.id)">
-          <mat-icon>delete</mat-icon>
-          Elimina
-        </button>
-      </mat-card-actions>
     </mat-card>
   </div>
 
@@ -49,10 +67,7 @@
     <div class="no-messages">
       <mat-icon class="large-icon">schedule</mat-icon>
       <h3>Nessun messaggio programmato</h3>
-      <p>Inizia creando il tuo primo messaggio programmato</p>
-      <button mat-raised-button color="primary" (click)="openScheduleDialog()">
-        Crea Messaggio
-      </button>
+      <p>Vai alla dashboard e modifica un compleanno per aggiungere messaggi programmati</p>
     </div>
   </ng-template>
 </div>
