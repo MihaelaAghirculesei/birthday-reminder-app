@@ -162,22 +162,13 @@
   }
 
   &.selected {
-    border: 2px solid var(--primary) !important;
-    background: linear-gradient(
-      135deg,
-      var(--primary-light) 0%,
-      rgba(102, 126, 234, 0.05) 100%
-    ) !important;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25) !important;
+    border: 2px solid rgb(99, 27, 103) !important;
+    background: rgb(222, 186, 248) !important;
+    box-shadow: 0 8px 32px rgba(235, 99, 235, 0.986) !important;
     transform: translateY(-4px) scale(1.05);
 
     &::before {
       opacity: 1;
-    }
-
-    .category-stat-name {
-      color: var(--primary);
-      font-weight: 800;
     }
 
     .category-card-background {
