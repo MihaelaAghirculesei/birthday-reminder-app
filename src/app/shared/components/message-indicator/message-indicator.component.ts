@@ -16,20 +16,9 @@ export class MessageIndicatorComponent {
 
   get hasActiveMessages(): boolean {
     if (!this.birthday?.scheduledMessages) {
-      console.log('No scheduled messages for:', this.birthday?.name);
       return false;
     }
-    const hasActive = this.birthday.scheduledMessages.some(
-      (msg) => msg.isActive
-    );
-    console.log(
-      'Has active messages for',
-      this.birthday.name,
-      ':',
-      hasActive,
-      this.birthday.scheduledMessages
-    );
-    return hasActive;
+    return this.birthday.scheduledMessages.some((msg) => msg.isActive);
   }
 
   get activeMessageCount(): number {
@@ -67,18 +56,6 @@ export class MessageIndicatorComponent {
     }
 
     return `✅ ${activeCount} of ${totalCount} configured messages are active`;
-  }
-
-  debugClick(): void {
-    console.log('=== MESSAGE INDICATOR DEBUG ===');
-    console.log('Birthday:', this.birthday);
-    console.log('Has active messages:', this.hasActiveMessages);
-    console.log('Active message count:', this.activeMessageCount);
-    console.log('Total message count:', this.totalMessageCount);
-    console.log(
-      'Border color should be:',
-      this.hasActiveMessages ? '#9b59b6' : '#95a5a6'
-    );
   }
 
   getNextMessageInfo(): string {
