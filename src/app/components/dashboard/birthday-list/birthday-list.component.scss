@@ -1,4 +1,3 @@
-// Birthday List Card Styles
 .birthday-list-card {
   background: var(--surface) !important;
   border-radius: var(--radius-lg) !important;
@@ -18,7 +17,6 @@
   }
 }
 
-// Birthday List Header
 .birthday-list-header {
   background: linear-gradient(
     135deg,
@@ -34,7 +32,6 @@
   gap: 16px;
 }
 
-// Header Title Section
 .header-title-section {
   flex: 1;
   min-width: 300px;
@@ -51,7 +48,6 @@
   }
 }
 
-// Undo Button Enhanced
 .undo-button-enhanced {
   background: linear-gradient(
     135deg,
@@ -74,7 +70,6 @@
   }
 }
 
-// Pulse Undo Animation
 @keyframes pulse-undo {
   0%,
   100% {
@@ -85,7 +80,6 @@
   }
 }
 
-// Header Search Section
 .header-search-section {
   flex-shrink: 0;
 
@@ -98,7 +92,6 @@
   }
 }
 
-// Dashboard Search Field Styles
 ::ng-deep .header-search-section .dashboard-search-field {
   margin-bottom: 24px;
 
@@ -150,7 +143,6 @@
   }
 }
 
-// Dashboard Birthday List
 .dashboard-birthday-list {
   display: flex;
   flex-direction: column;
@@ -182,7 +174,6 @@
   }
 }
 
-// No Birthdays Styles
 .no-birthdays {
   text-align: center;
   padding: 48px;
@@ -209,7 +200,6 @@
   }
 }
 
-// No Data Icon
 .no-data-icon {
   font-size: 64px;
   width: 64px;
@@ -221,7 +211,6 @@
   background-clip: text;
 }
 
-// No Data Text
 .no-data-text {
   text-align: center;
   color: var(--text-secondary);
@@ -229,14 +218,15 @@
   margin-top: 16px;
 }
 
-// Test Data Section
-.test-data-section {
+.test-data-section,
+.clear-data-section {
   margin-top: 32px;
   display: flex;
   justify-content: center;
 }
 
-.test-data-card {
+.test-data-card,
+.clear-data-card {
   background: linear-gradient(
     135deg,
     var(--primary) 0%,
@@ -258,7 +248,8 @@
   }
 }
 
-.test-data-content {
+.test-data-content,
+.clear-data-content {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -332,77 +323,6 @@
   }
 }
 
-// Clear Data Section (same as test-data-section)
-.clear-data-section {
-  margin-top: 32px;
-  display: flex;
-  justify-content: center;
-}
-
-.clear-data-card {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--secondary) 100%
-  ) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: var(--shadow-elevated) !important;
-  border: none !important;
-  max-width: 600px;
-  width: 100%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    transform: translateY(-4px) scale(1.02);
-  }
-
-  .mat-mdc-card-content {
-    padding: 32px !important;
-  }
-}
-
-.clear-data-content {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  color: var(--text-inverse);
-
-  .test-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 80px;
-    min-height: 80px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .test-info {
-    flex: 1;
-
-    h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-inverse);
-    }
-
-    p {
-      margin: 0;
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.9);
-      line-height: 1.4;
-    }
-  }
-}
-
-// FadeInUp Animation
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -414,7 +334,6 @@
   }
 }
 
-// Responsive Media Queries
 @media (max-width: 768px) {
   .birthday-list-card,
   .chart-card {
@@ -424,18 +343,21 @@
     }
   }
 
-  .test-data-section {
+  .test-data-section,
+  .clear-data-section {
     margin-top: 24px;
     padding: 0 8px;
   }
 
-  .test-data-card {
+  .test-data-card,
+  .clear-data-card {
     .mat-mdc-card-content {
       padding: 24px !important;
     }
   }
 
-  .test-data-content {
+  .test-data-content,
+  .clear-data-content {
     flex-direction: column;
     text-align: center;
     gap: 16px;
