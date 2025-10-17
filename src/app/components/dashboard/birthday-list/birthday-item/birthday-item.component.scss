@@ -42,9 +42,9 @@
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
-  margin: 0 !important;
+  margin: 0 16px !important;
   position: relative;
-  background: #f8f9fa;
+  background: #d2d4d7;
   border-radius: 8px;
   border-left: 8px solid #4c3fd9;
   border: 1px solid transparent;
@@ -55,7 +55,7 @@
   &:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid #6c757d;
+    border: 3px solid #6c757d;
     border-left: 8px solid #4c3fd9;
     background: #f1f3f4;
   }
