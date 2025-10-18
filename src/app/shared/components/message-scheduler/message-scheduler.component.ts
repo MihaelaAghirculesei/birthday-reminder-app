@@ -12,6 +12,7 @@ import { ScheduledMessageService } from '../../../services/scheduled-message.ser
 import { NotificationService } from '../../../services/notification.service';
 import { BirthdayService } from '../../../services/birthday.service';
 import { ScheduledMessage, Birthday } from '../../../models/birthday.model';
+import { calculateAge } from '../../utils/age.util';
 
 @Component({
   selector: 'app-message-scheduler',
@@ -159,24 +160,8 @@ export class MessageSchedulerComponent implements OnInit {
   private processMessage(template: string, birthday: Birthday): string {
     return template
       .replace(/\{name\}/g, birthday.name)
-      .replace(/\{age\}/g, this.calculateAge(birthday.birthDate).toString())
+      .replace(/\{age\}/g, calculateAge(birthday.birthDate).toString())
       .replace(/\{zodiac\}/g, birthday.zodiacSign || '');
-  }
-
-  private calculateAge(birthDate: Date): number {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
   }
 
   formatDate(date: Date): string {

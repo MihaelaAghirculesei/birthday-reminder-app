@@ -4,6 +4,7 @@ import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { Birthday, ScheduledMessage } from '../models/birthday.model';
 import { MONTHS } from '../shared/constants';
 import { getZodiacSign } from '../shared/utils/zodiac.util';
+import { calculateAge } from '../shared/utils/age.util';
 import { DEFAULT_CATEGORY } from '../shared/constants/categories';
 import { IndexedDBStorageService } from './offline-storage.service';
 import { NetworkService } from './network.service';
@@ -63,7 +64,7 @@ export class BirthdayService {
           case 'name':
             return a.name.localeCompare(b.name);
           case 'age':
-            return this.calculateAge(b.birthDate) - this.calculateAge(a.birthDate);
+            return calculateAge(b.birthDate) - calculateAge(a.birthDate);
           case 'nextBirthday':
             const nextA = this.getNextBirthdayDate(a.birthDate);
             const nextB = this.getNextBirthdayDate(b.birthDate);
@@ -222,18 +223,6 @@ export class BirthdayService {
     this.setSortOrder('name');
   }
 
-  calculateAge(birthDate: Date): number {
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
-  }
-
   getBirthdaysThisMonth(): Birthday[] {
     const currentMonth = new Date().getMonth();
     return this.birthdays.filter(birthday =>
@@ -247,8 +236,8 @@ export class BirthdayService {
 
   getAverageAge(): number {
     if (this.birthdays.length === 0) return 0;
-    const totalAge = this.birthdays.reduce((sum, birthday) => 
-      sum + this.calculateAge(birthday.birthDate), 0
+    const totalAge = this.birthdays.reduce((sum, birthday) =>
+      sum + calculateAge(birthday.birthDate), 0
     );
     return Math.round(totalAge / this.birthdays.length);
   }

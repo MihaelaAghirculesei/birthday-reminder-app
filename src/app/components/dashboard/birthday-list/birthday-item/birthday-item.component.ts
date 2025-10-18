@@ -10,6 +10,7 @@ import { MessageSchedulerComponent } from '../../../../shared/components/message
 import { MessageIndicatorComponent } from '../../../../shared/components/message-indicator/message-indicator.component';
 import { Birthday } from '../../../../models/birthday.model';
 import { BIRTHDAY_CATEGORIES } from '../../../../shared/constants/categories';
+import { calculateAge } from '../../../../shared/utils/age.util';
 
 @Component({
   selector: 'app-birthday-item',
@@ -49,19 +50,7 @@ export class BirthdayItemComponent {
   @Output() downloadRememberPhoto = new EventEmitter<Birthday>();
 
   getAge(birthDate: Date): number {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
+    return calculateAge(birthDate);
   }
 
   getDaysText(days: number): string {
