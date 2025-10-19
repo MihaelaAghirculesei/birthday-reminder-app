@@ -54,7 +54,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         };
       });
     } catch (error) {
-      console.error('Error getting birthdays from IndexedDB:', error);
       return [];
     }
   }
@@ -79,7 +78,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         transaction.onerror = () => reject(transaction.error);
       });
     } catch (error) {
-      console.error('Error saving birthdays to IndexedDB:', error);
       throw error;
     }
   }
@@ -99,7 +97,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Error adding birthday to IndexedDB:', error);
       throw error;
     }
   }
@@ -119,7 +116,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Error updating birthday in IndexedDB:', error);
       throw error;
     }
   }
@@ -136,7 +132,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Error deleting birthday from IndexedDB:', error);
       throw error;
     }
   }
@@ -153,7 +148,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Error clearing IndexedDB:', error);
       throw error;
     }
   }

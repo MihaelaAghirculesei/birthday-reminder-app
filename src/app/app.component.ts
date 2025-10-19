@@ -78,9 +78,6 @@ export class AppComponent {
   }
 
   onSubmit() {
-    console.log('Form submitted, valid:', this.birthdayForm.valid);
-    console.log('Form value:', this.birthdayForm.value);
-
     if (this.birthdayForm.valid) {
       const birthDate = new Date(this.birthdayForm.value.birthDate);
       const zodiacSign = getZodiacSign(birthDate);
@@ -91,19 +88,9 @@ export class AppComponent {
         zodiacSign: zodiacSign.name,
       };
 
-      console.log('Saving birthday data:', formData);
       this.birthdayService.addBirthday(formData);
       this.birthdayForm.reset({ reminderDays: 7 });
       this.selectedPhoto = null;
-      console.log('Birthday saved successfully');
-    } else {
-      console.log('Form is invalid:', this.birthdayForm.errors);
-      Object.keys(this.birthdayForm.controls).forEach((key) => {
-        const control = this.birthdayForm.get(key);
-        if (control?.errors) {
-          console.log(`Field ${key} errors:`, control.errors);
-        }
-      });
     }
   }
 

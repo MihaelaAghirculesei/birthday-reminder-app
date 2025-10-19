@@ -397,8 +397,8 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.googleCalendarService.initialize().catch(error => {
-      console.error('Failed to initialize Google Calendar:', error);
+    this.googleCalendarService.initialize().catch(() => {
+      // Silent failure for Google Calendar initialization
     });
 
     this.googleCalendarService.isSignedIn$
@@ -435,7 +435,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     try {
       await this.googleCalendarService.signIn();
     } catch (error) {
-      console.error('Sign in failed:', error);
+      // Silent failure for sign in
     } finally {
       this.isConnecting = false;
     }
@@ -447,7 +447,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
       this.calendars = [];
       this.lastSyncResult = null;
     } catch (error) {
-      console.error('Sign out failed:', error);
+      // Silent failure for sign out
     }
   }
 
@@ -455,7 +455,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     try {
       this.calendars = await this.googleCalendarService.getCalendars();
     } catch (error) {
-      console.error('Failed to load calendars:', error);
+      // Silent failure for loading calendars
     }
   }
 
@@ -467,7 +467,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
         this.lastSyncResult = await this.googleCalendarService.syncAllBirthdays(birthdays);
       }
     } catch (error) {
-      console.error('Sync failed:', error);
+      // Silent failure for sync
     } finally {
       this.isSyncing = false;
     }

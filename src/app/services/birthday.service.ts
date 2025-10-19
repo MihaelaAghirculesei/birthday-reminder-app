@@ -106,7 +106,7 @@ export class BirthdayService {
         const eventId = await this.googleCalendarService.syncBirthdayToCalendar(newBirthday);
         newBirthday.googleCalendarEventId = eventId;
       } catch (error) {
-        console.warn('Failed to sync birthday to Google Calendar:', error);
+        // Silent failure for Google Calendar sync
       }
     }
     
@@ -126,7 +126,7 @@ export class BirthdayService {
       try {
         await this.googleCalendarService.deleteBirthdayFromCalendar(birthdayToDelete.googleCalendarEventId);
       } catch (error) {
-        console.warn('Failed to delete birthday from Google Calendar:', error);
+        // Silent failure for Google Calendar sync
       }
     }
     
@@ -146,7 +146,7 @@ export class BirthdayService {
         try {
           await this.googleCalendarService.updateBirthdayInCalendar(updatedBirthday, updatedBirthday.googleCalendarEventId);
         } catch (error) {
-          console.warn('Failed to update birthday in Google Calendar:', error);
+          // Silent failure for Google Calendar sync
         }
       }
       
@@ -302,7 +302,6 @@ export class BirthdayService {
       this.updateBirthdaysSubject();
       this.isInitialized = true;
     } catch (error) {
-      console.warn('Error initializing service, falling back to localStorage:', error);
       await this.migrateFromLocalStorage();
       this.isInitialized = true;
     }
@@ -329,7 +328,6 @@ export class BirthdayService {
         }
       }
     } catch (error) {
-      console.warn('Error migrating from localStorage:', error);
       localStorage.removeItem('birthdays');
     }
   }
@@ -344,7 +342,7 @@ export class BirthdayService {
           try {
             await changeFunction();
           } catch (error) {
-            console.warn('Error processing pending change:', error);
+            // Silent failure for pending changes
           }
         }
       }
@@ -367,9 +365,8 @@ export class BirthdayService {
       
       this.saveToLocalStorage();
     } catch (error) {
-      console.warn(`Error saving to IndexedDB, using localStorage backup:`, error);
       this.saveToLocalStorage();
-      
+
       if (this.networkService.isOffline) {
         const changeFunction = async () => {
           try {
@@ -385,7 +382,7 @@ export class BirthdayService {
                 break;
             }
           } catch (retryError) {
-            console.warn('Retry failed:', retryError);
+            // Silent failure for retry
           }
         };
         this.pendingChanges.push(changeFunction);
@@ -401,7 +398,6 @@ export class BirthdayService {
       await this.offlineStorage.clear();
       localStorage.removeItem('birthdays');
     } catch (error) {
-      console.warn('Error clearing birthdays:', error);
       localStorage.removeItem('birthdays');
     }
   }
@@ -419,7 +415,6 @@ export class BirthdayService {
         await this.addBirthday(birthdayData);
       }
     } catch (error) {
-      console.error('Error loading test birthdays:', error);
       this.notificationService.show('Error loading test data', 'error');
     }
   }
@@ -429,7 +424,6 @@ export class BirthdayService {
 
     const birthday = this.birthdays.find(b => b.id === birthdayId);
     if (!birthday) {
-      console.error('Birthday not found:', birthdayId);
       return;
     }
 
@@ -446,7 +440,6 @@ export class BirthdayService {
 
     const birthday = this.birthdays.find(b => b.id === birthdayId);
     if (!birthday?.scheduledMessages) {
-      console.error('Birthday or messages not found:', birthdayId);
       return;
     }
 
@@ -465,7 +458,6 @@ export class BirthdayService {
 
     const birthday = this.birthdays.find(b => b.id === birthdayId);
     if (!birthday?.scheduledMessages) {
-      console.error('Birthday or messages not found:', birthdayId);
       return;
     }
 

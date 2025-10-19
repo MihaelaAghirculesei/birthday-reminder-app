@@ -59,7 +59,6 @@ export class GoogleCalendarService {
     }
 
     if (this.CLIENT_ID.includes('YOUR_GOOGLE') || this.API_KEY.includes('YOUR_GOOGLE')) {
-      console.log('Google Calendar: Placeholder credentials detected, skipping initialization');
       return;
     }
 
@@ -83,7 +82,6 @@ export class GoogleCalendarService {
         this.isInitialized = true;
       });
     } catch (error) {
-      console.error('Error initializing Google Calendar API:', error);
       throw error;
     }
   }
@@ -122,7 +120,6 @@ export class GoogleCalendarService {
       const authInstance = gapi.auth2.getAuthInstance();
       await authInstance.signIn();
     } catch (error) {
-      console.error('Error signing in to Google:', error);
       throw error;
     }
   }
@@ -137,7 +134,6 @@ export class GoogleCalendarService {
       await authInstance.signOut();
       this.updateSettings({ ...this.settingsSubject.value, enabled: false });
     } catch (error) {
-      console.error('Error signing out from Google:', error);
       throw error;
     }
   }
@@ -151,7 +147,6 @@ export class GoogleCalendarService {
       const response = await gapi.client.calendar.calendarList.list();
       return response.result.items || [];
     } catch (error) {
-      console.error('Error fetching calendars:', error);
       throw error;
     }
   }
@@ -170,7 +165,6 @@ export class GoogleCalendarService {
       
       return response.result.id;
     } catch (error) {
-      console.error('Error syncing birthday to calendar:', error);
       throw error;
     }
   }
@@ -188,7 +182,6 @@ export class GoogleCalendarService {
         resource: event
       });
     } catch (error) {
-      console.error('Error updating birthday in calendar:', error);
       throw error;
     }
   }
@@ -204,7 +197,6 @@ export class GoogleCalendarService {
         eventId: eventId
       });
     } catch (error) {
-      console.error('Error deleting birthday from calendar:', error);
       throw error;
     }
   }
@@ -268,7 +260,7 @@ export class GoogleCalendarService {
           const settings = JSON.parse(stored);
           this.settingsSubject.next(settings);
         } catch (error) {
-          console.warn('Error loading Google Calendar settings:', error);
+          // Silent failure for settings loading
         }
       }
     }
