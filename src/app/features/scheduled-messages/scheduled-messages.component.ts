@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MaterialModule, Birthday } from '../../shared';
-import { BirthdayService, NotificationService } from '../../core';
+import { BirthdayFacadeService, NotificationService } from '../../core';
 
 @Component({
   selector: 'app-scheduled-messages',
@@ -18,19 +18,19 @@ export class ScheduledMessagesComponent implements OnInit {
   birthdaysWithMessages: Birthday[] = [];
 
   constructor(
-    private birthdayService: BirthdayService,
+    private birthdayFacade: BirthdayFacadeService,
     private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.loadScheduledMessages();
-    this.birthdayService.birthdays$.subscribe(() => {
+    this.birthdayFacade.birthdays$.subscribe(() => {
       this.loadScheduledMessages();
     });
   }
 
   loadScheduledMessages(): void {
-    this.birthdayService.birthdays$.subscribe(birthdays => {
+    this.birthdayFacade.birthdays$.subscribe(birthdays => {
       this.birthdaysWithMessages = birthdays.filter(
         b => b.scheduledMessages && b.scheduledMessages.length > 0
       );
@@ -41,10 +41,10 @@ export class ScheduledMessagesComponent implements OnInit {
     this.notificationService.show('Dialog not yet implemented', 'info');
   }
 
-  async deleteMessage(birthdayId: string, messageId: string): Promise<void> {
+  deleteMessage(birthdayId: string, messageId: string): void {
     if (confirm('Are you sure you want to delete this message?')) {
-      await this.birthdayService.deleteMessageFromBirthday(birthdayId, messageId);
-      this.notificationService.show('Message deleted', 'success');
+      this.birthdayFacade.deleteMessageFromBirthday(birthdayId, messageId);
+      // Success notification is handled by the effect
     }
   }
 

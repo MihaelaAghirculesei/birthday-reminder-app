@@ -1,468 +1,237 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
-import { Birthday, ScheduledMessage, MONTHS, getZodiacSign, calculateAge, DEFAULT_CATEGORY } from '../../shared';
-import { IndexedDBStorageService } from './offline-storage.service';
-import { NetworkService } from './network.service';
-import { GoogleCalendarService } from './google-calendar.service';
-import { NotificationService } from './notification.service';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Birthday, ScheduledMessage, MONTHS } from '../../shared';
+import { BirthdayFacadeService } from './birthday-facade.service';
 
+/**
+ * @deprecated This service is deprecated and will be removed in a future version.
+ *
+ * Please use BirthdayFacadeService instead, which provides better state management
+ * with NgRx Store, improved performance, and easier testing.
+ *
+ * Migration Guide:
+ * - Replace: BirthdayService → BirthdayFacadeService
+ * - All methods have the same signature
+ * - All observables are available with the same names
+ * - Remove 'await' keywords (methods are now synchronous actions)
+ *
+ * Example:
+ * ```typescript
+ * // Before
+ * constructor(private birthdayService: BirthdayService) {}
+ * await this.birthdayService.addBirthday(birthday);
+ *
+ * // After
+ * constructor(private birthdayFacade: BirthdayFacadeService) {}
+ * this.birthdayFacade.addBirthday(birthday);
+ * ```
+ *
+ * See NGRX_MIGRATION_GUIDE.md for complete migration instructions.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class BirthdayService {
-  private birthdays: Birthday[] = [];
-  private birthdaysSubject = new BehaviorSubject<Birthday[]>([]);
-  public birthdays$ = this.birthdaysSubject.asObservable();
-  private isInitialized = false;
-  private pendingChanges: (() => Promise<void>)[] = [];
+  // Legacy Observables - delegating to NgRx Store via Facade
+  public birthdays$ = this.facade.birthdays$;
+  public searchTerm$ = this.facade.searchTerm$;
+  public selectedMonth$ = this.facade.selectedMonth$;
+  public selectedCategory$ = this.facade.selectedCategory$;
+  public sortOrder$ = this.facade.sortOrder$;
+  public filteredBirthdays$ = this.facade.filteredBirthdays$;
 
-  private searchTermSubject = new BehaviorSubject<string>('');
-  private selectedMonthSubject = new BehaviorSubject<number | null>(null);
-  private selectedCategorySubject = new BehaviorSubject<string | null>(null);
-  private sortOrderSubject = new BehaviorSubject<string>('name');
+  constructor(private facade: BirthdayFacadeService) {}
 
-  public searchTerm$ = this.searchTermSubject.asObservable();
-  public selectedMonth$ = this.selectedMonthSubject.asObservable();
-  public selectedCategory$ = this.selectedCategorySubject.asObservable();
-  public sortOrder$ = this.sortOrderSubject.asObservable();
-
-  public filteredBirthdays$ = combineLatest([
-    this.birthdays$,
-    this.searchTerm$,
-    this.selectedMonth$,
-    this.selectedCategory$,
-    this.sortOrder$
-  ]).pipe(
-    map(([birthdays, searchTerm, selectedMonth, selectedCategory, sortOrder]) => {
-      let filtered = [...birthdays];
-
-      if (searchTerm.trim()) {
-        filtered = filtered.filter(birthday =>
-          birthday.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-
-      if (selectedMonth !== null) {
-        filtered = filtered.filter(birthday =>
-          birthday.birthDate.getMonth() === selectedMonth
-        );
-      }
-
-      if (selectedCategory !== null) {
-        filtered = filtered.filter(birthday =>
-          (birthday.category || DEFAULT_CATEGORY) === selectedCategory
-        );
-      }
-
-      filtered.sort((a, b) => {
-        switch (sortOrder) {
-          case 'name':
-            return a.name.localeCompare(b.name);
-          case 'age':
-            return calculateAge(b.birthDate) - calculateAge(a.birthDate);
-          case 'nextBirthday':
-            const nextA = this.getNextBirthdayDate(a.birthDate);
-            const nextB = this.getNextBirthdayDate(b.birthDate);
-            return nextA.getTime() - nextB.getTime();
-          default:
-            return 0;
-        }
-      });
-
-      return filtered;
-    })
-  );
-
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private offlineStorage: IndexedDBStorageService,
-    private networkService: NetworkService,
-    private googleCalendarService: GoogleCalendarService,
-    private notificationService: NotificationService
-  ) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.initializeService();
-      this.setupNetworkSync();
-    }
-  }
-
+  /**
+   * @deprecated Use BirthdayFacadeService.addBirthday() instead
+   */
   async addBirthday(birthday: Omit<Birthday, 'id'>): Promise<void> {
-    await this.initializeService();
-    
-    const newBirthday: Birthday = {
-      ...birthday,
-      id: this.generateId(),
-      category: birthday.category || DEFAULT_CATEGORY,
-      zodiacSign: birthday.zodiacSign || getZodiacSign(birthday.birthDate).name
-    };
-    
-    if (this.googleCalendarService.isEnabled()) {
-      try {
-        const eventId = await this.googleCalendarService.syncBirthdayToCalendar(newBirthday);
-        newBirthday.googleCalendarEventId = eventId;
-      } catch (error) {
-        // Silent failure for Google Calendar sync
-      }
-    }
-    
-    this.birthdays.push(newBirthday);
-    this.updateBirthdaysSubject();
-
-    await this.saveToStorage(newBirthday, 'add');
-    this.notificationService.show(`${newBirthday.name} added successfully!`, 'success');
+    this.facade.addBirthday(birthday);
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.deleteBirthday() instead
+   */
   async deleteBirthday(id: string): Promise<void> {
-    await this.initializeService();
-    
-    const birthdayToDelete = this.birthdays.find(b => b.id === id);
-    
-    if (birthdayToDelete?.googleCalendarEventId && this.googleCalendarService.isEnabled()) {
-      try {
-        await this.googleCalendarService.deleteBirthdayFromCalendar(birthdayToDelete.googleCalendarEventId);
-      } catch (error) {
-        // Silent failure for Google Calendar sync
-      }
-    }
-    
-    this.birthdays = this.birthdays.filter(b => b.id !== id);
-    this.updateBirthdaysSubject();
-
-    await this.saveToStorage({ id } as Birthday, 'delete');
-    this.notificationService.show(`Birthday deleted successfully!`, 'success');
+    this.facade.deleteBirthday(id);
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.updateBirthday() instead
+   */
   async updateBirthday(updatedBirthday: Birthday): Promise<void> {
-    await this.initializeService();
-    
-    const index = this.birthdays.findIndex(b => b.id === updatedBirthday.id);
-    if (index !== -1) {
-      if (updatedBirthday.googleCalendarEventId && this.googleCalendarService.isEnabled()) {
-        try {
-          await this.googleCalendarService.updateBirthdayInCalendar(updatedBirthday, updatedBirthday.googleCalendarEventId);
-        } catch (error) {
-          // Silent failure for Google Calendar sync
-        }
-      }
-      
-      this.birthdays[index] = updatedBirthday;
-      this.updateBirthdaysSubject();
-
-      await this.saveToStorage(updatedBirthday, 'update');
-      this.notificationService.show(`${updatedBirthday.name} updated successfully!`, 'success');
-    }
+    this.facade.updateBirthday(updatedBirthday);
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.getUpcomingBirthdays() instead
+   */
   getUpcomingBirthdays(days: number = 30): Birthday[] {
-    const today = new Date();
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + days);
-
-    return this.birthdays.filter(birthday => {
-      const nextBirthday = this.getNextBirthdayDate(birthday.birthDate);
-      return nextBirthday >= today && nextBirthday <= futureDate;
-    }).sort((a, b) => {
-      const nextA = this.getNextBirthdayDate(a.birthDate);
-      const nextB = this.getNextBirthdayDate(b.birthDate);
-      return nextA.getTime() - nextB.getTime();
-    });
+    console.warn('BirthdayService.getUpcomingBirthdays() is deprecated. Use BirthdayFacadeService.getUpcomingBirthdays() which returns an Observable.');
+    // This returns empty array since we can't convert Observable to sync array
+    // Components should migrate to use the Observable version
+    return [];
   }
 
-  private getNextBirthdayDate(birthDate: Date): Date {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    const currentYear = today.getFullYear();
-    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
-    
-    if (nextBirthday < today) {
-      nextBirthday.setFullYear(currentYear + 1);
-    }
-    
-    return nextBirthday;
-  }
-
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2);
-  }
-
-  private updateBirthdaysSubject(): void {
-    this.birthdaysSubject.next([...this.birthdays]);
-  }
-
-  private saveToLocalStorage(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('birthdays', JSON.stringify(this.birthdays));
-    }
-  }
-
+  /**
+   * @deprecated Use BirthdayFacadeService.setSearchTerm() instead
+   */
   setSearchTerm(term: string): void {
-    this.searchTermSubject.next(term);
+    this.facade.setSearchTerm(term);
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.setSelectedMonth() instead
+   */
   setSelectedMonth(month: number | null): void {
-    this.selectedMonthSubject.next(month);
+    this.facade.setSelectedMonth(month);
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.setSortOrder() instead
+   */
   setSortOrder(order: string): void {
-    this.sortOrderSubject.next(order);
+    this.facade.setSortOrder(order as 'name' | 'age' | 'nextBirthday');
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.setSelectedCategory() instead
+   */
   setSelectedCategory(category: string | null): void {
-    this.selectedCategorySubject.next(category);
+    this.facade.setSelectedCategory(category);
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.clearFilters() instead
+   */
   clearFilters(): void {
-    this.searchTermSubject.next('');
-    this.selectedMonthSubject.next(null);
-    this.selectedCategorySubject.next(null);
-    this.setSortOrder('name');
+    this.facade.clearFilters();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.birthdaysThisMonth$ instead
+   */
   getBirthdaysThisMonth(): Birthday[] {
-    const currentMonth = new Date().getMonth();
-    return this.birthdays.filter(birthday =>
-      birthday.birthDate.getMonth() === currentMonth
-    );
+    console.warn('BirthdayService.getBirthdaysThisMonth() is deprecated. Use BirthdayFacadeService.birthdaysThisMonth$ Observable instead.');
+    return [];
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.getBirthdaysNext30Days() instead
+   */
   getBirthdaysNext30Days(): Birthday[] {
-    return this.getUpcomingBirthdays(30);
+    console.warn('BirthdayService.getBirthdaysNext30Days() is deprecated. Use BirthdayFacadeService.getBirthdaysNext30Days() Observable instead.');
+    return [];
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.averageAge$ instead
+   */
   getAverageAge(): number {
-    if (this.birthdays.length === 0) return 0;
-    const totalAge = this.birthdays.reduce((sum, birthday) =>
-      sum + calculateAge(birthday.birthDate), 0
-    );
-    return Math.round(totalAge / this.birthdays.length);
+    console.warn('BirthdayService.getAverageAge() is deprecated. Use BirthdayFacadeService.averageAge$ Observable instead.');
+    return 0;
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.next5Birthdays$ instead
+   */
   getNext5Birthdays(): Birthday[] {
-    return this.birthdays
-      .map(birthday => ({
-        ...birthday,
-        nextBirthday: this.getNextBirthdayDate(birthday.birthDate),
-        daysUntil: this.getDaysUntilBirthday(birthday.birthDate)
-      }))
-      .sort((a, b) => a.nextBirthday.getTime() - b.nextBirthday.getTime())
-      .slice(0, 5);
+    console.warn('BirthdayService.getNext5Birthdays() is deprecated. Use BirthdayFacadeService.next5Birthdays$ Observable instead.');
+    return [];
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.birthdaysByMonth$ instead
+   */
   getBirthdaysByMonth(): { month: string; count: number; monthIndex: number }[] {
-    const monthCounts = new Array(12).fill(0);
-    
-    this.birthdays.forEach(birthday => {
-      monthCounts[birthday.birthDate.getMonth()]++;
-    });
-    
-    return MONTHS.SHORT.map((month, index) => ({
-      month,
-      count: monthCounts[index],
-      monthIndex: index
-    }));
+    console.warn('BirthdayService.getBirthdaysByMonth() is deprecated. Use BirthdayFacadeService.birthdaysByMonth$ Observable instead.');
+    return [];
   }
 
+  /**
+   * @deprecated Not needed with NgRx Store
+   */
   getDaysUntilBirthday(birthDate: Date): number {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
     const nextBirthday = this.getNextBirthdayDate(birthDate);
-    nextBirthday.setHours(0, 0, 0, 0); 
+    nextBirthday.setHours(0, 0, 0, 0);
     const diffTime = nextBirthday.getTime() - today.getTime();
     return Math.round(diffTime / (1000 * 60 * 60 * 24));
   }
 
+  /**
+   * @deprecated Not needed with NgRx Store
+   */
   getNextBirthdayText(birthDate: Date): string {
     const days = this.getDaysUntilBirthday(birthDate);
-    
     if (days === 0) return 'Today!';
     if (days === 1) return 'Tomorrow!';
     return `In ${days} days`;
   }
 
-  private async initializeService(): Promise<void> {
-    if (this.isInitialized) return;
-    
-    try {
-      const storedBirthdays = await this.offlineStorage.getBirthdays();
-      
-      if (storedBirthdays.length > 0) {
-        this.birthdays = storedBirthdays.map(b => ({
-          ...b,
-          zodiacSign: b.zodiacSign || getZodiacSign(b.birthDate).name
-        }));
-      } else {
-        await this.migrateFromLocalStorage();
-      }
-      
-      this.updateBirthdaysSubject();
-      this.isInitialized = true;
-    } catch (error) {
-      await this.migrateFromLocalStorage();
-      this.isInitialized = true;
-    }
-  }
-
-  private async migrateFromLocalStorage(): Promise<void> {
-    try {
-      const stored = localStorage.getItem('birthdays');
-      
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          this.birthdays = parsed.map((b: Omit<Birthday, 'birthDate'> & { birthDate: string }) => {
-            const birthDate = new Date(b.birthDate);
-            return {
-              ...b,
-              birthDate,
-              zodiacSign: b.zodiacSign || getZodiacSign(birthDate).name
-            };
-          });
-          
-          await this.offlineStorage.saveBirthdays(this.birthdays);
-          localStorage.removeItem('birthdays');
-        }
-      }
-    } catch (error) {
-      localStorage.removeItem('birthdays');
-    }
-  }
-
-  private setupNetworkSync(): void {
-    this.networkService.online$.subscribe(async (isOnline) => {
-      if (isOnline && this.pendingChanges.length > 0) {
-        const changes = [...this.pendingChanges];
-        this.pendingChanges = [];
-        
-        for (const changeFunction of changes) {
-          try {
-            await changeFunction();
-          } catch (error) {
-            // Silent failure for pending changes
-          }
-        }
-      }
-    });
-  }
-
-  private async saveToStorage(birthday: Birthday, operation: 'add' | 'update' | 'delete'): Promise<void> {
-    try {
-      switch (operation) {
-        case 'add':
-          await this.offlineStorage.addBirthday(birthday);
-          break;
-        case 'update':
-          await this.offlineStorage.updateBirthday(birthday);
-          break;
-        case 'delete':
-          await this.offlineStorage.deleteBirthday(birthday.id);
-          break;
-      }
-      
-      this.saveToLocalStorage();
-    } catch (error) {
-      this.saveToLocalStorage();
-
-      if (this.networkService.isOffline) {
-        const changeFunction = async () => {
-          try {
-            switch (operation) {
-              case 'add':
-                await this.offlineStorage.addBirthday(birthday);
-                break;
-              case 'update':
-                await this.offlineStorage.updateBirthday(birthday);
-                break;
-              case 'delete':
-                await this.offlineStorage.deleteBirthday(birthday.id);
-                break;
-            }
-          } catch (retryError) {
-            // Silent failure for retry
-          }
-        };
-        this.pendingChanges.push(changeFunction);
-      }
-    }
-  }
-
+  /**
+   * @deprecated Use BirthdayFacadeService.clearAllBirthdays() instead
+   */
   async clearAllBirthdays(): Promise<void> {
-    this.birthdays = [];
-    this.updateBirthdaysSubject();
-    
-    try {
-      await this.offlineStorage.clear();
-      localStorage.removeItem('birthdays');
-    } catch (error) {
-      localStorage.removeItem('birthdays');
-    }
+    this.facade.clearAllBirthdays();
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Test data should be loaded differently
+   */
   async addTestBirthdays(): Promise<void> {
-    try {
-      const response = await fetch('/assets/test-birthdays.json');
-      const testBirthdays = await response.json();
-
-      for (const testBirthday of testBirthdays) {
-        const birthdayData = {
-          ...testBirthday,
-          birthDate: new Date(testBirthday.birthDate)
-        };
-        await this.addBirthday(birthdayData);
-      }
-    } catch (error) {
-      this.notificationService.show('Error loading test data', 'error');
-    }
+    console.warn('BirthdayService.addTestBirthdays() is deprecated. Please implement test data loading separately.');
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.addMessageToBirthday() instead
+   */
   async addMessageToBirthday(birthdayId: string, message: ScheduledMessage): Promise<void> {
-    await this.initializeService();
-
-    const birthday = this.birthdays.find(b => b.id === birthdayId);
-    if (!birthday) {
-      return;
-    }
-
-    if (!birthday.scheduledMessages) {
-      birthday.scheduledMessages = [];
-    }
-
-    birthday.scheduledMessages.push(message);
-    await this.updateBirthday(birthday);
+    this.facade.addMessageToBirthday(birthdayId, message);
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.updateMessageInBirthday() instead
+   */
   async updateMessageInBirthday(birthdayId: string, messageId: string, updates: Partial<ScheduledMessage>): Promise<void> {
-    await this.initializeService();
-
-    const birthday = this.birthdays.find(b => b.id === birthdayId);
-    if (!birthday?.scheduledMessages) {
-      return;
-    }
-
-    const messageIndex = birthday.scheduledMessages.findIndex(m => m.id === messageId);
-    if (messageIndex !== -1) {
-      birthday.scheduledMessages[messageIndex] = {
-        ...birthday.scheduledMessages[messageIndex],
-        ...updates
-      };
-      await this.updateBirthday(birthday);
-    }
+    this.facade.updateMessageInBirthday(birthdayId, messageId, updates);
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.deleteMessageFromBirthday() instead
+   */
   async deleteMessageFromBirthday(birthdayId: string, messageId: string): Promise<void> {
-    await this.initializeService();
-
-    const birthday = this.birthdays.find(b => b.id === birthdayId);
-    if (!birthday?.scheduledMessages) {
-      return;
-    }
-
-    birthday.scheduledMessages = birthday.scheduledMessages.filter(m => m.id !== messageId);
-    await this.updateBirthday(birthday);
+    this.facade.deleteMessageFromBirthday(birthdayId, messageId);
+    return Promise.resolve();
   }
 
+  /**
+   * @deprecated Use BirthdayFacadeService.getMessagesByBirthday() instead
+   */
   getMessagesByBirthday(birthdayId: string): ScheduledMessage[] {
-    const birthday = this.birthdays.find(b => b.id === birthdayId);
-    return birthday?.scheduledMessages || [];
+    console.warn('BirthdayService.getMessagesByBirthday() is deprecated. Use BirthdayFacadeService.getMessagesByBirthday() Observable instead.');
+    return [];
+  }
+
+  // Private helper methods - kept for backward compatibility
+  private getNextBirthdayDate(birthDate: Date): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(currentYear + 1);
+    }
+
+    return nextBirthday;
   }
 }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
-import { BirthdayService } from '../../../../core';
+import { BirthdayFacadeService } from '../../../../core';
 import { BirthdayEditService } from '../../services/birthday-edit.service';
 
 @Component({
@@ -34,7 +34,7 @@ export class BirthdayListComponent {
   isClearingData = false;
 
   constructor(
-    public birthdayService: BirthdayService,
+    public birthdayFacade: BirthdayFacadeService,
     public editService: BirthdayEditService
   ) {}
 
@@ -79,7 +79,7 @@ export class BirthdayListComponent {
   }
 
   deleteBirthday(birthday: any): void {
-    this.birthdayService.deleteBirthday(birthday.id);
+    this.birthdayFacade.deleteBirthday(birthday.id);
   }
 
   saveBirthday(birthday: any): void {
@@ -94,7 +94,7 @@ export class BirthdayListComponent {
       category: editingData.category,
     };
 
-    this.birthdayService.updateBirthday(updatedBirthday);
+    this.birthdayFacade.updateBirthday(updatedBirthday);
     this.editService.cancelEdit();
   }
 
@@ -188,6 +188,22 @@ export class BirthdayListComponent {
   }
 
   getDaysUntilBirthday(birthDate: Date): number {
-    return this.birthdayService.getDaysUntilBirthday(birthDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nextBirthday = this.getNextBirthdayDate(birthDate);
+    nextBirthday.setHours(0, 0, 0, 0);
+    const diffTime = nextBirthday.getTime() - today.getTime();
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  private getNextBirthdayDate(birthDate: Date): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(currentYear + 1);
+    }
+    return nextBirthday;
   }
 }

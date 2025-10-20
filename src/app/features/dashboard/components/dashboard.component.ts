@@ -8,7 +8,7 @@ import { DashboardStatsComponent } from './stats/dashboard-stats.component';
 import { BirthdayChartComponent } from './birthday-chart/birthday-chart.component';
 import { CategoryFilterComponent, CategoryStats } from './category-filter/category-filter.component';
 import { BirthdayListComponent } from './birthday-list/birthday-list.component';
-import { BirthdayService } from '../../../core';
+import { BirthdayFacadeService } from '../../../core';
 import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../services';
 
 @Component({
@@ -44,42 +44,40 @@ export class DashboardComponent {
   lastAction: { type: string; data: any } | null = null;
 
   constructor(
-    public birthdayService: BirthdayService,
+    public birthdayFacade: BirthdayFacadeService,
     public editService: BirthdayEditService,
     private statsService: BirthdayStatsService
   ) {
-    this.totalBirthdays$ = this.birthdayService.birthdays$.pipe(
+    this.totalBirthdays$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => birthdays.length)
     );
 
-    this.birthdaysThisMonth$ = this.birthdayService.birthdays$.pipe(
-      map(() => this.birthdayService.getBirthdaysNext30Days().length)
+    this.birthdaysThisMonth$ = this.birthdayFacade.getBirthdaysNext30Days().pipe(
+      map((birthdays) => birthdays.length)
     );
 
-    this.averageAge$ = this.birthdayService.birthdays$.pipe(
-      map(() => this.birthdayService.getAverageAge())
-    );
+    this.averageAge$ = this.birthdayFacade.averageAge$;
 
-    this.nextBirthdayDays$ = this.birthdayService.birthdays$.pipe(
-      map(() => {
-        const nextBirthdays = this.birthdayService.getNext5Birthdays();
+    this.nextBirthdayDays$ = this.birthdayFacade.next5Birthdays$.pipe(
+      map((nextBirthdays) => {
         if (nextBirthdays.length > 0) {
-          return this.birthdayService.getDaysUntilBirthday(nextBirthdays[0].birthDate);
+          return nextBirthdays[0].daysUntil;
         }
         return 0;
       })
     );
 
-    this.nextBirthdayText$ = this.birthdayService.birthdays$.pipe(
-      map(() => {
-        const nextBirthdays = this.birthdayService.getNext5Birthdays();
-        return nextBirthdays.length > 0
-          ? this.birthdayService.getNextBirthdayText(nextBirthdays[0].birthDate)
-          : 'N/A';
+    this.nextBirthdayText$ = this.birthdayFacade.next5Birthdays$.pipe(
+      map((nextBirthdays) => {
+        if (nextBirthdays.length === 0) return 'N/A';
+        const days = nextBirthdays[0].daysUntil;
+        if (days === 0) return 'Today!';
+        if (days === 1) return 'Tomorrow!';
+        return `In ${days} days`;
       })
     );
 
-    this.chartData$ = this.birthdayService.birthdays$.pipe(
+    this.chartData$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => this.statsService.getChartData(birthdays))
     );
 
@@ -87,7 +85,7 @@ export class DashboardComponent {
       map((chartData) => this.statsService.getMaxCount(chartData))
     );
 
-    this.categoriesStats$ = this.birthdayService.birthdays$.pipe(
+    this.categoriesStats$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => {
         const stats = this.statsService.getCategoriesStats(birthdays);
         return stats.map(stat => ({
@@ -98,7 +96,7 @@ export class DashboardComponent {
       })
     );
 
-    this.allBirthdays$ = this.birthdayService.birthdays$.pipe(
+    this.allBirthdays$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => this.getSortedFilteredBirthdays(birthdays))
     );
   }
@@ -144,26 +142,48 @@ export class DashboardComponent {
     }
 
     return filtered.sort((a, b) => {
-      const daysA = this.birthdayService.getDaysUntilBirthday(a.birthDate);
-      const daysB = this.birthdayService.getDaysUntilBirthday(b.birthDate);
+      const daysA = this.getDaysUntilBirthday(a.birthDate);
+      const daysB = this.getDaysUntilBirthday(b.birthDate);
       return daysA - daysB;
     });
   }
 
   async addTestData(): Promise<void> {
-    await this.birthdayService.addTestBirthdays();
+    // TODO: Implement test data loading with NgRx
+    console.warn('Test data loading not yet implemented with NgRx');
   }
 
-  async clearAllData(): Promise<void> {
-    await this.birthdayService.clearAllBirthdays();
+  clearAllData(): void {
+    this.birthdayFacade.clearAllBirthdays();
     this.lastAction = null;
   }
 
   undoLastAction(): void {
     if (this.lastAction && this.lastAction.type === 'delete') {
-      this.birthdayService.addBirthday(this.lastAction.data);
+      this.birthdayFacade.addBirthday(this.lastAction.data);
       this.lastAction = null;
     }
+  }
+
+  // Helper method for sorting
+  private getDaysUntilBirthday(birthDate: Date): number {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nextBirthday = this.getNextBirthdayDate(birthDate);
+    nextBirthday.setHours(0, 0, 0, 0);
+    const diffTime = nextBirthday.getTime() - today.getTime();
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  private getNextBirthdayDate(birthDate: Date): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(currentYear + 1);
+    }
+    return nextBirthday;
   }
 
   onBirthdayDeleted(birthday: any): void {
@@ -190,7 +210,7 @@ export class DashboardComponent {
   }
 
   private updateAllBirthdays(): void {
-    this.allBirthdays$ = this.birthdayService.birthdays$.pipe(
+    this.allBirthdays$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => this.getSortedFilteredBirthdays(birthdays))
     );
   }

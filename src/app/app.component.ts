@@ -14,7 +14,7 @@ import { trigger, style, transition, animate } from '@angular/animations';
 import { MaterialModule, PhotoUploadComponent, NotificationComponent } from './shared';
 import { Birthday, getZodiacSign } from './shared';
 import { DashboardComponent } from './features/dashboard';
-import { BirthdayService } from './core';
+import { BirthdayFacadeService } from './core';
 import { HeaderComponent, FooterComponent } from './layout';
 
 @Component({
@@ -61,7 +61,7 @@ export class AppComponent {
 
   constructor(
     private fb: FormBuilder,
-    private birthdayService: BirthdayService
+    private birthdayFacade: BirthdayFacadeService
   ) {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
@@ -71,7 +71,7 @@ export class AppComponent {
       photo: [null],
     });
 
-    this.birthdays$ = this.birthdayService.birthdays$;
+    this.birthdays$ = this.birthdayFacade.birthdays$;
   }
 
   onSubmit() {
@@ -85,7 +85,7 @@ export class AppComponent {
         zodiacSign: zodiacSign.name,
       };
 
-      this.birthdayService.addBirthday(formData);
+      this.birthdayFacade.addBirthday(formData);
       this.birthdayForm.reset({ reminderDays: 7 });
       this.selectedPhoto = null;
     }
@@ -101,13 +101,13 @@ export class AppComponent {
     this.birthdayForm.patchValue({ photo: null });
   }
 
-  async addTestData(): Promise<void> {
+  addTestData(): void {
     this.isAddingTestData = true;
-    try {
-      await this.birthdayService.addTestBirthdays();
-    } finally {
+    this.birthdayFacade.loadTestData();
+    // Reset loading state after a short delay to allow the effect to complete
+    setTimeout(() => {
       this.isAddingTestData = false;
-    }
+    }, 1000);
   }
 
   toggleAddBirthdaySection(): void {

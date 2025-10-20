@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { MaterialModule } from '../../shared';
-import { GoogleCalendarService, GoogleCalendarSettings, BirthdayService } from '../../core';
+import { GoogleCalendarService, GoogleCalendarSettings, BirthdayFacadeService } from '../../core';
 
 @Component({
   selector: 'app-google-calendar-sync',
@@ -384,7 +384,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
 
   constructor(
     private googleCalendarService: GoogleCalendarService,
-    private birthdayService: BirthdayService,
+    private birthdayFacade: BirthdayFacadeService,
     private fb: FormBuilder
   ) {
     this.settingsForm = this.fb.group({
@@ -461,7 +461,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   async syncAllBirthdays() {
     this.isSyncing = true;
     try {
-      const birthdays = await firstValueFrom(this.birthdayService.birthdays$);
+      const birthdays = await firstValueFrom(this.birthdayFacade.birthdays$);
       if (birthdays) {
         this.lastSyncResult = await this.googleCalendarService.syncAllBirthdays(birthdays);
       }

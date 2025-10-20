@@ -1,0 +1,162 @@
+import { createAction, props } from '@ngrx/store';
+import { Birthday, ScheduledMessage } from '../../../shared/models/birthday.model';
+import { BirthdayFilters } from './birthday.state';
+
+// Load Actions
+export const loadBirthdays = createAction(
+  '[Birthday] Load Birthdays'
+);
+
+export const loadBirthdaysSuccess = createAction(
+  '[Birthday] Load Birthdays Success',
+  props<{ birthdays: Birthday[] }>()
+);
+
+export const loadBirthdaysFailure = createAction(
+  '[Birthday] Load Birthdays Failure',
+  props<{ error: string }>()
+);
+
+// Add Actions
+export const addBirthday = createAction(
+  '[Birthday] Add Birthday',
+  props<{ birthday: Omit<Birthday, 'id'> }>()
+);
+
+export const addBirthdaySuccess = createAction(
+  '[Birthday] Add Birthday Success',
+  props<{ birthday: Birthday }>()
+);
+
+export const addBirthdayFailure = createAction(
+  '[Birthday] Add Birthday Failure',
+  props<{ error: string }>()
+);
+
+// Update Actions
+export const updateBirthday = createAction(
+  '[Birthday] Update Birthday',
+  props<{ birthday: Birthday }>()
+);
+
+export const updateBirthdaySuccess = createAction(
+  '[Birthday] Update Birthday Success',
+  props<{ birthday: Birthday }>()
+);
+
+export const updateBirthdayFailure = createAction(
+  '[Birthday] Update Birthday Failure',
+  props<{ error: string }>()
+);
+
+// Delete Actions
+export const deleteBirthday = createAction(
+  '[Birthday] Delete Birthday',
+  props<{ id: string }>()
+);
+
+export const deleteBirthdaySuccess = createAction(
+  '[Birthday] Delete Birthday Success',
+  props<{ id: string }>()
+);
+
+export const deleteBirthdayFailure = createAction(
+  '[Birthday] Delete Birthday Failure',
+  props<{ error: string }>()
+);
+
+// Select Actions
+export const selectBirthday = createAction(
+  '[Birthday] Select Birthday',
+  props<{ id: string | null }>()
+);
+
+// Filter Actions
+export const setSearchTerm = createAction(
+  '[Birthday] Set Search Term',
+  props<{ searchTerm: string }>()
+);
+
+export const setSelectedMonth = createAction(
+  '[Birthday] Set Selected Month',
+  props<{ month: number | null }>()
+);
+
+export const setSelectedCategory = createAction(
+  '[Birthday] Set Selected Category',
+  props<{ category: string | null }>()
+);
+
+export const setSortOrder = createAction(
+  '[Birthday] Set Sort Order',
+  props<{ sortOrder: 'name' | 'age' | 'nextBirthday' }>()
+);
+
+export const clearFilters = createAction(
+  '[Birthday] Clear Filters'
+);
+
+export const updateFilters = createAction(
+  '[Birthday] Update Filters',
+  props<{ filters: Partial<BirthdayFilters> }>()
+);
+
+// Clear All
+export const clearAllBirthdays = createAction(
+  '[Birthday] Clear All Birthdays'
+);
+
+export const clearAllBirthdaysSuccess = createAction(
+  '[Birthday] Clear All Birthdays Success'
+);
+
+export const clearAllBirthdaysFailure = createAction(
+  '[Birthday] Clear All Birthdays Failure',
+  props<{ error: string }>()
+);
+
+// Scheduled Messages Actions
+export const addMessageToBirthday = createAction(
+  '[Birthday] Add Message To Birthday',
+  props<{ birthdayId: string; message: ScheduledMessage }>()
+);
+
+export const addMessageToBirthdaySuccess = createAction(
+  '[Birthday] Add Message To Birthday Success',
+  props<{ birthdayId: string; message: ScheduledMessage }>()
+);
+
+export const updateMessageInBirthday = createAction(
+  '[Birthday] Update Message In Birthday',
+  props<{ birthdayId: string; messageId: string; updates: Partial<ScheduledMessage> }>()
+);
+
+export const updateMessageInBirthdaySuccess = createAction(
+  '[Birthday] Update Message In Birthday Success',
+  props<{ birthdayId: string; messageId: string; updates: Partial<ScheduledMessage> }>()
+);
+
+export const deleteMessageFromBirthday = createAction(
+  '[Birthday] Delete Message From Birthday',
+  props<{ birthdayId: string; messageId: string }>()
+);
+
+export const deleteMessageFromBirthdaySuccess = createAction(
+  '[Birthday] Delete Message From Birthday Success',
+  props<{ birthdayId: string; messageId: string }>()
+);
+
+// Test Data Actions
+export const loadTestData = createAction(
+  '[Birthday] Load Test Data'
+);
+
+export const loadTestDataSuccess = createAction(
+  '[Birthday] Load Test Data Success',
+  props<{ birthdays: Birthday[] }>()
+);
+
+export const loadTestDataFailure = createAction(
+  '[Birthday] Load Test Data Failure',
+  props<{ error: string }>()
+);

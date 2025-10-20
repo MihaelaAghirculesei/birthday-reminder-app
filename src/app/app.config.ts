@@ -2,17 +2,32 @@ import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 import { routes } from './app.routes';
-import { BirthdayService, NotificationService } from './core';
+import { NotificationService } from './core';
 import { provideServiceWorker } from '@angular/service-worker';
+import { birthdayReducer } from './core/store/birthday/birthday.reducer';
+import { BirthdayEffects } from './core/store/birthday/birthday.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     // provideClientHydration(), // Temporarily disabled
     provideAnimationsAsync(),
-    BirthdayService,
+    provideStore({
+      birthdays: birthdayReducer
+    }),
+    provideEffects([BirthdayEffects]),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      autoPause: true,
+      trace: false,
+      traceLimit: 75
+    }),
     NotificationService,
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
