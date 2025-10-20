@@ -11,15 +11,11 @@ import {
 import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 
-import { MaterialModule } from './shared/material.module';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { PhotoUploadComponent } from './shared/components/photo-upload.component';
-import { NetworkStatusComponent } from './shared/components/network-status.component';
-import { NotificationComponent } from './shared/components/notification.component';
-
-import { BirthdayService } from './services/birthday.service';
-import { Birthday } from './models/birthday.model';
-import { getZodiacSign } from './shared/utils/zodiac.util';
+import { MaterialModule, PhotoUploadComponent, NotificationComponent } from './shared';
+import { Birthday, getZodiacSign } from './shared';
+import { DashboardComponent } from './features/dashboard';
+import { BirthdayService } from './core';
+import { HeaderComponent, FooterComponent } from './layout';
 
 @Component({
   selector: 'app-root',
@@ -30,8 +26,9 @@ import { getZodiacSign } from './shared/utils/zodiac.util';
     MaterialModule,
     DashboardComponent,
     PhotoUploadComponent,
-    NetworkStatusComponent,
     NotificationComponent,
+    HeaderComponent,
+    FooterComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

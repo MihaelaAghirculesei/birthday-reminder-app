@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ZODIAC_SIGNS, ZodiacSign } from '../utils/zodiac.util';
+import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
 
 @Component({
   selector: 'zodiac-icon',

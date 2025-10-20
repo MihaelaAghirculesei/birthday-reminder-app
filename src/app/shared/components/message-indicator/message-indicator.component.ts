@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { MaterialModule } from '../../material.module';
-import { Birthday } from '../../../models/birthday.model';
+import { MaterialModule, Birthday } from '../..';
 
 @Component({
   selector: 'app-message-indicator',

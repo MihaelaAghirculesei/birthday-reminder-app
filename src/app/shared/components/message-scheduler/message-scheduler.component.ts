@@ -7,12 +7,9 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { MaterialModule } from '../../material.module';
-import { ScheduledMessageService } from '../../../services/scheduled-message.service';
-import { NotificationService } from '../../../services/notification.service';
-import { BirthdayService } from '../../../services/birthday.service';
-import { ScheduledMessage, Birthday } from '../../../models/birthday.model';
-import { calculateAge } from '../../utils/age.util';
+import { MaterialModule, ScheduledMessage, Birthday, calculateAge } from '../..';
+import { ScheduledMessageService } from '../../../features/scheduled-messages/scheduled-message.service';
+import { NotificationService, BirthdayService } from '../../../core';
 
 @Component({
   selector: 'app-message-scheduler',

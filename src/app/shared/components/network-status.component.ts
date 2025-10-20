@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material.module';
-import { NetworkService } from '../../services/network.service';
+import { NetworkService } from '../../core';
 
 @Component({
   selector: 'app-network-status',
