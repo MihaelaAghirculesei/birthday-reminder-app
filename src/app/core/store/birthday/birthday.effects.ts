@@ -19,7 +19,8 @@ export class BirthdayEffects {
         this.offlineStorage.getBirthdays().then(birthdays => {
           return birthdays.map(b => ({
             ...b,
-            zodiacSign: b.zodiacSign || getZodiacSign(b.birthDate).name
+            zodiacSign: b.zodiacSign || getZodiacSign(b.birthDate).name,
+            category: this.normalizeCategoryId(b.category)
           }));
         }).then(birthdays =>
           BirthdayActions.loadBirthdaysSuccess({ birthdays })
@@ -37,7 +38,7 @@ export class BirthdayEffects {
         const newBirthday: Birthday = {
           ...birthday,
           id: this.generateId(),
-          category: birthday.category || DEFAULT_CATEGORY,
+          category: this.normalizeCategoryId(birthday.category || DEFAULT_CATEGORY),
           zodiacSign: birthday.zodiacSign || getZodiacSign(birthday.birthDate).name
         };
 
@@ -71,15 +72,19 @@ export class BirthdayEffects {
   updateBirthday$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BirthdayActions.updateBirthday),
-      mergeMap(({ birthday }) =>
-        this.updateGoogleCalendar(birthday).then(() =>
-          this.offlineStorage.updateBirthday(birthday)
+      mergeMap(({ birthday }) => {
+        const normalizedBirthday: Birthday = {
+          ...birthday,
+          category: this.normalizeCategoryId(birthday.category)
+        };
+        return this.updateGoogleCalendar(normalizedBirthday).then(() =>
+          this.offlineStorage.updateBirthday(normalizedBirthday)
         ).then(() =>
-          BirthdayActions.updateBirthdaySuccess({ birthday })
+          BirthdayActions.updateBirthdaySuccess({ birthday: normalizedBirthday })
         ).catch(error =>
           BirthdayActions.updateBirthdayFailure({ error: error.message })
-        )
-      )
+        );
+      })
     )
   );
 
@@ -174,13 +179,10 @@ export class BirthdayEffects {
       mergeMap(() => {
         const testBirthdays = this.generateTestData();
 
-        // Dispatch addBirthday action for each test birthday
-        // This reuses existing logic for saving to IndexedDB and Google Calendar
         const addActions = testBirthdays.map(birthday =>
           BirthdayActions.addBirthday({ birthday })
         );
 
-        // Return success action after dispatching all add actions
         return [
           ...addActions,
           BirthdayActions.loadTestDataSuccess({ birthdays: testBirthdays })
@@ -214,47 +216,47 @@ export class BirthdayEffects {
 
   private generateTestData(): Birthday[] {
     const testNames = [
-      { name: 'Uwe Müller', date: new Date(1990, 2, 15), category: 'Family', photo: 'https://i.pravatar.cc/200?img=1' },
-      { name: 'Bob Smith', date: new Date(1985, 5, 22), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=12' },
-      { name: 'Charlie Brown', date: new Date(1992, 8, 10), category: 'Work', photo: 'https://i.pravatar.cc/200?img=13' },
-      { name: 'Diana Prince', date: new Date(1988, 11, 5), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=5' },
-      { name: 'Edward Norton', date: new Date(1995, 1, 28), category: 'Family', photo: 'https://i.pravatar.cc/200?img=14' },
-      { name: 'Fiona Apple', date: new Date(1987, 6, 18), category: 'Other', photo: 'https://i.pravatar.cc/200?img=9' },
-      { name: 'George Martin', date: new Date(1993, 9, 3), category: 'Work', photo: 'https://i.pravatar.cc/200?img=15' },
-      { name: 'Hannah Montana', date: new Date(1991, 3, 12), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=10' },
-      { name: 'Isabella Garcia', date: new Date(1994, 0, 8), category: 'Family', photo: 'https://i.pravatar.cc/200?img=16' },
-      { name: 'Jack Thompson', date: new Date(1989, 4, 19), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=17' },
-      { name: 'Katherine Lee', date: new Date(1996, 7, 25), category: 'Work', photo: 'https://i.pravatar.cc/200?img=20' },
-      { name: 'Liam O\'Connor', date: new Date(1986, 10, 14), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=33' },
-      { name: 'Maya Patel', date: new Date(1993, 2, 30), category: 'Family', photo: 'https://i.pravatar.cc/200?img=21' },
-      { name: 'Olivia Martinez', date: new Date(1997, 9, 21), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=47' },
-      { name: 'Patrick Anderson', date: new Date(1984, 1, 16), category: 'Other', photo: null },
-      { name: 'Quinn Roberts', date: new Date(1992, 6, 11), category: 'Family', photo: 'https://i.pravatar.cc/200?img=23' },
-      { name: 'Rachel Green', date: new Date(1990, 8, 4), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=24' },
-      { name: 'Hanna Gau', date: new Date(1988, 3, 29), category: 'Work', photo: 'https://i.pravatar.cc/200?img=25' },
-      { name: 'Tiffany Chen', date: new Date(1995, 11, 23), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=26' },
-      { name: 'Ulysses Grant', date: new Date(1987, 0, 17), category: 'Other', photo: null },
-      { name: 'Vanessa Lopez', date: new Date(1994, 4, 9), category: 'Family', photo: 'https://i.pravatar.cc/200?img=27' },
-      { name: 'Julia Davis', date: new Date(1989, 7, 13), category: 'Work', photo: 'https://i.pravatar.cc/200?img=28' },
-      { name: 'Anna Wilson', date: new Date(1996, 10, 27), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=29' },
-      { name: 'Yasmin Ahmed', date: new Date(1985, 2, 6), category: 'Family', photo: 'https://i.pravatar.cc/200?img=30' },
-      { name: 'Sophia Moore', date: new Date(1993, 5, 20), category: 'Work', photo: 'https://i.pravatar.cc/200?img=31' },
-      { name: 'Amelia Clark', date: new Date(1991, 8, 15), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=32' },
-      { name: 'Benjamin Harris', date: new Date(1988, 1, 2), category: 'Other', photo: null },
-      { name: 'Chloe Walker', date: new Date(1997, 4, 24), category: 'Family', photo: 'https://i.pravatar.cc/200?img=34' },
-      { name: 'Daniela Young', date: new Date(1986, 7, 8), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=35' },
-      { name: 'Emily Turner', date: new Date(1994, 10, 18), category: 'Work', photo: 'https://i.pravatar.cc/200?img=36' },
-      { name: 'Chloe Rodriguez', date: new Date(1992, 2, 12), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=37' },
-      { name: 'Grace Mitchell', date: new Date(1990, 5, 26), category: 'Family', photo: 'https://i.pravatar.cc/200?img=38' },
-      { name: 'Henry Phillips', date: new Date(1987, 9, 1), category: 'Other', photo: null },
-      { name: 'Iris Campbell', date: new Date(1995, 1, 14), category: 'Work', photo: 'https://i.pravatar.cc/200?img=48' },
-      { name: 'Jessica Parker', date: new Date(1989, 6, 31), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=40' },
-      { name: 'Kylie Evans', date: new Date(1996, 3, 5), category: 'Family', photo: 'https://i.pravatar.cc/200?img=41' },
-      { name: 'Lena Collins', date: new Date(1984, 8, 22), category: 'Work', photo: 'https://i.pravatar.cc/200?img=42' },
-      { name: 'Mia Stewart', date: new Date(1993, 11, 10), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=43' },
-      { name: 'Noah Morris', date: new Date(1991, 0, 28), category: 'Other', photo: 'https://i.pravatar.cc/200?img=51' },
-      { name: 'Penelope Cox', date: new Date(1988, 4, 16), category: 'Family', photo: 'https://i.pravatar.cc/200?img=44' },
-      { name: 'Roberta Bailey', date: new Date(1997, 7, 3), category: 'Friends', photo: 'https://i.pravatar.cc/200?img=45' }
+      { name: 'Uwe Müller', date: new Date(1990, 2, 15), category: 'family', photo: 'https://i.pravatar.cc/200?img=1' },
+      { name: 'Bob Smith', date: new Date(1985, 5, 22), category: 'friends', photo: 'https://i.pravatar.cc/200?img=12' },
+      { name: 'Charlie Brown', date: new Date(1992, 8, 10), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=13' },
+      { name: 'Diana Prince', date: new Date(1988, 11, 5), category: 'friends', photo: 'https://i.pravatar.cc/200?img=5' },
+      { name: 'Edward Norton', date: new Date(1995, 1, 28), category: 'family', photo: 'https://i.pravatar.cc/200?img=14' },
+      { name: 'Fiona Apple', date: new Date(1987, 6, 18), category: 'romantic', photo: 'https://i.pravatar.cc/200?img=9' },
+      { name: 'George Martin', date: new Date(1993, 9, 3), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=15' },
+      { name: 'Hannah Montana', date: new Date(1991, 3, 12), category: 'friends', photo: 'https://i.pravatar.cc/200?img=10' },
+      { name: 'Isabella Garcia', date: new Date(1994, 0, 8), category: 'family', photo: 'https://i.pravatar.cc/200?img=16' },
+      { name: 'Jack Thompson', date: new Date(1989, 4, 19), category: 'acquaintances', photo: 'https://i.pravatar.cc/200?img=17' },
+      { name: 'Katherine Lee', date: new Date(1996, 7, 25), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=20' },
+      { name: 'Liam O\'Connor', date: new Date(1986, 10, 14), category: 'friends', photo: 'https://i.pravatar.cc/200?img=33' },
+      { name: 'Maya Patel', date: new Date(1993, 2, 30), category: 'family', photo: 'https://i.pravatar.cc/200?img=21' },
+      { name: 'Olivia Martinez', date: new Date(1997, 9, 21), category: 'friends', photo: 'https://i.pravatar.cc/200?img=47' },
+      { name: 'Patrick Anderson', date: new Date(1984, 1, 16), category: 'acquaintances', photo: null },
+      { name: 'Quinn Roberts', date: new Date(1992, 6, 11), category: 'family', photo: 'https://i.pravatar.cc/200?img=23' },
+      { name: 'Rachel Green', date: new Date(1990, 8, 4), category: 'friends', photo: 'https://i.pravatar.cc/200?img=24' },
+      { name: 'Hanna Gau', date: new Date(1988, 3, 29), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=25' },
+      { name: 'Tiffany Chen', date: new Date(1995, 11, 23), category: 'friends', photo: 'https://i.pravatar.cc/200?img=26' },
+      { name: 'Ulysses Grant', date: new Date(1987, 0, 17), category: 'other', photo: null },
+      { name: 'Vanessa Lopez', date: new Date(1994, 4, 9), category: 'family', photo: 'https://i.pravatar.cc/200?img=27' },
+      { name: 'Julia Davis', date: new Date(1989, 7, 13), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=28' },
+      { name: 'Anna Wilson', date: new Date(1996, 10, 27), category: 'friends', photo: 'https://i.pravatar.cc/200?img=29' },
+      { name: 'Yasmin Ahmed', date: new Date(1985, 2, 6), category: 'family', photo: 'https://i.pravatar.cc/200?img=30' },
+      { name: 'Sophia Moore', date: new Date(1993, 5, 20), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=31' },
+      { name: 'Amelia Clark', date: new Date(1991, 8, 15), category: 'friends', photo: 'https://i.pravatar.cc/200?img=32' },
+      { name: 'Benjamin Harris', date: new Date(1988, 1, 2), category: 'acquaintances', photo: null },
+      { name: 'Chloe Walker', date: new Date(1997, 4, 24), category: 'family', photo: 'https://i.pravatar.cc/200?img=34' },
+      { name: 'Daniela Young', date: new Date(1986, 7, 8), category: 'romantic', photo: 'https://i.pravatar.cc/200?img=35' },
+      { name: 'Emily Turner', date: new Date(1994, 10, 18), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=36' },
+      { name: 'Chloe Rodriguez', date: new Date(1992, 2, 12), category: 'friends', photo: 'https://i.pravatar.cc/200?img=37' },
+      { name: 'Grace Mitchell', date: new Date(1990, 5, 26), category: 'family', photo: 'https://i.pravatar.cc/200?img=38' },
+      { name: 'Henry Phillips', date: new Date(1987, 9, 1), category: 'other', photo: null },
+      { name: 'Iris Campbell', date: new Date(1995, 1, 14), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=48' },
+      { name: 'Jessica Parker', date: new Date(1989, 6, 31), category: 'friends', photo: 'https://i.pravatar.cc/200?img=40' },
+      { name: 'Kylie Evans', date: new Date(1996, 3, 5), category: 'family', photo: 'https://i.pravatar.cc/200?img=41' },
+      { name: 'Lena Collins', date: new Date(1984, 8, 22), category: 'colleagues', photo: 'https://i.pravatar.cc/200?img=42' },
+      { name: 'Mia Stewart', date: new Date(1993, 11, 10), category: 'friends', photo: 'https://i.pravatar.cc/200?img=43' },
+      { name: 'Noah Morris', date: new Date(1991, 0, 28), category: 'acquaintances', photo: 'https://i.pravatar.cc/200?img=51' },
+      { name: 'Penelope Cox', date: new Date(1988, 4, 16), category: 'family', photo: 'https://i.pravatar.cc/200?img=44' },
+      { name: 'Roberta Bailey', date: new Date(1997, 7, 3), category: 'friends', photo: 'https://i.pravatar.cc/200?img=45' }
     ];
 
     return testNames.map(({ name, date, category, photo }) => ({
@@ -271,9 +273,29 @@ export class BirthdayEffects {
   }
 
   private generateAvatarUrl(name: string): string {
-    // Generate avatar using UI Avatars API for contacts without photos
     const encodedName = encodeURIComponent(name);
     return `https://ui-avatars.com/api/?name=${encodedName}&size=200&background=random&color=fff&bold=true`;
+  }
+
+  private normalizeCategoryId(category?: string): string {
+    if (!category) return DEFAULT_CATEGORY;
+
+    const categoryMap: { [key: string]: string } = {
+      'Family': 'family',
+      'Friends': 'friends',
+      'Work': 'colleagues',
+      'Colleagues': 'colleagues',
+      'Other': 'other',
+      'Partner/Ex': 'romantic',
+      'Romantic': 'romantic',
+      'Acquaintances': 'acquaintances'
+    };
+
+    if (category === category.toLowerCase()) {
+      return category;
+    }
+
+    return categoryMap[category] || category.toLowerCase();
   }
 
   private async syncToGoogleCalendar(birthday: Birthday): Promise<string | null> {
@@ -281,7 +303,6 @@ export class BirthdayEffects {
       try {
         return await this.googleCalendarService.syncBirthdayToCalendar(birthday);
       } catch (error) {
-        // Silent failure for Google Calendar sync
         return null;
       }
     }
@@ -293,7 +314,6 @@ export class BirthdayEffects {
       try {
         await this.googleCalendarService.updateBirthdayInCalendar(birthday, birthday.googleCalendarEventId);
       } catch (error) {
-        // Silent failure for Google Calendar sync
       }
     }
   }
@@ -303,7 +323,6 @@ export class BirthdayEffects {
       try {
         await this.googleCalendarService.deleteBirthdayFromCalendar(eventId);
       } catch (error) {
-        // Silent failure for Google Calendar sync
       }
     }
   }
