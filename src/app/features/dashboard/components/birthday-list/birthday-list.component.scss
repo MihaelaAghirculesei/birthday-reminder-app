@@ -113,21 +113,9 @@
     display: none !important;
   }
 
-  .mat-mdc-input-element {
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-  }
-
-  input[matInput] {
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-  }
-
-  input {
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-  }
-
+  .mat-mdc-input-element,
+  input[matInput],
+  input,
   .mat-mdc-form-field-infix input {
     color: #000000 !important;
     -webkit-text-fill-color: #000000 !important;
@@ -152,6 +140,8 @@
     max-height: 600px;
     overflow-y: auto;
     padding-right: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     margin-right: -7px;
 
     &::-webkit-scrollbar {
@@ -182,17 +172,6 @@
   border-radius: var(--radius);
   border: 2px dashed var(--border);
 
-  mat-icon {
-    font-size: 64px;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 24px;
-    background: var(--primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
   p {
     font-size: 1.2rem;
     font-weight: 600;
@@ -200,6 +179,7 @@
   }
 }
 
+.no-birthdays mat-icon,
 .no-data-icon {
   font-size: 64px;
   width: 64px;
@@ -412,7 +392,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-width: 769px) {
   .birthday-list-header {
     flex-direction: column;
     align-items: flex-start;
