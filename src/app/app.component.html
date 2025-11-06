@@ -59,6 +59,18 @@
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category">
+                <mat-option *ngFor="let category of availableCategories" [value]="category.id">
+                  <div class="category-option">
+                    <mat-icon [style.color]="category.color">{{ category.icon }}</mat-icon>
+                    <span>{{ category.name }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>label</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
               <mat-label>Notes (optional)</mat-label>
               <textarea matInput formControlName="notes" placeholder="e.g. Gift: cooking book" rows="2"></textarea>
               <mat-icon matSuffix>notes</mat-icon>

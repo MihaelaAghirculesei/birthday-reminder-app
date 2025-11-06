@@ -11,7 +11,7 @@ import {
 import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 
-import { MaterialModule, PhotoUploadComponent, NotificationComponent } from './shared';
+import { MaterialModule, PhotoUploadComponent, NotificationComponent, getAllCategories, DEFAULT_CATEGORY } from './shared';
 import { Birthday, getZodiacSign } from './shared';
 import { DashboardComponent } from './features/dashboard';
 import { BirthdayFacadeService } from './core';
@@ -58,6 +58,7 @@ export class AppComponent {
   selectedPhoto: string | null = null;
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
+  availableCategories = getAllCategories();
 
   constructor(
     private fb: FormBuilder,
@@ -66,6 +67,7 @@ export class AppComponent {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
       birthDate: ['', [Validators.required, this.pastDateValidator]],
+      category: [DEFAULT_CATEGORY, Validators.required],
       notes: [''],
       reminderDays: [7, [Validators.min(1), Validators.max(365)]],
       photo: [null],
@@ -86,8 +88,9 @@ export class AppComponent {
       };
 
       this.birthdayFacade.addBirthday(formData);
-      this.birthdayForm.reset({ reminderDays: 7 });
+      this.birthdayForm.reset({ reminderDays: 7, category: DEFAULT_CATEGORY });
       this.selectedPhoto = null;
+      this.availableCategories = getAllCategories();
     }
   }
 
