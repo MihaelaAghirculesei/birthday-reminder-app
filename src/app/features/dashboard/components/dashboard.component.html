@@ -19,7 +19,6 @@
     </div>
   </div>
 
-  <!-- Stats Section -->
   <app-dashboard-stats
     [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
     [birthdaysThisMonth]="(birthdaysThisMonth$ | async) ?? 0"
@@ -28,15 +27,14 @@
     [nextBirthdayText]="(nextBirthdayText$ | async) ?? ''"
   ></app-dashboard-stats>
 
-  <!-- Category Filter Section -->
   <app-category-filter
     [categoriesStats]="(categoriesStats$ | async) ?? []"
     [selectedCategory]="selectedCategory"
     (categorySelected)="selectCategory($event)"
     (filterCleared)="clearCategoryFilter()"
+    (addCategoryClicked)="onAddCategory()"
   ></app-category-filter>
 
-  <!-- Birthday List Section -->
   <app-birthday-list
     [birthdays]="(allBirthdays$ | async) ?? []"
     [searchTerm]="dashboardSearchTerm"
@@ -49,7 +47,6 @@
     (clearAllData)="clearAllData()"
   ></app-birthday-list>
 
-  <!-- Chart Section -->
   <div class="full-width-section">
     <app-birthday-chart
       [chartData]="(chartData$ | async) ?? []"
@@ -59,7 +56,6 @@
     ></app-birthday-chart>
   </div>
 
-  <!-- Google Calendar Sync Section -->
   <div class="full-width-section">
     <app-google-calendar-sync></app-google-calendar-sync>
   </div>

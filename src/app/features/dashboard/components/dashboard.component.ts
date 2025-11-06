@@ -111,6 +111,10 @@ export class DashboardComponent {
     this.updateAllBirthdays();
   }
 
+  onAddCategory(): void {
+    console.log('Add category clicked');
+  }
+
   isCategorySelected(categoryId: string): boolean {
     return this.selectedCategory === categoryId;
   }
@@ -149,7 +153,6 @@ export class DashboardComponent {
   }
 
   async addTestData(): Promise<void> {
-    // TODO: Implement test data loading with NgRx
     console.warn('Test data loading not yet implemented with NgRx');
   }
 
@@ -165,7 +168,6 @@ export class DashboardComponent {
     }
   }
 
-  // Helper method for sorting
   private getDaysUntilBirthday(birthDate: Date): number {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

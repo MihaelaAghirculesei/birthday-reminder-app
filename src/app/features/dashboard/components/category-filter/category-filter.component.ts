@@ -21,6 +21,7 @@ export class CategoryFilterComponent {
 
   @Output() categorySelected = new EventEmitter<string>();
   @Output() filterCleared = new EventEmitter<void>();
+  @Output() addCategoryClicked = new EventEmitter<void>();
 
   selectCategory(categoryId: string): void {
     this.categorySelected.emit(categoryId);
@@ -28,6 +29,10 @@ export class CategoryFilterComponent {
 
   clearFilter(): void {
     this.filterCleared.emit();
+  }
+
+  addNewCategory(): void {
+    this.addCategoryClicked.emit();
   }
 
   isCategorySelected(categoryId: string): boolean {
