@@ -7,7 +7,8 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { MaterialModule, ScheduledMessage, Birthday, calculateAge } from '../..';
+import { MaterialModule } from '../../material.module';
+import { ScheduledMessage, Birthday, calculateAge } from '../..';
 import { ScheduledMessageService } from '../../../features/scheduled-messages/scheduled-message.service';
 import { NotificationService, BirthdayFacadeService } from '../../../core';
 
