@@ -1,13 +1,15 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, map } from 'rxjs';
-import { MaterialModule, DEFAULT_CATEGORY, BIRTHDAY_CATEGORIES } from '../../../shared';
+import { MatDialog } from '@angular/material/dialog';
+import { MaterialModule, DEFAULT_CATEGORY, getAllCategories } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
 import { GoogleCalendarSyncComponent } from '../../calendar-sync/google-calendar-sync.component';
 import { DashboardStatsComponent } from './stats/dashboard-stats.component';
 import { BirthdayChartComponent } from './birthday-chart/birthday-chart.component';
 import { CategoryFilterComponent, CategoryStats } from './category-filter/category-filter.component';
 import { BirthdayListComponent } from './birthday-list/birthday-list.component';
+import { CategoryDialogComponent } from './category-dialog/category-dialog.component';
 import { BirthdayFacadeService } from '../../../core';
 import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../services';
 
@@ -46,7 +48,8 @@ export class DashboardComponent {
   constructor(
     public birthdayFacade: BirthdayFacadeService,
     public editService: BirthdayEditService,
-    private statsService: BirthdayStatsService
+    private statsService: BirthdayStatsService,
+    private dialog: MatDialog
   ) {
     this.totalBirthdays$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => birthdays.length)
@@ -88,10 +91,14 @@ export class DashboardComponent {
     this.categoriesStats$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => {
         const stats = this.statsService.getCategoriesStats(birthdays);
-        return stats.map(stat => ({
-          id: stat.categoryId,
-          name: BIRTHDAY_CATEGORIES.find(c => c.id === stat.categoryId)?.name || 'Unknown',
-          count: stat.count
+        const allCategories = getAllCategories();
+
+        const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
+
+        return allCategories.map(category => ({
+          id: category.id,
+          name: category.name,
+          count: statsMap.get(category.id) || 0
         }));
       })
     );
@@ -112,7 +119,54 @@ export class DashboardComponent {
   }
 
   onAddCategory(): void {
-    console.log('Add category clicked');
+    const dialogRef = this.dialog.open(CategoryDialogComponent, {
+      width: '600px',
+      data: { mode: 'add' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const newCategory = {
+          id: this.generateCategoryId(result.name),
+          name: result.name,
+          icon: result.icon,
+          color: result.color
+        };
+
+        this.saveCustomCategory(newCategory);
+        console.log('New category created:', newCategory);
+      }
+    });
+  }
+
+  private generateCategoryId(name: string): string {
+    return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+  }
+
+  private saveCustomCategory(category: any): void {
+    const customCategories = this.getCustomCategories();
+    customCategories.push(category);
+    localStorage.setItem('customCategories', JSON.stringify(customCategories));
+
+    this.categoriesStats$ = this.birthdayFacade.birthdays$.pipe(
+      map((birthdays) => {
+        const stats = this.statsService.getCategoriesStats(birthdays);
+        const allCategories = getAllCategories();
+
+        const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
+
+        return allCategories.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          count: statsMap.get(cat.id) || 0
+        }));
+      })
+    );
+  }
+
+  private getCustomCategories(): any[] {
+    const stored = localStorage.getItem('customCategories');
+    return stored ? JSON.parse(stored) : [];
   }
 
   isCategorySelected(categoryId: string): boolean {
