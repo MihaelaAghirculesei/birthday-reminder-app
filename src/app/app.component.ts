@@ -58,7 +58,10 @@ export class AppComponent {
   selectedPhoto: string | null = null;
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
-  availableCategories = getAllCategories();
+
+  get availableCategories() {
+    return getAllCategories();
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -90,7 +93,6 @@ export class AppComponent {
       this.birthdayFacade.addBirthday(formData);
       this.birthdayForm.reset({ reminderDays: 7, category: DEFAULT_CATEGORY });
       this.selectedPhoto = null;
-      this.availableCategories = getAllCategories();
     }
   }
 
