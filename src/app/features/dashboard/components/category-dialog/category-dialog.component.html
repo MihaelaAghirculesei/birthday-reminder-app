@@ -1,0 +1,75 @@
+<h2 mat-dialog-title>{{ data.mode === 'add' ? 'Add New Category' : 'Edit Category' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="categoryForm" class="category-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Category Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Sports, Music, Gaming">
+      <mat-icon matSuffix>label</mat-icon>
+      <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+      <mat-error *ngIf="categoryForm.get('name')?.hasError('minlength')">
+        Name must be at least 2 characters
+      </mat-error>
+    </mat-form-field>
+
+    <div class="icon-section">
+      <label class="section-label">Choose Icon</label>
+      <div class="icon-grid">
+        <button
+          *ngFor="let icon of availableIcons"
+          type="button"
+          mat-icon-button
+          class="icon-option"
+          [class.selected]="categoryForm.get('icon')?.value === icon"
+          (click)="categoryForm.patchValue({ icon: icon })"
+          [style.color]="categoryForm.get('icon')?.value === icon ? categoryForm.get('color')?.value : ''"
+        >
+          <mat-icon>{{ icon }}</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="color-section">
+      <label class="section-label">Choose Color</label>
+      <div class="color-grid">
+        <button
+          *ngFor="let colorOption of availableColors"
+          type="button"
+          class="color-option"
+          [class.selected]="categoryForm.get('color')?.value === colorOption.value"
+          [style.background-color]="colorOption.value"
+          (click)="categoryForm.patchValue({ color: colorOption.value })"
+          [matTooltip]="colorOption.name"
+        >
+          <mat-icon *ngIf="categoryForm.get('color')?.value === colorOption.value" class="check-icon">
+            check_circle
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="preview-section">
+      <label class="section-label">Preview</label>
+      <div class="category-preview">
+        <mat-icon [style.color]="categoryForm.get('color')?.value">
+          {{ categoryForm.get('icon')?.value }}
+        </mat-icon>
+        <span class="preview-name">{{ categoryForm.get('name')?.value || 'Category Name' }}</span>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="categoryForm.invalid"
+  >
+    {{ data.mode === 'add' ? 'Add Category' : 'Save Changes' }}
+  </button>
+</mat-dialog-actions>

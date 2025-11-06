@@ -46,8 +46,18 @@ export const BIRTHDAY_CATEGORIES: BirthdayCategory[] = [
 
 export const DEFAULT_CATEGORY = 'friends';
 
+export function getCustomCategories(): BirthdayCategory[] {
+  if (typeof localStorage === 'undefined') return [];
+  const stored = localStorage.getItem('customCategories');
+  return stored ? JSON.parse(stored) : [];
+}
+
+export function getAllCategories(): BirthdayCategory[] {
+  return [...BIRTHDAY_CATEGORIES, ...getCustomCategories()];
+}
+
 export function getCategoryById(id: string): BirthdayCategory | undefined {
-  return BIRTHDAY_CATEGORIES.find(cat => cat.id === id);
+  return getAllCategories().find(cat => cat.id === id);
 }
 
 export function getCategoryIcon(categoryId: string): string {
