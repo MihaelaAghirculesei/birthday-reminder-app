@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, BIRTHDAY_CATEGORIES, calculateAge } from '../../../../../shared';
+import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, getAllCategories, calculateAge } from '../../../../../shared';
 import { RememberPhotoComponent } from '../../remember-photo/remember-photo.component';
 
 @Component({
@@ -58,7 +58,7 @@ export class BirthdayItemComponent {
   }
 
   getBirthdayCategories() {
-    return BIRTHDAY_CATEGORIES;
+    return getAllCategories();
   }
 
   onEdit(): void {
