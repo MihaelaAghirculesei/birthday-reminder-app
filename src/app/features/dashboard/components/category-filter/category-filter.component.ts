@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule, CategoryIconComponent, BIRTHDAY_CATEGORIES } from '../../../../shared';
+import { MaterialModule, CategoryIconComponent } from '../../../../shared';
 
 export interface CategoryStats {
   id: string;
@@ -45,11 +45,6 @@ export class CategoryFilterComponent {
   deleteCategory(event: Event, categoryId: string): void {
     event.stopPropagation();
     this.deleteCategoryClicked.emit(categoryId);
-  }
-
-  isCustomCategory(categoryId: string): boolean {
-    const defaultIds = BIRTHDAY_CATEGORIES.map(c => c.id);
-    return !defaultIds.includes(categoryId);
   }
 
   isCategorySelected(categoryId: string): boolean {

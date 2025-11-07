@@ -139,8 +139,8 @@ export class DashboardComponent {
   }
 
   onEditCategory(categoryId: string): void {
-    const categories = this.getCustomCategories();
-    const category = categories.find(c => c.id === categoryId);
+    const allCategories = getAllCategories();
+    const category = allCategories.find(c => c.id === categoryId);
 
     if (!category) return;
 
@@ -161,19 +161,19 @@ export class DashboardComponent {
           color: result.color
         };
 
-        this.updateCustomCategory(categoryId, updatedCategory);
+        this.updateCategory(categoryId, updatedCategory);
       }
     });
   }
 
   onDeleteCategory(categoryId: string): void {
-    const categories = this.getCustomCategories();
-    const category = categories.find(c => c.id === categoryId);
+    const allCategories = getAllCategories();
+    const category = allCategories.find(c => c.id === categoryId);
 
     if (!category) return;
 
     if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
-      this.deleteCustomCategory(categoryId);
+      this.deleteCategory(categoryId);
     }
   }
 
@@ -188,22 +188,37 @@ export class DashboardComponent {
     this.refreshCategories();
   }
 
-  private updateCustomCategory(categoryId: string, updatedCategory: any): void {
-    const customCategories = this.getCustomCategories();
-    const index = customCategories.findIndex(c => c.id === categoryId);
+  private updateCategory(categoryId: string, updatedCategory: any): void {
+    const modifiedCategories = this.getModifiedCategories();
+    const index = modifiedCategories.findIndex(c => c.id === categoryId);
 
     if (index !== -1) {
-      customCategories[index] = updatedCategory;
-      localStorage.setItem('customCategories', JSON.stringify(customCategories));
-      this.refreshCategories();
+      modifiedCategories[index] = updatedCategory;
+    } else {
+      modifiedCategories.push(updatedCategory);
     }
+
+    localStorage.setItem('modifiedCategories', JSON.stringify(modifiedCategories));
+    this.refreshCategories();
   }
 
-  private deleteCustomCategory(categoryId: string): void {
-    const customCategories = this.getCustomCategories();
-    const filtered = customCategories.filter(c => c.id !== categoryId);
-    localStorage.setItem('customCategories', JSON.stringify(filtered));
+  private deleteCategory(categoryId: string): void {
+    const deletedIds = this.getDeletedCategoryIds();
+    if (!deletedIds.includes(categoryId)) {
+      deletedIds.push(categoryId);
+      localStorage.setItem('deletedCategoryIds', JSON.stringify(deletedIds));
+    }
     this.refreshCategories();
+  }
+
+  private getModifiedCategories(): any[] {
+    const stored = localStorage.getItem('modifiedCategories');
+    return stored ? JSON.parse(stored) : [];
+  }
+
+  private getDeletedCategoryIds(): string[] {
+    const stored = localStorage.getItem('deletedCategoryIds');
+    return stored ? JSON.parse(stored) : [];
   }
 
   private refreshCategories(): void {

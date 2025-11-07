@@ -52,8 +52,32 @@ export function getCustomCategories(): BirthdayCategory[] {
   return stored ? JSON.parse(stored) : [];
 }
 
+function getModifiedCategories(): BirthdayCategory[] {
+  if (typeof localStorage === 'undefined') return [];
+  const stored = localStorage.getItem('modifiedCategories');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function getDeletedCategoryIds(): string[] {
+  if (typeof localStorage === 'undefined') return [];
+  const stored = localStorage.getItem('deletedCategoryIds');
+  return stored ? JSON.parse(stored) : [];
+}
+
 export function getAllCategories(): BirthdayCategory[] {
-  return [...BIRTHDAY_CATEGORIES, ...getCustomCategories()];
+  const deletedIds = getDeletedCategoryIds();
+  const modifiedCategories = getModifiedCategories();
+  const modifiedMap = new Map(modifiedCategories.map(cat => [cat.id, cat]));
+
+  const defaultCategories = BIRTHDAY_CATEGORIES
+    .filter(cat => !deletedIds.includes(cat.id))
+    .map(cat => modifiedMap.get(cat.id) || cat);
+
+  const customCategories = getCustomCategories()
+    .filter(cat => !deletedIds.includes(cat.id))
+    .map(cat => modifiedMap.get(cat.id) || cat);
+
+  return [...defaultCategories, ...customCategories];
 }
 
 export function getCategoryById(id: string): BirthdayCategory | undefined {
