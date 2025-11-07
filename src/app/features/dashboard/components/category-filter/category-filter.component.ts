@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule, CategoryIconComponent } from '../../../../shared';
+import { MaterialModule, CategoryIconComponent, BIRTHDAY_CATEGORIES } from '../../../../shared';
 
 export interface CategoryStats {
   id: string;
@@ -22,6 +22,8 @@ export class CategoryFilterComponent {
   @Output() categorySelected = new EventEmitter<string>();
   @Output() filterCleared = new EventEmitter<void>();
   @Output() addCategoryClicked = new EventEmitter<void>();
+  @Output() editCategoryClicked = new EventEmitter<string>();
+  @Output() deleteCategoryClicked = new EventEmitter<string>();
 
   selectCategory(categoryId: string): void {
     this.categorySelected.emit(categoryId);
@@ -33,6 +35,21 @@ export class CategoryFilterComponent {
 
   addNewCategory(): void {
     this.addCategoryClicked.emit();
+  }
+
+  editCategory(event: Event, categoryId: string): void {
+    event.stopPropagation();
+    this.editCategoryClicked.emit(categoryId);
+  }
+
+  deleteCategory(event: Event, categoryId: string): void {
+    event.stopPropagation();
+    this.deleteCategoryClicked.emit(categoryId);
+  }
+
+  isCustomCategory(categoryId: string): boolean {
+    const defaultIds = BIRTHDAY_CATEGORIES.map(c => c.id);
+    return !defaultIds.includes(categoryId);
   }
 
   isCategorySelected(categoryId: string): boolean {

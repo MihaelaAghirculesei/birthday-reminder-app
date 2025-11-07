@@ -134,9 +134,47 @@ export class DashboardComponent {
         };
 
         this.saveCustomCategory(newCategory);
-        console.log('New category created:', newCategory);
       }
     });
+  }
+
+  onEditCategory(categoryId: string): void {
+    const categories = this.getCustomCategories();
+    const category = categories.find(c => c.id === categoryId);
+
+    if (!category) return;
+
+    const dialogRef = this.dialog.open(CategoryDialogComponent, {
+      width: '600px',
+      data: {
+        mode: 'edit',
+        category: category
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const updatedCategory = {
+          ...category,
+          name: result.name,
+          icon: result.icon,
+          color: result.color
+        };
+
+        this.updateCustomCategory(categoryId, updatedCategory);
+      }
+    });
+  }
+
+  onDeleteCategory(categoryId: string): void {
+    const categories = this.getCustomCategories();
+    const category = categories.find(c => c.id === categoryId);
+
+    if (!category) return;
+
+    if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+      this.deleteCustomCategory(categoryId);
+    }
   }
 
   private generateCategoryId(name: string): string {
@@ -147,7 +185,28 @@ export class DashboardComponent {
     const customCategories = this.getCustomCategories();
     customCategories.push(category);
     localStorage.setItem('customCategories', JSON.stringify(customCategories));
+    this.refreshCategories();
+  }
 
+  private updateCustomCategory(categoryId: string, updatedCategory: any): void {
+    const customCategories = this.getCustomCategories();
+    const index = customCategories.findIndex(c => c.id === categoryId);
+
+    if (index !== -1) {
+      customCategories[index] = updatedCategory;
+      localStorage.setItem('customCategories', JSON.stringify(customCategories));
+      this.refreshCategories();
+    }
+  }
+
+  private deleteCustomCategory(categoryId: string): void {
+    const customCategories = this.getCustomCategories();
+    const filtered = customCategories.filter(c => c.id !== categoryId);
+    localStorage.setItem('customCategories', JSON.stringify(filtered));
+    this.refreshCategories();
+  }
+
+  private refreshCategories(): void {
     this.categoriesStats$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => {
         const stats = this.statsService.getCategoriesStats(birthdays);

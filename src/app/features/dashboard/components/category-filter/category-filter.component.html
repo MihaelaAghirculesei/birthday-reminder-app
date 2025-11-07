@@ -49,6 +49,24 @@
             {{ categoryStats.count === 1 ? 'person' : 'people' }}
           </div>
         </div>
+        <div class="category-actions" *ngIf="isCustomCategory(categoryStats.id)">
+          <button
+            mat-icon-button
+            class="category-action-btn edit-btn"
+            (click)="editCategory($event, categoryStats.id)"
+            matTooltip="Edit category"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            class="category-action-btn delete-btn"
+            (click)="deleteCategory($event, categoryStats.id)"
+            matTooltip="Delete category"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
       </div>
     </div>
 

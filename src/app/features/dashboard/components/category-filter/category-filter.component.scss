@@ -126,7 +126,7 @@
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   backdrop-filter: blur(10px);
 
   &::before {
@@ -189,6 +189,7 @@
   opacity: 0.05;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 0;
+  overflow: hidden;
 }
 
 .category-stat-content {
@@ -274,6 +275,56 @@
 
   &::first-letter {
     text-transform: uppercase;
+  }
+}
+
+.category-actions {
+  display: flex;
+  gap: 4px;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.category-stat-card:hover .category-actions {
+  opacity: 1;
+}
+
+.category-action-btn {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  min-width: 32px !important;
+  line-height: 32px !important;
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    line-height: 18px !important;
+  }
+
+  &.edit-btn {
+    color: var(--primary) !important;
+    background: rgba(102, 126, 234, 0.1) !important;
+
+    &:hover {
+      background: rgba(102, 126, 234, 0.2) !important;
+      transform: scale(1.1);
+    }
+  }
+
+  &.delete-btn {
+    color: var(--warning) !important;
+    background: rgba(255, 107, 107, 0.1) !important;
+
+    &:hover {
+      background: rgba(255, 107, 107, 0.2) !important;
+      transform: scale(1.1);
+    }
   }
 }
 
