@@ -2,6 +2,10 @@
   <div class="header">
     <h2>Messaggi Programmati</h2>
     <p class="subtitle">Tutti i messaggi programmati per i compleanni</p>
+    <button mat-fab extended color="primary" (click)="openScheduleDialog()" class="add-message-fab">
+      <mat-icon>add</mat-icon>
+      New Message
+    </button>
   </div>
 
   <div
@@ -48,14 +52,24 @@
               <span class="status" [class.active]="message.isActive">
                 {{ message.isActive ? "Attivo" : "Disattivo" }}
               </span>
-              <button
-                mat-icon-button
-                color="warn"
-                (click)="deleteMessage(birthday.id, message.id)"
-                matTooltip="Elimina messaggio"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="message-actions">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="openScheduleDialog(birthday)"
+                  matTooltip="Edit messages"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteMessage(birthday.id, message.id)"
+                  matTooltip="Elimina messaggio"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
