@@ -10,6 +10,7 @@ import { BirthdayChartComponent } from './birthday-chart/birthday-chart.componen
 import { CategoryFilterComponent, CategoryStats } from './category-filter/category-filter.component';
 import { BirthdayListComponent } from './birthday-list/birthday-list.component';
 import { CategoryDialogComponent } from './category-dialog/category-dialog.component';
+import { MessageScheduleDialogComponent } from '../../scheduled-messages/message-schedule-dialog/message-schedule-dialog.component';
 import { BirthdayFacadeService } from '../../../core';
 import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../services';
 
@@ -175,6 +176,23 @@ export class DashboardComponent {
     if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
       this.deleteCategory(categoryId);
     }
+  }
+
+  openMessageDialog(event?: MouseEvent): void {
+    if (event?.target instanceof HTMLElement) {
+      const button = event.target.closest('button');
+      if (button) {
+        button.blur();
+      }
+    }
+
+    this.dialog.open(MessageScheduleDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      autoFocus: 'dialog',
+      restoreFocus: true
+    });
   }
 
   private generateCategoryId(name: string): string {

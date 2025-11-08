@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 
 import { MaterialModule, Birthday } from '../../shared';
 import { BirthdayFacadeService, NotificationService } from '../../core';
+import { MessageScheduleDialogComponent } from './message-schedule-dialog/message-schedule-dialog.component';
 
 @Component({
   selector: 'app-scheduled-messages',
@@ -19,7 +21,8 @@ export class ScheduledMessagesComponent implements OnInit {
 
   constructor(
     private birthdayFacade: BirthdayFacadeService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -37,14 +40,24 @@ export class ScheduledMessagesComponent implements OnInit {
     });
   }
 
-  openScheduleDialog(): void {
-    this.notificationService.show('Dialog not yet implemented', 'info');
+  openScheduleDialog(birthday?: Birthday): void {
+    const dialogRef = this.dialog.open(MessageScheduleDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { birthday },
+      autoFocus: 'dialog',
+      restoreFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadScheduledMessages();
+    });
   }
 
   deleteMessage(birthdayId: string, messageId: string): void {
     if (confirm('Are you sure you want to delete this message?')) {
       this.birthdayFacade.deleteMessageFromBirthday(birthdayId, messageId);
-      // Success notification is handled by the effect
     }
   }
 

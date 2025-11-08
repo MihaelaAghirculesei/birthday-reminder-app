@@ -49,6 +49,17 @@
     (clearAllData)="clearAllData()"
   ></app-birthday-list>
 
+  <button
+    mat-fab
+    color="primary"
+    class="schedule-message-fab"
+    (click)="openMessageDialog($event)"
+    matTooltip="Schedule Birthday Messages"
+    matTooltipPosition="left"
+  >
+    <mat-icon>schedule_send</mat-icon>
+  </button>
+
   <div class="full-width-section">
     <app-birthday-chart
       [chartData]="(chartData$ | async) ?? []"
