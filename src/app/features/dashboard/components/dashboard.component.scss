@@ -82,6 +82,30 @@
   }
 }
 
+.schedule-message-fab {
+  position: fixed !important;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 16px;
@@ -100,5 +124,21 @@
 
   .dashboard-section-subtitle {
     font-size: 1rem;
+  }
+
+  .schedule-message-fab {
+    bottom: 16px;
+    right: 16px;
+    transform: scale(0.9);
+
+    &:hover {
+      transform: scale(1);
+    }
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
   }
 }
