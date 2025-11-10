@@ -9,6 +9,7 @@ import { BirthdayCategory, getAllCategories } from '../../../../shared';
 export interface CategoryReassignDialogData {
   categoryToDelete: BirthdayCategory;
   affectedBirthdaysCount: number;
+  mode?: 'delete' | 'reassign-only';
 }
 
 @Component({
@@ -25,12 +26,15 @@ export interface CategoryReassignDialogData {
 export class CategoryReassignDialogComponent {
   availableCategories: BirthdayCategory[] = [];
   selectedCategoryId: string | null = null;
+  isReassignOnly: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<CategoryReassignDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CategoryReassignDialogData
   ) {
-    // Get all categories except the one being deleted
+    this.isReassignOnly = this.data.mode === 'reassign-only';
+
+    // Get all categories except the one being deleted/reassigned
     this.availableCategories = getAllCategories()
       .filter(cat => cat.id !== this.data.categoryToDelete.id);
 

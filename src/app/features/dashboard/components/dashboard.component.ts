@@ -141,6 +141,38 @@ export class DashboardComponent {
   }
 
   onEditCategory(categoryId: string): void {
+    // Special handling for Uncategorized
+    if (categoryId === '__orphaned__') {
+      this.birthdayFacade.birthdays$.subscribe(birthdays => {
+        // Filter orphaned birthdays (with non-existent categories)
+        const validCategoryIds = new Set(getAllCategories().map(c => c.id));
+        const uncategorizedBirthdays = birthdays.filter(b => b.category && !validCategoryIds.has(b.category));
+
+        if (uncategorizedBirthdays.length === 0) {
+          alert('There are no uncategorized birthdays to reassign.');
+          return;
+        }
+
+        const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
+          width: '600px',
+          maxWidth: '95vw',
+          data: {
+            categoryToDelete: { id: '__orphaned__', name: 'Uncategorized', icon: 'help_outline', color: '#9e9e9e' },
+            affectedBirthdaysCount: uncategorizedBirthdays.length,
+            mode: 'reassign-only'
+          }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result && result.action === 'reassign' && result.newCategoryId) {
+            this.reassignBirthdaysToCategory(uncategorizedBirthdays, result.newCategoryId);
+          }
+        });
+      }).unsubscribe();
+      return;
+    }
+
+    // Normal category editing
     const allCategories = getAllCategories();
     const category = allCategories.find(c => c.id === categoryId);
 

@@ -1,7 +1,7 @@
 <div class="category-reassign-dialog">
   <div class="dialog-header">
-    <mat-icon class="warning-icon">warning</mat-icon>
-    <h2 mat-dialog-title>Delete Category "{{ data.categoryToDelete.name }}"?</h2>
+    <mat-icon class="warning-icon">{{ isReassignOnly ? 'move_to_inbox' : 'warning' }}</mat-icon>
+    <h2 mat-dialog-title>{{ isReassignOnly ? 'Reassign Uncategorized Birthdays' : 'Delete Category "' + data.categoryToDelete.name + '"?' }}</h2>
   </div>
 
   <mat-dialog-content>
@@ -9,10 +9,10 @@
       <p class="count-warning">
         <strong>{{ data.affectedBirthdaysCount }}</strong>
         {{ data.affectedBirthdaysCount === 1 ? 'birthday is' : 'birthdays are' }}
-        currently assigned to this category.
+        {{ isReassignOnly ? 'currently uncategorized' : 'currently assigned to this category' }}.
       </p>
       <p class="info-text">
-        What would you like to do with {{ data.affectedBirthdaysCount === 1 ? 'it' : 'them' }}?
+        {{ isReassignOnly ? 'Choose a category to move them to:' : 'What would you like to do with ' + (data.affectedBirthdaysCount === 1 ? 'it' : 'them') + '?' }}
       </p>
     </div>
 
@@ -31,7 +31,7 @@
       </mat-form-field>
     </div>
 
-    <div class="alternative-section">
+    <div class="alternative-section" *ngIf="!isReassignOnly">
       <p class="alternative-text">
         Or you can delete the category and leave birthdays without a category
         (they will use the default "Friends" category).
@@ -44,6 +44,7 @@
       Cancel
     </button>
     <button
+      *ngIf="!isReassignOnly"
       mat-stroked-button
       color="warn"
       (click)="onDeleteWithoutReassign()"
@@ -58,7 +59,7 @@
       [disabled]="!selectedCategoryId"
     >
       <mat-icon>move_to_inbox</mat-icon>
-      Reassign & Delete
+      {{ isReassignOnly ? 'Reassign Birthdays' : 'Reassign & Delete' }}
     </button>
   </mat-dialog-actions>
 </div>
