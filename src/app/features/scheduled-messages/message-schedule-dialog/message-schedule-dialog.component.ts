@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 import { MaterialModule } from '../../../shared/material.module';
@@ -26,7 +26,9 @@ interface MessageScheduleDialogData {
   templateUrl: './message-schedule-dialog.component.html',
   styleUrls: ['./message-schedule-dialog.component.scss']
 })
-export class MessageScheduleDialogComponent implements OnInit {
+export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   selectedBirthday: Birthday | null = null;
   allBirthdays$: Observable<Birthday[]>;
   selectedBirthdayId: string = '';
@@ -44,12 +46,14 @@ export class MessageScheduleDialogComponent implements OnInit {
     if (this.data?.birthday) {
       this.selectedBirthday = this.data.birthday;
     } else if (this.data?.birthdayId) {
-      this.allBirthdays$.subscribe(birthdays => {
-        const found = birthdays.find(b => b.id === this.data.birthdayId);
-        if (found) {
-          this.selectedBirthday = found;
-        }
-      });
+      this.allBirthdays$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(birthdays => {
+          const found = birthdays.find(b => b.id === this.data.birthdayId);
+          if (found) {
+            this.selectedBirthday = found;
+          }
+        });
     } else {
       this.showBirthdaySelector = true;
     }
@@ -57,13 +61,15 @@ export class MessageScheduleDialogComponent implements OnInit {
 
   onBirthdaySelected(): void {
     if (this.selectedBirthdayId) {
-      this.allBirthdays$.subscribe(birthdays => {
-        const found = birthdays.find(b => b.id === this.selectedBirthdayId);
-        if (found) {
-          this.selectedBirthday = found;
-          this.showBirthdaySelector = false;
-        }
-      });
+      this.allBirthdays$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(birthdays => {
+          const found = birthdays.find(b => b.id === this.selectedBirthdayId);
+          if (found) {
+            this.selectedBirthday = found;
+            this.showBirthdaySelector = false;
+          }
+        });
     }
   }
 
@@ -74,5 +80,10 @@ export class MessageScheduleDialogComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
