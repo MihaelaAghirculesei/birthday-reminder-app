@@ -10,6 +10,7 @@ import { BirthdayChartComponent } from './birthday-chart/birthday-chart.componen
 import { CategoryFilterComponent, CategoryStats } from './category-filter/category-filter.component';
 import { BirthdayListComponent } from './birthday-list/birthday-list.component';
 import { CategoryDialogComponent } from './category-dialog/category-dialog.component';
+import { CategoryReassignDialogComponent } from './category-reassign-dialog/category-reassign-dialog.component';
 import { MessageScheduleDialogComponent } from '../../scheduled-messages/message-schedule-dialog/message-schedule-dialog.component';
 import { BirthdayFacadeService } from '../../../core';
 import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../services';
@@ -173,9 +174,40 @@ export class DashboardComponent {
 
     if (!category) return;
 
-    if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
-      this.deleteCategory(categoryId);
-    }
+    // Check if there are birthdays using this category
+    this.birthdayFacade.birthdays$.subscribe(birthdays => {
+      const affectedBirthdays = birthdays.filter(b => b.category === categoryId);
+
+      if (affectedBirthdays.length > 0) {
+        // Open dialog to handle reassignment
+        const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
+          width: '600px',
+          maxWidth: '95vw',
+          data: {
+            categoryToDelete: category,
+            affectedBirthdaysCount: affectedBirthdays.length
+          }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            if (result.action === 'reassign' && result.newCategoryId) {
+              // Reassign all affected birthdays to new category
+              this.reassignBirthdaysToCategory(affectedBirthdays, result.newCategoryId);
+              this.deleteCategory(categoryId);
+            } else if (result.action === 'delete-orphan') {
+              // Delete category, birthdays will use default category
+              this.deleteCategory(categoryId);
+            }
+          }
+        });
+      } else {
+        // No birthdays affected, just confirm deletion
+        if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+          this.deleteCategory(categoryId);
+        }
+      }
+    }).unsubscribe();
   }
 
   openMessageDialog(event?: MouseEvent): void {
@@ -229,6 +261,16 @@ export class DashboardComponent {
     this.refreshCategories();
   }
 
+  private reassignBirthdaysToCategory(birthdays: any[], newCategoryId: string): void {
+    birthdays.forEach(birthday => {
+      const updatedBirthday = {
+        ...birthday,
+        category: newCategoryId
+      };
+      this.birthdayFacade.updateBirthday(updatedBirthday);
+    });
+  }
+
   private getModifiedCategories(): any[] {
     const stored = localStorage.getItem('modifiedCategories');
     return stored ? JSON.parse(stored) : [];
@@ -244,14 +286,31 @@ export class DashboardComponent {
       map((birthdays) => {
         const stats = this.statsService.getCategoriesStats(birthdays);
         const allCategories = getAllCategories();
+        const validCategoryIds = new Set(allCategories.map(c => c.id));
 
         const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
 
-        return allCategories.map(cat => ({
+        // Count orphaned birthdays (with non-existent categories)
+        const orphanedCount = birthdays.filter(b =>
+          b.category && !validCategoryIds.has(b.category)
+        ).length;
+
+        const categoryStats = allCategories.map(cat => ({
           id: cat.id,
           name: cat.name,
           count: statsMap.get(cat.id) || 0
         }));
+
+        // Add orphaned category if there are orphaned birthdays
+        if (orphanedCount > 0) {
+          categoryStats.unshift({
+            id: '__orphaned__',
+            name: '⚠️ Uncategorized',
+            count: orphanedCount
+          });
+        }
+
+        return categoryStats;
       })
     );
   }
@@ -281,7 +340,13 @@ export class DashboardComponent {
     let filtered = [...birthdays];
 
     if (this.selectedCategory) {
-      filtered = filtered.filter(b => b.category === this.selectedCategory);
+      if (this.selectedCategory === '__orphaned__') {
+        // Filter orphaned birthdays (with non-existent categories)
+        const validCategoryIds = new Set(getAllCategories().map(c => c.id));
+        filtered = filtered.filter(b => b.category && !validCategoryIds.has(b.category));
+      } else {
+        filtered = filtered.filter(b => b.category === this.selectedCategory);
+      }
     }
 
     if (this.dashboardSearchTerm) {

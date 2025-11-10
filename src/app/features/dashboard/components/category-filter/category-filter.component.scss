@@ -293,6 +293,23 @@
   opacity: 1;
 }
 
+.category-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+
+  .warning-icon {
+    color: #ff9800;
+    font-size: 28px !important;
+    width: 28px !important;
+    height: 28px !important;
+    animation: pulse-warning 2s infinite;
+  }
+}
+
 .category-action-btn {
   width: 32px !important;
   height: 32px !important;

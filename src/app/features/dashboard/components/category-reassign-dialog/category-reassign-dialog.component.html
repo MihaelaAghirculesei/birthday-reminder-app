@@ -1,0 +1,64 @@
+<div class="category-reassign-dialog">
+  <div class="dialog-header">
+    <mat-icon class="warning-icon">warning</mat-icon>
+    <h2 mat-dialog-title>Delete Category "{{ data.categoryToDelete.name }}"?</h2>
+  </div>
+
+  <mat-dialog-content>
+    <div class="warning-message">
+      <p class="count-warning">
+        <strong>{{ data.affectedBirthdaysCount }}</strong>
+        {{ data.affectedBirthdaysCount === 1 ? 'birthday is' : 'birthdays are' }}
+        currently assigned to this category.
+      </p>
+      <p class="info-text">
+        What would you like to do with {{ data.affectedBirthdaysCount === 1 ? 'it' : 'them' }}?
+      </p>
+    </div>
+
+    <div class="reassign-section">
+      <h3>Choose a new category</h3>
+      <mat-form-field appearance="outline" class="category-select">
+        <mat-select [(ngModel)]="selectedCategoryId">
+          <mat-option *ngFor="let category of availableCategories" [value]="category.id">
+            <div class="category-option">
+              <mat-icon [style.background-color]="category.color">{{ category.icon }}</mat-icon>
+              <span>{{ category.name }}</span>
+            </div>
+          </mat-option>
+        </mat-select>
+        <mat-hint>All affected birthdays will be moved to this category</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="alternative-section">
+      <p class="alternative-text">
+        Or you can delete the category and leave birthdays without a category
+        (they will use the default "Friends" category).
+      </p>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">
+      Cancel
+    </button>
+    <button
+      mat-stroked-button
+      color="warn"
+      (click)="onDeleteWithoutReassign()"
+    >
+      <mat-icon>delete</mat-icon>
+      Delete Without Reassigning
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onConfirm()"
+      [disabled]="!selectedCategoryId"
+    >
+      <mat-icon>move_to_inbox</mat-icon>
+      Reassign & Delete
+    </button>
+  </mat-dialog-actions>
+</div>
