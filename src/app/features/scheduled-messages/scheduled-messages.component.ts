@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
 import { MaterialModule, Birthday } from '../../shared';
@@ -16,7 +17,8 @@ import { MessageScheduleDialogComponent } from './message-schedule-dialog/messag
   templateUrl: './scheduled-messages.component.html',
   styleUrls: ['./scheduled-messages.component.scss'],
 })
-export class ScheduledMessagesComponent implements OnInit {
+export class ScheduledMessagesComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   birthdaysWithMessages: Birthday[] = [];
 
   constructor(
@@ -27,17 +29,21 @@ export class ScheduledMessagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadScheduledMessages();
-    this.birthdayFacade.birthdays$.subscribe(() => {
-      this.loadScheduledMessages();
-    });
+    this.birthdayFacade.birthdays$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.loadScheduledMessages();
+      });
   }
 
   loadScheduledMessages(): void {
-    this.birthdayFacade.birthdays$.subscribe(birthdays => {
-      this.birthdaysWithMessages = birthdays.filter(
-        b => b.scheduledMessages && b.scheduledMessages.length > 0
-      );
-    });
+    this.birthdayFacade.birthdays$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(birthdays => {
+        this.birthdaysWithMessages = birthdays.filter(
+          b => b.scheduledMessages && b.scheduledMessages.length > 0
+        );
+      });
   }
 
   openScheduleDialog(birthday?: Birthday): void {
@@ -50,9 +56,11 @@ export class ScheduledMessagesComponent implements OnInit {
       restoreFocus: true
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadScheduledMessages();
-    });
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.loadScheduledMessages();
+      });
   }
 
   deleteMessage(birthdayId: string, messageId: string): void {
@@ -72,5 +80,10 @@ export class ScheduledMessagesComponent implements OnInit {
       default:
         return priority;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
