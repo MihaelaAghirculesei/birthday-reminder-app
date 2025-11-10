@@ -298,8 +298,8 @@ export class DashboardComponent {
     });
   }
 
-  async addTestData(): Promise<void> {
-    console.warn('Test data loading not yet implemented with NgRx');
+  addTestData(): void {
+    this.birthdayFacade.loadTestData();
   }
 
   clearAllData(): void {
