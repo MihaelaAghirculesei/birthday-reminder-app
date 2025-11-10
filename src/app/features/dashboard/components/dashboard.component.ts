@@ -1,6 +1,6 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, map } from 'rxjs';
+import { Observable, Subject, map, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule, DEFAULT_CATEGORY, getAllCategories } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
@@ -31,7 +31,9 @@ import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../ser
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+
   totalBirthdays$: Observable<number>;
   birthdaysThisMonth$: Observable<number>;
   averageAge$: Observable<number>;
@@ -126,53 +128,56 @@ export class DashboardComponent {
       data: { mode: 'add' }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const newCategory = {
-          id: this.generateCategoryId(result.name),
-          name: result.name,
-          icon: result.icon,
-          color: result.color
-        };
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(result => {
+        if (result) {
+          const newCategory = {
+            id: this.generateCategoryId(result.name),
+            name: result.name,
+            icon: result.icon,
+            color: result.color
+          };
 
-        this.saveCustomCategory(newCategory);
-      }
-    });
+          this.saveCustomCategory(newCategory);
+        }
+      });
   }
 
   onEditCategory(categoryId: string): void {
-    // Special handling for Uncategorized
     if (categoryId === '__orphaned__') {
-      this.birthdayFacade.birthdays$.subscribe(birthdays => {
-        // Filter orphaned birthdays (with non-existent categories)
-        const validCategoryIds = new Set(getAllCategories().map(c => c.id));
-        const uncategorizedBirthdays = birthdays.filter(b => b.category && !validCategoryIds.has(b.category));
+      this.birthdayFacade.birthdays$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(birthdays => {
+          const validCategoryIds = new Set(getAllCategories().map(c => c.id));
+          const uncategorizedBirthdays = birthdays.filter(b => b.category && !validCategoryIds.has(b.category));
 
-        if (uncategorizedBirthdays.length === 0) {
-          alert('There are no uncategorized birthdays to reassign.');
-          return;
-        }
-
-        const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
-          width: '600px',
-          maxWidth: '95vw',
-          data: {
-            categoryToDelete: { id: '__orphaned__', name: 'Uncategorized', icon: 'help_outline', color: '#9e9e9e' },
-            affectedBirthdaysCount: uncategorizedBirthdays.length,
-            mode: 'reassign-only'
+          if (uncategorizedBirthdays.length === 0) {
+            alert('There are no uncategorized birthdays to reassign.');
+            return;
           }
-        });
 
-        dialogRef.afterClosed().subscribe(result => {
-          if (result && result.action === 'reassign' && result.newCategoryId) {
-            this.reassignBirthdaysToCategory(uncategorizedBirthdays, result.newCategoryId);
-          }
+          const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
+            width: '600px',
+            maxWidth: '95vw',
+            data: {
+              categoryToDelete: { id: '__orphaned__', name: 'Uncategorized', icon: 'help_outline', color: '#9e9e9e' },
+              affectedBirthdaysCount: uncategorizedBirthdays.length,
+              mode: 'reassign-only'
+            }
+          });
+
+          dialogRef.afterClosed()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(result => {
+              if (result && result.action === 'reassign' && result.newCategoryId) {
+                this.reassignBirthdaysToCategory(uncategorizedBirthdays, result.newCategoryId);
+              }
+            });
         });
-      }).unsubscribe();
       return;
     }
 
-    // Normal category editing
     const allCategories = getAllCategories();
     const category = allCategories.find(c => c.id === categoryId);
 
@@ -186,18 +191,20 @@ export class DashboardComponent {
       }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const updatedCategory = {
-          ...category,
-          name: result.name,
-          icon: result.icon,
-          color: result.color
-        };
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(result => {
+        if (result) {
+          const updatedCategory = {
+            ...category,
+            name: result.name,
+            icon: result.icon,
+            color: result.color
+          };
 
-        this.updateCategory(categoryId, updatedCategory);
-      }
-    });
+          this.updateCategory(categoryId, updatedCategory);
+        }
+      });
   }
 
   onDeleteCategory(categoryId: string): void {
@@ -206,40 +213,39 @@ export class DashboardComponent {
 
     if (!category) return;
 
-    // Check if there are birthdays using this category
-    this.birthdayFacade.birthdays$.subscribe(birthdays => {
-      const affectedBirthdays = birthdays.filter(b => b.category === categoryId);
+    this.birthdayFacade.birthdays$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(birthdays => {
+        const affectedBirthdays = birthdays.filter(b => b.category === categoryId);
 
-      if (affectedBirthdays.length > 0) {
-        // Open dialog to handle reassignment
-        const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
-          width: '600px',
-          maxWidth: '95vw',
-          data: {
-            categoryToDelete: category,
-            affectedBirthdaysCount: affectedBirthdays.length
-          }
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-          if (result) {
-            if (result.action === 'reassign' && result.newCategoryId) {
-              // Reassign all affected birthdays to new category
-              this.reassignBirthdaysToCategory(affectedBirthdays, result.newCategoryId);
-              this.deleteCategory(categoryId);
-            } else if (result.action === 'delete-orphan') {
-              // Delete category, birthdays will use default category
-              this.deleteCategory(categoryId);
+        if (affectedBirthdays.length > 0) {
+          const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
+            width: '600px',
+            maxWidth: '95vw',
+            data: {
+              categoryToDelete: category,
+              affectedBirthdaysCount: affectedBirthdays.length
             }
+          });
+
+          dialogRef.afterClosed()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(result => {
+              if (result) {
+                if (result.action === 'reassign' && result.newCategoryId) {
+                  this.reassignBirthdaysToCategory(affectedBirthdays, result.newCategoryId);
+                  this.deleteCategory(categoryId);
+                } else if (result.action === 'delete-orphan') {
+                  this.deleteCategory(categoryId);
+                }
+              }
+            });
+        } else {
+          if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+            this.deleteCategory(categoryId);
           }
-        });
-      } else {
-        // No birthdays affected, just confirm deletion
-        if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
-          this.deleteCategory(categoryId);
         }
-      }
-    }).unsubscribe();
+      });
   }
 
   openMessageDialog(event?: MouseEvent): void {
@@ -322,7 +328,6 @@ export class DashboardComponent {
 
         const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
 
-        // Count orphaned birthdays (with non-existent categories)
         const orphanedCount = birthdays.filter(b =>
           b.category && !validCategoryIds.has(b.category)
         ).length;
@@ -333,7 +338,6 @@ export class DashboardComponent {
           count: statsMap.get(cat.id) || 0
         }));
 
-        // Add orphaned category if there are orphaned birthdays
         if (orphanedCount > 0) {
           categoryStats.unshift({
             id: '__orphaned__',
@@ -373,7 +377,6 @@ export class DashboardComponent {
 
     if (this.selectedCategory) {
       if (this.selectedCategory === '__orphaned__') {
-        // Filter orphaned birthdays (with non-existent categories)
         const validCategoryIds = new Set(getAllCategories().map(c => c.id));
         filtered = filtered.filter(b => b.category && !validCategoryIds.has(b.category));
       } else {
@@ -458,5 +461,10 @@ export class DashboardComponent {
     this.allBirthdays$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => this.getSortedFilteredBirthdays(birthdays))
     );
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
