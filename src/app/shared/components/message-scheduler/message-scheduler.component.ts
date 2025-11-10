@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -23,7 +24,9 @@ import { NotificationService, BirthdayFacadeService } from '../../../core';
   templateUrl: './message-scheduler.component.html',
   styleUrls: ['./message-scheduler.component.scss'],
 })
-export class MessageSchedulerComponent implements OnInit {
+export class MessageSchedulerComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   @Input() birthday: Birthday | null = null;
 
   messageForm: FormGroup;
@@ -57,9 +60,11 @@ export class MessageSchedulerComponent implements OnInit {
 
   loadMessages(): void {
     if (this.birthday) {
-      this.birthdayFacade.getMessagesByBirthday(this.birthday.id).subscribe(messages => {
-        this.messages = messages || [];
-      });
+      this.birthdayFacade.getMessagesByBirthday(this.birthday.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(messages => {
+          this.messages = messages || [];
+        });
     }
   }
 
@@ -175,5 +180,10 @@ export class MessageSchedulerComponent implements OnInit {
 
   trackByMessageId(_index: number, message: ScheduledMessage): string {
     return message.id;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
