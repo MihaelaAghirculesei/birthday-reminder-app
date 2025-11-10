@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -14,7 +14,7 @@ import { trigger, style, transition, animate } from '@angular/animations';
 import { MaterialModule, PhotoUploadComponent, NotificationComponent, getAllCategories, DEFAULT_CATEGORY } from './shared';
 import { Birthday, getZodiacSign } from './shared';
 import { DashboardComponent } from './features/dashboard';
-import { BirthdayFacadeService } from './core';
+import { BirthdayFacadeService, CategoryFacadeService } from './core';
 import { HeaderComponent, FooterComponent } from './layout';
 
 @Component({
@@ -51,7 +51,7 @@ import { HeaderComponent, FooterComponent } from './layout';
     ]),
   ],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Birthday Reminder App';
   birthdayForm: FormGroup;
   birthdays$: Observable<Birthday[]>;
@@ -65,7 +65,8 @@ export class AppComponent {
 
   constructor(
     private fb: FormBuilder,
-    private birthdayFacade: BirthdayFacadeService
+    private birthdayFacade: BirthdayFacadeService,
+    private categoryFacade: CategoryFacadeService
   ) {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
@@ -77,6 +78,10 @@ export class AppComponent {
     });
 
     this.birthdays$ = this.birthdayFacade.birthdays$;
+  }
+
+  ngOnInit(): void {
+    this.categoryFacade.loadCategories();
   }
 
   onSubmit() {

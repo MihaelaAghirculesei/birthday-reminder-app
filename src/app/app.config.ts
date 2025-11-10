@@ -11,6 +11,8 @@ import { NotificationService } from './core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { birthdayReducer } from './core/store/birthday/birthday.reducer';
 import { BirthdayEffects } from './core/store/birthday/birthday.effects';
+import { categoryReducer } from './core/store/category/category.reducer';
+import { CategoryEffects } from './core/store/category/category.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,9 +20,10 @@ export const appConfig: ApplicationConfig = {
     // provideClientHydration(), // Temporarily disabled
     provideAnimationsAsync(),
     provideStore({
-      birthdays: birthdayReducer
+      birthdays: birthdayReducer,
+      categories: categoryReducer
     }),
-    provideEffects([BirthdayEffects]),
+    provideEffects([BirthdayEffects, CategoryEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),
