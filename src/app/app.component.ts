@@ -11,7 +11,7 @@ import {
 import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 
-import { MaterialModule, PhotoUploadComponent, NotificationComponent, getAllCategories, DEFAULT_CATEGORY } from './shared';
+import { MaterialModule, PhotoUploadComponent, NotificationComponent, DEFAULT_CATEGORY, BirthdayCategory } from './shared';
 import { Birthday, getZodiacSign } from './shared';
 import { DashboardComponent } from './features/dashboard';
 import { BirthdayFacadeService, CategoryFacadeService } from './core';
@@ -53,15 +53,12 @@ import { HeaderComponent, FooterComponent } from './layout';
 })
 export class AppComponent implements OnInit {
   title = 'Birthday Reminder App';
-  birthdayForm: FormGroup;
-  birthdays$: Observable<Birthday[]>;
+  birthdayForm!: FormGroup;
+  birthdays$!: Observable<Birthday[]>;
+  categories$!: Observable<BirthdayCategory[]>;
   selectedPhoto: string | null = null;
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
-
-  get availableCategories() {
-    return getAllCategories();
-  }
 
   constructor(
     private fb: FormBuilder,
@@ -78,6 +75,7 @@ export class AppComponent implements OnInit {
     });
 
     this.birthdays$ = this.birthdayFacade.birthdays$;
+    this.categories$ = this.categoryFacade.categories$;
   }
 
   ngOnInit(): void {

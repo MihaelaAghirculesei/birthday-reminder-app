@@ -2,8 +2,6 @@
   <app-header></app-header>
 
   <div class="content-container">
-    <app-dashboard *ngIf="(birthdays$ | async)?.length"></app-dashboard>
-    
     <div class="test-data-section" *ngIf="(birthdays$ | async)?.length === 0">
       <mat-card class="test-data-card">
         <mat-card-content>
@@ -25,14 +23,14 @@
 
     <div class="content-sections">
       <mat-card class="add-birthday-card">
-        <mat-card-header class="collapsible-header" 
+        <mat-card-header class="collapsible-header"
                          (click)="toggleAddBirthdaySection()"
                          [title]="isAddBirthdayExpanded ? 'Click to close form' : 'Click to add new birthday'">
           <mat-card-title>✨ Add New Birthday</mat-card-title>
           <mat-icon class="expand-icon" [class.expanded]="isAddBirthdayExpanded">
             {{ isAddBirthdayExpanded ? 'remove_circle' : 'add_circle' }}
           </mat-icon>
-        </mat-card-header>   
+        </mat-card-header>
         <mat-card-content *ngIf="isAddBirthdayExpanded" [@expandCollapse]>
           <form [formGroup]="birthdayForm" (ngSubmit)="onSubmit()" class="birthday-form">
             <photo-upload 
@@ -61,7 +59,7 @@
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Category</mat-label>
               <mat-select formControlName="category">
-                <mat-option *ngFor="let category of availableCategories" [value]="category.id">
+                <mat-option *ngFor="let category of (categories$ | async)" [value]="category.id">
                   <div class="category-option">
                     <mat-icon [style.color]="category.color">{{ category.icon }}</mat-icon>
                     <span>{{ category.name }}</span>
@@ -97,6 +95,8 @@
         </mat-card-content>
       </mat-card>
     </div>
+
+    <app-dashboard *ngIf="(birthdays$ | async)?.length"></app-dashboard>
   </div>
 
   <app-footer></app-footer>
