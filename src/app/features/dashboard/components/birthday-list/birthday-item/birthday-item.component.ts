@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, getAllCategories, calculateAge } from '../../../../../shared';
+import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, BirthdayCategory, calculateAge } from '../../../../../shared';
 import { RememberPhotoComponent } from '../../remember-photo/remember-photo.component';
 
 @Component({
@@ -27,6 +27,7 @@ export class BirthdayItemComponent {
   @Input() editingData: any = {};
   @Input() daysUntilBirthday: number = 0;
   @Input() defaultCategory: string = '';
+  @Input() categories: BirthdayCategory[] = [];
 
   @Output() edit = new EventEmitter<Birthday>();
   @Output() delete = new EventEmitter<Birthday>();
@@ -55,10 +56,6 @@ export class BirthdayItemComponent {
     if (days <= 7) return 'red-alert';
     if (days <= 21) return 'orange-warning';
     return 'green-safe';
-  }
-
-  getBirthdayCategories() {
-    return getAllCategories();
   }
 
   onEdit(): void {
