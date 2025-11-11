@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, map, takeUntil, combineLatest } from 'rxjs';
+import { Observable, Subject, map, takeUntil, combineLatest, take } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule, DEFAULT_CATEGORY, BirthdayCategory } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
@@ -151,7 +151,7 @@ export class DashboardComponent implements OnDestroy {
     });
 
     dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(take(1))
       .subscribe(result => {
         if (result) {
           const newCategory: BirthdayCategory = {
@@ -172,7 +172,7 @@ export class DashboardComponent implements OnDestroy {
         this.birthdayFacade.birthdays$,
         this.categoryFacade.categories$
       ])
-        .pipe(takeUntil(this.destroy$))
+        .pipe(take(1))
         .subscribe(([birthdays, allCategories]) => {
           const validCategoryIds = new Set(allCategories.map(c => c.id));
           const uncategorizedBirthdays = birthdays.filter(b => b.category && !validCategoryIds.has(b.category));
@@ -193,7 +193,7 @@ export class DashboardComponent implements OnDestroy {
           });
 
           dialogRef.afterClosed()
-            .pipe(takeUntil(this.destroy$))
+            .pipe(take(1))
             .subscribe(result => {
               if (result && result.action === 'reassign' && result.newCategoryId) {
                 this.reassignBirthdaysToCategory(uncategorizedBirthdays, result.newCategoryId);
@@ -204,7 +204,7 @@ export class DashboardComponent implements OnDestroy {
     }
 
     this.categoryFacade.categories$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(take(1))
       .subscribe(allCategories => {
         const category = allCategories.find(c => c.id === categoryId);
 
@@ -219,7 +219,7 @@ export class DashboardComponent implements OnDestroy {
         });
 
         dialogRef.afterClosed()
-          .pipe(takeUntil(this.destroy$))
+          .pipe(take(1))
           .subscribe(result => {
             if (result) {
               const updatedCategory: BirthdayCategory = {
@@ -240,7 +240,7 @@ export class DashboardComponent implements OnDestroy {
       this.categoryFacade.categories$,
       this.birthdayFacade.birthdays$
     ])
-      .pipe(takeUntil(this.destroy$))
+      .pipe(take(1))
       .subscribe(([allCategories, birthdays]) => {
         const category = allCategories.find(c => c.id === categoryId);
 
@@ -259,7 +259,7 @@ export class DashboardComponent implements OnDestroy {
           });
 
           dialogRef.afterClosed()
-            .pipe(takeUntil(this.destroy$))
+            .pipe(take(1))
             .subscribe(result => {
               if (result) {
                 if (result.action === 'reassign' && result.newCategoryId) {
