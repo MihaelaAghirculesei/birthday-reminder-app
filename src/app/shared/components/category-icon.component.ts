@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material.module';
 import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants/categories';
@@ -8,7 +8,7 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
   standalone: true,
   imports: [CommonModule, MaterialModule],
   template: `
-    <div class="category-icon-wrapper" 
+    <div class="category-icon-wrapper"
          [style.background-color]="iconColor"
          [matTooltip]="categoryName"
          [class]="cssClass">
@@ -66,19 +66,27 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
     }
   `]
 })
-export class CategoryIconComponent {
+export class CategoryIconComponent implements OnInit, OnChanges {
   @Input() categoryId: string = 'friends';
   @Input() cssClass: string = '';
 
-  get iconName(): string {
-    return getCategoryIcon(this.categoryId);
+  iconName: string = '';
+  iconColor: string = '';
+  categoryName: string = '';
+
+  ngOnInit(): void {
+    this.updateCategoryData();
   }
 
-  get iconColor(): string {
-    return getCategoryColor(this.categoryId);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['categoryId']) {
+      this.updateCategoryData();
+    }
   }
 
-  get categoryName(): string {
-    return getCategoryById(this.categoryId)?.name || 'Unknown';
+  private updateCategoryData(): void {
+    this.iconName = getCategoryIcon(this.categoryId);
+    this.iconColor = getCategoryColor(this.categoryId);
+    this.categoryName = getCategoryById(this.categoryId)?.name || 'Unknown';
   }
 }
