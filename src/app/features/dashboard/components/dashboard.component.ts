@@ -43,6 +43,7 @@ export class DashboardComponent implements OnDestroy {
   maxCount$: Observable<number>;
   categoriesStats$: Observable<CategoryStats[]>;
   allBirthdays$: Observable<any[]>;
+  categories$: Observable<BirthdayCategory[]>;
 
   selectedCategory: string | null = null;
   currentMonth = new Date().getMonth();
@@ -132,6 +133,8 @@ export class DashboardComponent implements OnDestroy {
     ]).pipe(
       map(([birthdays, categories]) => this.getSortedFilteredBirthdays(birthdays, categories))
     );
+
+    this.categories$ = this.categoryFacade.categories$;
   }
 
   selectCategory(categoryId: string): void {
@@ -396,7 +399,16 @@ export class DashboardComponent implements OnDestroy {
     if (!this.editService.currentEditingId) return;
 
     const target = event.target as HTMLElement;
-    if (target.closest('button, mat-icon')) return;
+
+    // Ignore clicks on the Add Birthday header and other UI elements outside dashboard
+    if (target.closest('.collapsible-header, .add-birthday-card, .category-filter')) {
+      return;
+    }
+
+    // Ignore clicks on buttons and icons globally (for dialogs, etc.)
+    if (target.closest('button, mat-icon')) {
+      return;
+    }
 
     const clickedBirthdayItem = target.closest('.dashboard-birthday-item') as HTMLElement;
 
@@ -406,6 +418,7 @@ export class DashboardComponent implements OnDestroy {
         this.editService.cancelEdit();
       }
     } else {
+      // Clicked outside of any birthday item - cancel edit
       this.editService.cancelEdit();
     }
   }
