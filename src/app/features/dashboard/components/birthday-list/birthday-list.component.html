@@ -35,6 +35,7 @@
       <app-birthday-item
         *ngFor="let birthday of birthdays; trackBy: trackByBirthday"
         [birthday]="birthday"
+        [categories]="categories"
         [isEditing]="isEditing(birthday.id)"
         [editingData]="getEditingData()"
         [daysUntilBirthday]="getDaysUntilBirthday(birthday.birthDate)"

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from '../../../../shared';
+import { MaterialModule, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
 import { BirthdayFacadeService } from '../../../../core';
 import { BirthdayEditService } from '../../services/birthday-edit.service';
@@ -20,6 +20,7 @@ import { BirthdayEditService } from '../../services/birthday-edit.service';
 })
 export class BirthdayListComponent {
   @Input() birthdays: any[] = [];
+  @Input() categories: BirthdayCategory[] = [];
   @Input() searchTerm: string = '';
   @Input() lastAction: { type: string; data: any } | null = null;
   @Input() totalBirthdays: number = 0;

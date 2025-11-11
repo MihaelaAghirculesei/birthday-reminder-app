@@ -39,6 +39,7 @@
 
   <app-birthday-list
     [birthdays]="(allBirthdays$ | async) ?? []"
+    [categories]="(categories$ | async) ?? []"
     [searchTerm]="dashboardSearchTerm"
     [lastAction]="lastAction"
     [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
