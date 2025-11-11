@@ -191,6 +191,7 @@ export class DashboardComponent implements OnDestroy {
             data: {
               categoryToDelete: { id: '__orphaned__', name: 'Uncategorized', icon: 'help_outline', color: '#9e9e9e' },
               affectedBirthdaysCount: uncategorizedBirthdays.length,
+              availableCategories: allCategories,
               mode: 'reassign-only'
             }
           });
@@ -257,7 +258,8 @@ export class DashboardComponent implements OnDestroy {
             maxWidth: '95vw',
             data: {
               categoryToDelete: category,
-              affectedBirthdaysCount: affectedBirthdays.length
+              affectedBirthdaysCount: affectedBirthdays.length,
+              availableCategories: allCategories
             }
           });
 

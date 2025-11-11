@@ -4,11 +4,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 
 import { MaterialModule } from '../../../../shared/material.module';
-import { BirthdayCategory, getAllCategories } from '../../../../shared';
+import { BirthdayCategory } from '../../../../shared';
 
 export interface CategoryReassignDialogData {
   categoryToDelete: BirthdayCategory;
   affectedBirthdaysCount: number;
+  availableCategories: BirthdayCategory[];
   mode?: 'delete' | 'reassign-only';
 }
 
@@ -34,8 +35,8 @@ export class CategoryReassignDialogComponent {
   ) {
     this.isReassignOnly = this.data.mode === 'reassign-only';
 
-    // Get all categories except the one being deleted/reassigned
-    this.availableCategories = getAllCategories()
+    // Use categories passed from dialog data (from NgRx store)
+    this.availableCategories = this.data.availableCategories
       .filter(cat => cat.id !== this.data.categoryToDelete.id);
 
     // Set default selection to the first available category
