@@ -1,8 +1,8 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, map, takeUntil } from 'rxjs';
+import { Observable, Subject, map, takeUntil, combineLatest } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { MaterialModule, DEFAULT_CATEGORY, getAllCategories } from '../../../shared';
+import { MaterialModule, DEFAULT_CATEGORY, BirthdayCategory } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
 import { GoogleCalendarSyncComponent } from '../../calendar-sync/google-calendar-sync.component';
 import { DashboardStatsComponent } from './stats/dashboard-stats.component';
@@ -12,7 +12,7 @@ import { BirthdayListComponent } from './birthday-list/birthday-list.component';
 import { CategoryDialogComponent } from './category-dialog/category-dialog.component';
 import { CategoryReassignDialogComponent } from './category-reassign-dialog/category-reassign-dialog.component';
 import { MessageScheduleDialogComponent } from '../../scheduled-messages/message-schedule-dialog/message-schedule-dialog.component';
-import { BirthdayFacadeService } from '../../../core';
+import { BirthdayFacadeService, CategoryFacadeService } from '../../../core';
 import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../services';
 
 @Component({
@@ -51,6 +51,7 @@ export class DashboardComponent implements OnDestroy {
 
   constructor(
     public birthdayFacade: BirthdayFacadeService,
+    private categoryFacade: CategoryFacadeService,
     public editService: BirthdayEditService,
     private statsService: BirthdayStatsService,
     private dialog: MatDialog
@@ -92,23 +93,44 @@ export class DashboardComponent implements OnDestroy {
       map((chartData) => this.statsService.getMaxCount(chartData))
     );
 
-    this.categoriesStats$ = this.birthdayFacade.birthdays$.pipe(
-      map((birthdays) => {
+    this.categoriesStats$ = combineLatest([
+      this.birthdayFacade.birthdays$,
+      this.categoryFacade.categories$
+    ]).pipe(
+      map(([birthdays, allCategories]) => {
         const stats = this.statsService.getCategoriesStats(birthdays);
-        const allCategories = getAllCategories();
-
+        const validCategoryIds = new Set(allCategories.map(c => c.id));
         const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
 
-        return allCategories.map(category => ({
+        // Count orphaned birthdays (with non-existent categories)
+        const orphanedCount = birthdays.filter(b =>
+          b.category && !validCategoryIds.has(b.category)
+        ).length;
+
+        const categoryStats = allCategories.map(category => ({
           id: category.id,
           name: category.name,
           count: statsMap.get(category.id) || 0
         }));
+
+        // Add orphaned category if there are orphaned birthdays
+        if (orphanedCount > 0) {
+          categoryStats.unshift({
+            id: '__orphaned__',
+            name: '⚠️ Uncategorized',
+            count: orphanedCount
+          });
+        }
+
+        return categoryStats;
       })
     );
 
-    this.allBirthdays$ = this.birthdayFacade.birthdays$.pipe(
-      map((birthdays) => this.getSortedFilteredBirthdays(birthdays))
+    this.allBirthdays$ = combineLatest([
+      this.birthdayFacade.birthdays$,
+      this.categoryFacade.categories$
+    ]).pipe(
+      map(([birthdays, categories]) => this.getSortedFilteredBirthdays(birthdays, categories))
     );
   }
 
@@ -132,24 +154,27 @@ export class DashboardComponent implements OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(result => {
         if (result) {
-          const newCategory = {
+          const newCategory: BirthdayCategory = {
             id: this.generateCategoryId(result.name),
             name: result.name,
             icon: result.icon,
             color: result.color
           };
 
-          this.saveCustomCategory(newCategory);
+          this.categoryFacade.addCategory(newCategory);
         }
       });
   }
 
   onEditCategory(categoryId: string): void {
     if (categoryId === '__orphaned__') {
-      this.birthdayFacade.birthdays$
+      combineLatest([
+        this.birthdayFacade.birthdays$,
+        this.categoryFacade.categories$
+      ])
         .pipe(takeUntil(this.destroy$))
-        .subscribe(birthdays => {
-          const validCategoryIds = new Set(getAllCategories().map(c => c.id));
+        .subscribe(([birthdays, allCategories]) => {
+          const validCategoryIds = new Set(allCategories.map(c => c.id));
           const uncategorizedBirthdays = birthdays.filter(b => b.category && !validCategoryIds.has(b.category));
 
           if (uncategorizedBirthdays.length === 0) {
@@ -178,44 +203,49 @@ export class DashboardComponent implements OnDestroy {
       return;
     }
 
-    const allCategories = getAllCategories();
-    const category = allCategories.find(c => c.id === categoryId);
-
-    if (!category) return;
-
-    const dialogRef = this.dialog.open(CategoryDialogComponent, {
-      width: '600px',
-      data: {
-        mode: 'edit',
-        category: category
-      }
-    });
-
-    dialogRef.afterClosed()
+    this.categoryFacade.categories$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(result => {
-        if (result) {
-          const updatedCategory = {
-            ...category,
-            name: result.name,
-            icon: result.icon,
-            color: result.color
-          };
+      .subscribe(allCategories => {
+        const category = allCategories.find(c => c.id === categoryId);
 
-          this.updateCategory(categoryId, updatedCategory);
-        }
+        if (!category) return;
+
+        const dialogRef = this.dialog.open(CategoryDialogComponent, {
+          width: '600px',
+          data: {
+            mode: 'edit',
+            category: category
+          }
+        });
+
+        dialogRef.afterClosed()
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(result => {
+            if (result) {
+              const updatedCategory: BirthdayCategory = {
+                ...category,
+                name: result.name,
+                icon: result.icon,
+                color: result.color
+              };
+
+              this.categoryFacade.updateCategory(updatedCategory);
+            }
+          });
       });
   }
 
   onDeleteCategory(categoryId: string): void {
-    const allCategories = getAllCategories();
-    const category = allCategories.find(c => c.id === categoryId);
-
-    if (!category) return;
-
-    this.birthdayFacade.birthdays$
+    combineLatest([
+      this.categoryFacade.categories$,
+      this.birthdayFacade.birthdays$
+    ])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(birthdays => {
+      .subscribe(([allCategories, birthdays]) => {
+        const category = allCategories.find(c => c.id === categoryId);
+
+        if (!category) return;
+
         const affectedBirthdays = birthdays.filter(b => b.category === categoryId);
 
         if (affectedBirthdays.length > 0) {
@@ -234,15 +264,15 @@ export class DashboardComponent implements OnDestroy {
               if (result) {
                 if (result.action === 'reassign' && result.newCategoryId) {
                   this.reassignBirthdaysToCategory(affectedBirthdays, result.newCategoryId);
-                  this.deleteCategory(categoryId);
+                  this.categoryFacade.deleteCategory(categoryId);
                 } else if (result.action === 'delete-orphan') {
-                  this.deleteCategory(categoryId);
+                  this.categoryFacade.deleteCategory(categoryId);
                 }
               }
             });
         } else {
           if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
-            this.deleteCategory(categoryId);
+            this.categoryFacade.deleteCategory(categoryId);
           }
         }
       });
@@ -269,36 +299,6 @@ export class DashboardComponent implements OnDestroy {
     return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
   }
 
-  private saveCustomCategory(category: any): void {
-    const customCategories = this.getCustomCategories();
-    customCategories.push(category);
-    localStorage.setItem('customCategories', JSON.stringify(customCategories));
-    this.refreshCategories();
-  }
-
-  private updateCategory(categoryId: string, updatedCategory: any): void {
-    const modifiedCategories = this.getModifiedCategories();
-    const index = modifiedCategories.findIndex(c => c.id === categoryId);
-
-    if (index !== -1) {
-      modifiedCategories[index] = updatedCategory;
-    } else {
-      modifiedCategories.push(updatedCategory);
-    }
-
-    localStorage.setItem('modifiedCategories', JSON.stringify(modifiedCategories));
-    this.refreshCategories();
-  }
-
-  private deleteCategory(categoryId: string): void {
-    const deletedIds = this.getDeletedCategoryIds();
-    if (!deletedIds.includes(categoryId)) {
-      deletedIds.push(categoryId);
-      localStorage.setItem('deletedCategoryIds', JSON.stringify(deletedIds));
-    }
-    this.refreshCategories();
-  }
-
   private reassignBirthdaysToCategory(birthdays: any[], newCategoryId: string): void {
     birthdays.forEach(birthday => {
       const updatedBirthday = {
@@ -307,53 +307,6 @@ export class DashboardComponent implements OnDestroy {
       };
       this.birthdayFacade.updateBirthday(updatedBirthday);
     });
-  }
-
-  private getModifiedCategories(): any[] {
-    const stored = localStorage.getItem('modifiedCategories');
-    return stored ? JSON.parse(stored) : [];
-  }
-
-  private getDeletedCategoryIds(): string[] {
-    const stored = localStorage.getItem('deletedCategoryIds');
-    return stored ? JSON.parse(stored) : [];
-  }
-
-  private refreshCategories(): void {
-    this.categoriesStats$ = this.birthdayFacade.birthdays$.pipe(
-      map((birthdays) => {
-        const stats = this.statsService.getCategoriesStats(birthdays);
-        const allCategories = getAllCategories();
-        const validCategoryIds = new Set(allCategories.map(c => c.id));
-
-        const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
-
-        const orphanedCount = birthdays.filter(b =>
-          b.category && !validCategoryIds.has(b.category)
-        ).length;
-
-        const categoryStats = allCategories.map(cat => ({
-          id: cat.id,
-          name: cat.name,
-          count: statsMap.get(cat.id) || 0
-        }));
-
-        if (orphanedCount > 0) {
-          categoryStats.unshift({
-            id: '__orphaned__',
-            name: '⚠️ Uncategorized',
-            count: orphanedCount
-          });
-        }
-
-        return categoryStats;
-      })
-    );
-  }
-
-  private getCustomCategories(): any[] {
-    const stored = localStorage.getItem('customCategories');
-    return stored ? JSON.parse(stored) : [];
   }
 
   isCategorySelected(categoryId: string): boolean {
@@ -370,14 +323,14 @@ export class DashboardComponent implements OnDestroy {
     this.updateAllBirthdays();
   }
 
-  getSortedFilteredBirthdays(birthdays: any[] | null): any[] {
+  getSortedFilteredBirthdays(birthdays: any[] | null, categories: BirthdayCategory[]): any[] {
     if (!birthdays) return [];
 
     let filtered = [...birthdays];
 
     if (this.selectedCategory) {
       if (this.selectedCategory === '__orphaned__') {
-        const validCategoryIds = new Set(getAllCategories().map(c => c.id));
+        const validCategoryIds = new Set(categories.map(c => c.id));
         filtered = filtered.filter(b => b.category && !validCategoryIds.has(b.category));
       } else {
         filtered = filtered.filter(b => b.category === this.selectedCategory);
@@ -458,8 +411,11 @@ export class DashboardComponent implements OnDestroy {
   }
 
   private updateAllBirthdays(): void {
-    this.allBirthdays$ = this.birthdayFacade.birthdays$.pipe(
-      map((birthdays) => this.getSortedFilteredBirthdays(birthdays))
+    this.allBirthdays$ = combineLatest([
+      this.birthdayFacade.birthdays$,
+      this.categoryFacade.categories$
+    ]).pipe(
+      map(([birthdays, categories]) => this.getSortedFilteredBirthdays(birthdays, categories))
     );
   }
 
