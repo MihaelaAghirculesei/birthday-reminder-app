@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -19,7 +19,8 @@ interface CategoryDialogData {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MaterialModule],
   templateUrl: './category-dialog.component.html',
-  styleUrls: ['./category-dialog.component.scss']
+  styleUrls: ['./category-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryDialogComponent {
   categoryForm: FormGroup;
