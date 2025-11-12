@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NetworkStatusComponent } from '../../shared/components/network-status.component';
 
@@ -6,6 +6,7 @@ import { NetworkStatusComponent } from '../../shared/components/network-status.c
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, NetworkStatusComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-header">
       <div class="header-top">
