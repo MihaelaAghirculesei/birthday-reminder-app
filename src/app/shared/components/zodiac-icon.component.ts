@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
 
@@ -6,6 +6,7 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
   selector: 'zodiac-icon',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button class="zodiac-button" 
             [class]="'zodiac-' + zodiacSign?.toLowerCase()" 
