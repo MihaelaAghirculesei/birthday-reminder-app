@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../../shared';
 import { CalendarIconComponent } from '../../../../shared/icons/calendar-icon.component';
@@ -8,7 +8,8 @@ import { CalendarIconComponent } from '../../../../shared/icons/calendar-icon.co
   standalone: true,
   imports: [CommonModule, MaterialModule, CalendarIconComponent],
   templateUrl: './dashboard-stats.component.html',
-  styleUrls: ['./dashboard-stats.component.scss']
+  styleUrls: ['./dashboard-stats.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardStatsComponent {
   @Input() totalBirthdays: number = 0;
