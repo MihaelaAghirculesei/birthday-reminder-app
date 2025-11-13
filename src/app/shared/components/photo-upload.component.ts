@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material.module';
 
@@ -6,6 +6,7 @@ import { MaterialModule } from '../material.module';
   selector: 'photo-upload',
   standalone: true,
   imports: [CommonModule, MaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="photo-upload-container">
       <div class="photo-preview" 

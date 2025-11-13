@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material.module';
 import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants/categories';
@@ -7,6 +7,7 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
   selector: 'category-icon',
   standalone: true,
   imports: [CommonModule, MaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="category-icon-wrapper"
          [style.background-color]="iconColor"

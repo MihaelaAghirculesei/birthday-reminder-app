@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { NotificationService, NotificationMessage } from '../../core/services/no
   selector: 'app-notification',
   standalone: true,
   imports: [CommonModule, MaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="notification-container">
       <div *ngFor="let notification of notifications$ | async"

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
 import { Birthday } from '../../models';
@@ -9,6 +9,7 @@ import { Birthday } from '../../models';
   imports: [CommonModule, MaterialModule],
   templateUrl: './message-indicator.component.html',
   styleUrls: ['./message-indicator.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MessageIndicatorComponent {
   @Input() birthday: Birthday | null = null;
