@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../../shared';
 
@@ -8,6 +8,7 @@ import { MaterialModule } from '../../../../shared';
   imports: [CommonModule, MaterialModule],
   templateUrl: './remember-photo.component.html',
   styleUrls: ['./remember-photo.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RememberPhotoComponent {
   @Input() photoUrl: string | null | undefined = null;

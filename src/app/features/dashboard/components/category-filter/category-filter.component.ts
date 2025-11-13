@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule, CategoryIconComponent } from '../../../../shared';
 
@@ -13,7 +13,8 @@ export interface CategoryStats {
   standalone: true,
   imports: [CommonModule, MaterialModule, CategoryIconComponent],
   templateUrl: './category-filter.component.html',
-  styleUrls: ['./category-filter.component.scss']
+  styleUrls: ['./category-filter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryFilterComponent {
   @Input() categoriesStats: CategoryStats[] = [];

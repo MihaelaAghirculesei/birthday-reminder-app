@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../../shared';
 import { ChartDataItem } from '../../services';
@@ -8,7 +8,8 @@ import { ChartDataItem } from '../../services';
   standalone: true,
   imports: [CommonModule, MaterialModule],
   templateUrl: './birthday-chart.component.html',
-  styleUrls: ['./birthday-chart.component.scss']
+  styleUrls: ['./birthday-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BirthdayChartComponent {
   @Input() chartData: ChartDataItem[] = [];
