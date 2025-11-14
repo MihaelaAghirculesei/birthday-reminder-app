@@ -31,7 +31,7 @@
             <h4>Predefined Templates</h4>
             <div class="template-chips">
               <mat-chip-option
-                *ngFor="let template of templates"
+                *ngFor="let template of templates; trackBy: trackByTemplate"
                 (click)="applyTemplate(template)"
                 class="template-chip"
               >
@@ -54,7 +54,7 @@
             <mat-form-field appearance="outline" class="time-field">
               <mat-label>Sending Time</mat-label>
               <mat-select formControlName="deliveryTime">
-                <mat-option *ngFor="let time of timeSlots" [value]="time">
+                <mat-option *ngFor="let time of timeSlots; trackBy: trackByIndex" [value]="time">
                   {{ time }}
                 </mat-option>
               </mat-select>

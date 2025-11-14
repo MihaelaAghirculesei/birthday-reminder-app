@@ -23,7 +23,7 @@
 
   <div class="categories-grid">
     <div
-      *ngFor="let categoryStats of categoriesStats"
+      *ngFor="let categoryStats of categoriesStats; trackBy: trackByCategoryStats"
       class="category-stat-card"
       [class.selected]="isCategorySelected(categoryStats.id)"
       (click)="selectCategory(categoryStats.id)"

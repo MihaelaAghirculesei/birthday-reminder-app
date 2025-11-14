@@ -82,6 +82,14 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
     }
   }
 
+  trackByBirthday(_index: number, birthday: Birthday): string {
+    return birthday.id;
+  }
+
+  trackByMessage(_index: number, message: any): string {
+    return message.id;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

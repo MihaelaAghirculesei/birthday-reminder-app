@@ -14,7 +14,7 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Select a Birthday</mat-label>
         <mat-select [(ngModel)]="selectedBirthdayId" (selectionChange)="onBirthdaySelected()">
-          <mat-option *ngFor="let birthday of allBirthdays$ | async" [value]="birthday.id">
+          <mat-option *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday" [value]="birthday.id">
             <div class="birthday-option">
               <span class="birthday-name">{{ birthday.name }}</span>
               <span class="birthday-date">{{ birthday.birthDate | date: 'dd MMM yyyy' }}</span>

@@ -12,7 +12,7 @@
     class="messages-list"
     *ngIf="birthdaysWithMessages.length > 0; else noMessages"
   >
-    <mat-card *ngFor="let birthday of birthdaysWithMessages" class="birthday-message-card">
+    <mat-card *ngFor="let birthday of birthdaysWithMessages; trackBy: trackByBirthday" class="birthday-message-card">
       <mat-card-header>
         <div class="birthday-header">
           <div class="birthday-avatar" *ngIf="birthday.photo">
@@ -33,7 +33,7 @@
       <mat-card-content>
         <div class="messages-for-birthday">
           <div
-            *ngFor="let message of birthday.scheduledMessages"
+            *ngFor="let message of birthday.scheduledMessages; trackBy: trackByMessage"
             class="message-item"
             [class.inactive]="!message.isActive"
           >

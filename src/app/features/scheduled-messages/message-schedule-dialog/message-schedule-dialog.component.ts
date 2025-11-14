@@ -82,6 +82,10 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
+  trackByBirthday(_index: number, birthday: Birthday): string {
+    return birthday.id;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

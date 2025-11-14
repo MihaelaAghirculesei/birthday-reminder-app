@@ -18,7 +18,7 @@
       <label class="section-label">Choose Icon</label>
       <div class="icon-grid">
         <button
-          *ngFor="let icon of availableIcons"
+          *ngFor="let icon of availableIcons; trackBy: trackByIndex"
           type="button"
           mat-icon-button
           class="icon-option"
@@ -35,7 +35,7 @@
       <label class="section-label">Choose Color</label>
       <div class="color-grid">
         <button
-          *ngFor="let colorOption of availableColors"
+          *ngFor="let colorOption of availableColors; trackBy: trackByColorValue"
           type="button"
           class="color-option"
           [class.selected]="categoryForm.get('color')?.value === colorOption.value"

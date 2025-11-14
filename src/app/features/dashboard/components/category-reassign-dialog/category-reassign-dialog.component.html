@@ -20,7 +20,7 @@
       <h3>Choose a new category</h3>
       <mat-form-field appearance="outline" class="category-select">
         <mat-select [(ngModel)]="selectedCategoryId">
-          <mat-option *ngFor="let category of availableCategories" [value]="category.id">
+          <mat-option *ngFor="let category of availableCategories; trackBy: trackByCategory" [value]="category.id">
             <div class="category-option">
               <mat-icon [style.background-color]="category.color">{{ category.icon }}</mat-icon>
               <span>{{ category.name }}</span>

@@ -72,4 +72,12 @@ export class CategoryDialogComponent {
   onCancel(): void {
     this.dialogRef.close();
   }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByColorValue(_index: number, colorOption: { name: string; value: string }): string {
+    return colorOption.value;
+  }
 }

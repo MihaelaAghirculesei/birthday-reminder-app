@@ -62,4 +62,8 @@ export class CategoryReassignDialogComponent {
   onCancel(): void {
     this.dialogRef.close(null);
   }
+
+  trackByCategory(_index: number, category: BirthdayCategory): string {
+    return category.id;
+  }
 }

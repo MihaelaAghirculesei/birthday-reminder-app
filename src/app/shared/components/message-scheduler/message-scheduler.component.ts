@@ -182,6 +182,14 @@ export class MessageSchedulerComponent implements OnInit, OnDestroy {
     return message.id;
   }
 
+  trackByTemplate(index: number, template: any): string {
+    return template.title || index.toString();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

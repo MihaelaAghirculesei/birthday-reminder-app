@@ -122,6 +122,10 @@ export class AppComponent implements OnInit {
     this.isAddBirthdayExpanded = !this.isAddBirthdayExpanded;
   }
 
+  trackByCategory(_index: number, category: BirthdayCategory): string {
+    return category.id;
+  }
+
   private pastDateValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
 

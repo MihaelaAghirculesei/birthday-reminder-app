@@ -26,4 +26,8 @@ export class BirthdayChartComponent {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months.indexOf(month);
   }
+
+  trackByMonth(_index: number, monthData: ChartDataItem): string {
+    return monthData.month;
+  }
 }
