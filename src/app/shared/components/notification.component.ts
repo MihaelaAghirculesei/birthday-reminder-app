@@ -12,7 +12,7 @@ import { NotificationService, NotificationMessage } from '../../core/services/no
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="notification-container">
-      <div *ngFor="let notification of notifications$ | async"
+      <div *ngFor="let notification of notifications$ | async; trackBy: trackByNotification"
            class="notification"
            [class]="'notification-' + notification.type"
            [@slideIn]
@@ -143,5 +143,9 @@ export class NotificationComponent implements OnInit {
 
   close(id: string): void {
     this.notificationService.remove(id);
+  }
+
+  trackByNotification(index: number, notification: NotificationMessage): string {
+    return notification.id;
   }
 }

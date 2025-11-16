@@ -58,7 +58,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, BirthdayFacadeService } 
                 <mat-label>Target Calendar</mat-label>
                 <mat-select formControlName="calendarId">
                   <mat-option value="primary">Primary Calendar</mat-option>
-                  <mat-option *ngFor="let calendar of calendars" [value]="calendar.id">
+                  <mat-option *ngFor="let calendar of calendars; trackBy: trackByCalendar" [value]="calendar.id">
                     {{ calendar.summary }}
                   </mat-option>
                 </mat-select>
@@ -477,5 +477,9 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
       this.googleCalendarService.updateSettings(this.settingsForm.value);
       this.settingsForm.markAsPristine();
     }
+  }
+
+  trackByCalendar(index: number, calendar: any): string {
+    return calendar.id;
   }
 }

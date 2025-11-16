@@ -105,4 +105,8 @@ export class BirthdayItemComponent {
   onDownloadRememberPhoto(): void {
     this.downloadRememberPhoto.emit(this.birthday);
   }
+
+  trackByCategory(index: number, category: BirthdayCategory): string {
+    return category.id;
+  }
 }

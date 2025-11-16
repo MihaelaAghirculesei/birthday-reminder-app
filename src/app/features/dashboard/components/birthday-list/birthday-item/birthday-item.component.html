@@ -147,7 +147,7 @@
         class="edit-category-select"
       >
         <option
-          *ngFor="let category of categories"
+          *ngFor="let category of categories; trackBy: trackByCategory"
           [value]="category.id"
         >
           {{ category.name }}
