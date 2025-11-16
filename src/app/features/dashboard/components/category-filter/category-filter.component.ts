@@ -48,10 +48,6 @@ export class CategoryFilterComponent {
     this.deleteCategoryClicked.emit(categoryId);
   }
 
-  isCategorySelected(categoryId: string): boolean {
-    return this.selectedCategory === categoryId;
-  }
-
   trackByCategoryStats(_index: number, categoryStats: CategoryStats): string {
     return categoryStats.id;
   }

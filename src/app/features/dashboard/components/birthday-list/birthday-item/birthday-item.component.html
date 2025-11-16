@@ -194,12 +194,12 @@
   <div class="dashboard-actions">
     <div
       class="birthday-days-circle"
-      [class]="getDaysChipClass(daysUntilBirthday)"
+      [class]="daysChipClass"
       *ngIf="!isEditing"
     >
       <div class="days-circle-content">
         <div class="days-number">
-          {{ getDaysText(daysUntilBirthday) }}
+          {{ daysText }}
         </div>
       </div>
     </div>

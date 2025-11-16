@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, BirthdayCategory, calculateAge } from '../../../../../shared';
@@ -21,13 +21,16 @@ import { RememberPhotoComponent } from '../../remember-photo/remember-photo.comp
   templateUrl: './birthday-item.component.html',
   styleUrls: ['./birthday-item.component.scss'],
 })
-export class BirthdayItemComponent {
+export class BirthdayItemComponent implements OnChanges {
   @Input() birthday!: Birthday;
   @Input() isEditing: boolean = false;
   @Input() editingData: any = {};
   @Input() daysUntilBirthday: number = 0;
   @Input() defaultCategory: string = '';
   @Input() categories: BirthdayCategory[] = [];
+
+  daysText: string = '';
+  daysChipClass: string = 'green-safe';
 
   @Output() edit = new EventEmitter<Birthday>();
   @Output() delete = new EventEmitter<Birthday>();
@@ -42,20 +45,34 @@ export class BirthdayItemComponent {
   @Output() shareRememberPhoto = new EventEmitter<Birthday>();
   @Output() downloadRememberPhoto = new EventEmitter<Birthday>();
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['daysUntilBirthday']) {
+      this.updateDaysData();
+    }
+  }
+
+  private updateDaysData(): void {
+    const days = this.daysUntilBirthday;
+
+    if (days === 0) {
+      this.daysText = 'Today!';
+    } else if (days === 1) {
+      this.daysText = 'Tomorrow';
+    } else {
+      this.daysText = `${days} days`;
+    }
+
+    if (days <= 7) {
+      this.daysChipClass = 'red-alert';
+    } else if (days <= 21) {
+      this.daysChipClass = 'orange-warning';
+    } else {
+      this.daysChipClass = 'green-safe';
+    }
+  }
+
   getAge(birthDate: Date): number {
     return calculateAge(birthDate);
-  }
-
-  getDaysText(days: number): string {
-    if (days === 0) return 'Today!';
-    if (days === 1) return 'Tomorrow';
-    return `${days} days`;
-  }
-
-  getDaysChipClass(days: number): string {
-    if (days <= 7) return 'red-alert';
-    if (days <= 21) return 'orange-warning';
-    return 'green-safe';
   }
 
   onEdit(): void {

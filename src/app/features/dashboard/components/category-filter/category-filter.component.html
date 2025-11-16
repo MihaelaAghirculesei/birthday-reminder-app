@@ -25,7 +25,7 @@
     <div
       *ngFor="let categoryStats of categoriesStats; trackBy: trackByCategoryStats"
       class="category-stat-card"
-      [class.selected]="isCategorySelected(categoryStats.id)"
+      [class.selected]="selectedCategory === categoryStats.id"
       (click)="selectCategory(categoryStats.id)"
     >
       <div class="category-card-background"></div>
@@ -37,7 +37,7 @@
           ></category-icon>
           <div
             class="selection-indicator"
-            *ngIf="isCategorySelected(categoryStats.id)"
+            *ngIf="selectedCategory === categoryStats.id"
           >
             <mat-icon>check_circle</mat-icon>
           </div>
