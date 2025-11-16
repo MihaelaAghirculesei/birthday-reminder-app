@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
 
@@ -8,11 +8,11 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <button class="zodiac-button" 
-            [class]="'zodiac-' + zodiacSign?.toLowerCase()" 
-            [title]="getTooltipText()"
+    <button class="zodiac-button"
+            [class]="'zodiac-' + zodiacSign?.toLowerCase()"
+            [title]="tooltipText"
             type="button">
-      {{ zodiacSign ? getZodiacData(zodiacSign)?.symbol : '?' }}
+      {{ symbol }}
     </button>
   `,
   styles: [`
@@ -111,18 +111,29 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
     }
   `]
 })
-export class ZodiacIconComponent {
+export class ZodiacIconComponent implements OnChanges {
   @Input() zodiacSign?: string;
 
-  getZodiacData(signName: string): ZodiacSign | undefined {
-    return ZODIAC_SIGNS.find(sign => sign.name.toLowerCase() === signName.toLowerCase());
+  symbol: string = '?';
+  tooltipText: string = 'Unknown zodiac sign';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['zodiacSign']) {
+      this.updateZodiacData();
+    }
   }
 
-  getTooltipText(): string {
-    const zodiacData = this.zodiacSign ? this.getZodiacData(this.zodiacSign) : null;
+  private updateZodiacData(): void {
+    const zodiacData = this.zodiacSign
+      ? ZODIAC_SIGNS.find(sign => sign.name.toLowerCase() === this.zodiacSign!.toLowerCase())
+      : null;
+
     if (zodiacData) {
-      return `${zodiacData.name} (${zodiacData.element} sign)`;
+      this.symbol = zodiacData.symbol;
+      this.tooltipText = `${zodiacData.name} (${zodiacData.element} sign)`;
+    } else {
+      this.symbol = '?';
+      this.tooltipText = 'Unknown zodiac sign';
     }
-    return 'Unknown zodiac sign';
   }
 }

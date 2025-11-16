@@ -1,7 +1,7 @@
 <div
   class="remember-photo-icon"
   *ngIf="photoUrl"
-  [matTooltip]="getTooltip()"
+  [matTooltip]="tooltipText"
   matTooltipPosition="below"
   (click)="onDownload()"
   (dblclick)="onShare()"

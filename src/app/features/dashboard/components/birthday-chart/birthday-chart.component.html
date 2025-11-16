@@ -7,12 +7,12 @@
   </mat-card-header>
   <mat-card-content>
     <div class="chart-container">
-      <div *ngFor="let monthData of chartData; trackBy: trackByMonth" class="chart-bar">
+      <div *ngFor="let monthData of enrichedChartData; trackBy: trackByMonth" class="chart-bar">
         <div class="bar-container">
           <div
             class="bar"
-            [style.height.%]="getBarHeight(monthData.count, maxCount)"
-            [class.current-month]="getMonthIndex(monthData.month) === currentMonth"
+            [style.height.%]="monthData.heightPercent"
+            [class.current-month]="monthData.isCurrentMonth"
           ></div>
           <div class="bar-value" *ngIf="monthData.count > 0">
             {{ monthData.count }}

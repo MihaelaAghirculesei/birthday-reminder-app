@@ -18,15 +18,13 @@ export class RememberPhotoComponent {
   @Output() download = new EventEmitter<void>();
   @Output() copyToClipboard = new EventEmitter<void>();
 
+  readonly tooltipText = 'Remember Photo - Click: Download | Double-click: Share';
+
   onShare(): void {
     this.share.emit();
   }
 
   onDownload(): void {
     this.download.emit();
-  }
-
-  getTooltip(): string {
-    return 'Remember Photo - Click: Download | Double-click: Share';
   }
 }

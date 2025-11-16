@@ -1,7 +1,12 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../../shared';
 import { ChartDataItem } from '../../services';
+
+interface EnrichedChartDataItem extends ChartDataItem {
+  heightPercent: number;
+  isCurrentMonth: boolean;
+}
 
 @Component({
   selector: 'app-birthday-chart',
@@ -11,23 +16,27 @@ import { ChartDataItem } from '../../services';
   styleUrls: ['./birthday-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BirthdayChartComponent {
+export class BirthdayChartComponent implements OnChanges {
+  private readonly MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
   @Input() chartData: ChartDataItem[] = [];
   @Input() maxCount: number = 0;
   @Input() currentMonth: number = new Date().getMonth();
   @Input() totalBirthdays: number = 0;
 
-  getBarHeight(count: number, maxCount: number): number {
-    if (!maxCount || maxCount === 0) return 0;
-    return (count / maxCount) * 100;
+  enrichedChartData: EnrichedChartDataItem[] = [];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['chartData'] || changes['maxCount'] || changes['currentMonth']) {
+      this.enrichedChartData = this.chartData.map(item => ({
+        ...item,
+        heightPercent: this.maxCount > 0 ? (item.count / this.maxCount) * 100 : 0,
+        isCurrentMonth: this.MONTHS.indexOf(item.month) === this.currentMonth
+      }));
+    }
   }
 
-  getMonthIndex(month: string): number {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months.indexOf(month);
-  }
-
-  trackByMonth(_index: number, monthData: ChartDataItem): string {
+  trackByMonth(_index: number, monthData: EnrichedChartDataItem): string {
     return monthData.month;
   }
 }
