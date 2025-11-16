@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule, BirthdayCategory } from '../../../../shared';
@@ -18,12 +18,14 @@ import { BirthdayEditService } from '../../services/birthday-edit.service';
   templateUrl: './birthday-list.component.html',
   styleUrls: ['./birthday-list.component.scss']
 })
-export class BirthdayListComponent {
+export class BirthdayListComponent implements OnChanges {
   @Input() birthdays: any[] = [];
   @Input() categories: BirthdayCategory[] = [];
   @Input() searchTerm: string = '';
   @Input() lastAction: { type: string; data: any } | null = null;
   @Input() totalBirthdays: number = 0;
+
+  enrichedBirthdays: any[] = [];
 
   @Output() searchTermChange = new EventEmitter<string>();
   @Output() clearSearch = new EventEmitter<void>();
@@ -38,6 +40,15 @@ export class BirthdayListComponent {
     public birthdayFacade: BirthdayFacadeService,
     public editService: BirthdayEditService
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['birthdays']) {
+      this.enrichedBirthdays = this.birthdays.map(birthday => ({
+        ...birthday,
+        daysUntilBirthday: this.calculateDaysUntilBirthday(birthday.birthDate)
+      }));
+    }
+  }
 
   onSearchChange(event: any): void {
     this.searchTermChange.emit(event.target.value);
@@ -184,11 +195,7 @@ export class BirthdayListComponent {
     return this.editService.isEditing(birthdayId);
   }
 
-  getEditingData(): any {
-    return this.editService.currentEditingData;
-  }
-
-  getDaysUntilBirthday(birthDate: Date): number {
+  private calculateDaysUntilBirthday(birthDate: Date): number {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const nextBirthday = this.getNextBirthdayDate(birthDate);

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import {
@@ -24,7 +24,7 @@ import { NotificationService, BirthdayFacadeService } from '../../../core';
   templateUrl: './message-scheduler.component.html',
   styleUrls: ['./message-scheduler.component.scss'],
 })
-export class MessageSchedulerComponent implements OnInit, OnDestroy {
+export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
   private destroy$ = new Subject<void>();
 
   @Input() birthday: Birthday | null = null;
@@ -35,6 +35,8 @@ export class MessageSchedulerComponent implements OnInit, OnDestroy {
   timeSlots: string[] = [];
   isCreatingMessage = false;
   editingMessage: ScheduledMessage | null = null;
+
+  messagePreview: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -56,6 +58,25 @@ export class MessageSchedulerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadMessages();
+
+    this.messageForm.get('message')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateMessagePreview();
+      });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['birthday']) {
+      this.updateMessagePreview();
+    }
+  }
+
+  private updateMessagePreview(): void {
+    const message = this.messageForm.get('message')?.value || '';
+    this.messagePreview = this.birthday
+      ? this.processMessage(message, this.birthday)
+      : message;
   }
 
   loadMessages(): void {
@@ -146,13 +167,6 @@ export class MessageSchedulerComponent implements OnInit, OnDestroy {
       this.loadMessages();
       this.notificationService.show('Message deleted', 'success');
     }
-  }
-
-  getMessagePreview(): string {
-    const message = this.messageForm.get('message')?.value;
-    return this.birthday
-      ? this.processMessage(message, this.birthday)
-      : message;
   }
 
   getProcessedMessage(message: ScheduledMessage): string {

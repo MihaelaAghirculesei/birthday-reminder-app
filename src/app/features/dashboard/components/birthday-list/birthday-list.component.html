@@ -30,15 +30,15 @@
   <mat-card-content>
     <div
       class="dashboard-birthday-list scrollable"
-      *ngIf="birthdays.length > 0"
+      *ngIf="enrichedBirthdays.length > 0"
     >
       <app-birthday-item
-        *ngFor="let birthday of birthdays; trackBy: trackByBirthday"
+        *ngFor="let birthday of enrichedBirthdays; trackBy: trackByBirthday"
         [birthday]="birthday"
         [categories]="categories"
         [isEditing]="isEditing(birthday.id)"
-        [editingData]="getEditingData()"
-        [daysUntilBirthday]="getDaysUntilBirthday(birthday.birthDate)"
+        [editingData]="editService.currentEditingData"
+        [daysUntilBirthday]="birthday.daysUntilBirthday"
         (edit)="editBirthday($event)"
         (delete)="deleteBirthday($event)"
         (save)="saveBirthday($event)"
