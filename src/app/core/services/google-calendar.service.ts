@@ -248,7 +248,11 @@ export class GoogleCalendarService {
   updateSettings(settings: GoogleCalendarSettings): void {
     this.settingsSubject.next(settings);
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('googleCalendarSettings', JSON.stringify(settings));
+      try {
+        localStorage.setItem('googleCalendarSettings', JSON.stringify(settings));
+      } catch (error) {
+        console.error('Failed to save settings to localStorage:', error);
+      }
     }
   }
 

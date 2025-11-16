@@ -48,20 +48,35 @@ export const DEFAULT_CATEGORY = 'friends';
 
 export function getCustomCategories(): BirthdayCategory[] {
   if (typeof localStorage === 'undefined') return [];
-  const stored = localStorage.getItem('customCategories');
-  return stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem('customCategories');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Failed to parse customCategories from localStorage:', error);
+    return [];
+  }
 }
 
 function getModifiedCategories(): BirthdayCategory[] {
   if (typeof localStorage === 'undefined') return [];
-  const stored = localStorage.getItem('modifiedCategories');
-  return stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem('modifiedCategories');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Failed to parse modifiedCategories from localStorage:', error);
+    return [];
+  }
 }
 
 function getDeletedCategoryIds(): string[] {
   if (typeof localStorage === 'undefined') return [];
-  const stored = localStorage.getItem('deletedCategoryIds');
-  return stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem('deletedCategoryIds');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Failed to parse deletedCategoryIds from localStorage:', error);
+    return [];
+  }
 }
 
 export function getAllCategories(): BirthdayCategory[] {

@@ -235,6 +235,10 @@ export class PhotoUploadComponent {
         const base64String = e.target?.result as string;
         this.photoSelected.emit(base64String);
       };
+      reader.onerror = () => {
+        console.error('Failed to read file:', reader.error);
+        alert('Failed to read the selected file. Please try again.');
+      };
       reader.readAsDataURL(file);
     }
   }
