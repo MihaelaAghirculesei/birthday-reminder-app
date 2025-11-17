@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import * as CategoryActions from './category.actions';
-import { BIRTHDAY_CATEGORIES } from '../../../shared';
+import { BIRTHDAY_CATEGORIES, BirthdayCategory } from '../../../shared';
 
 @Injectable()
 export class CategoryEffects {
@@ -29,7 +29,7 @@ export class CategoryEffects {
 
           // Create a map of modifications
           const modifiedMap = new Map(
-            modifiedCategories.map((cat: any) => [cat.id, cat])
+            modifiedCategories.map((cat: BirthdayCategory) => [cat.id, cat])
           );
 
           // Apply modifications to default categories
@@ -38,7 +38,7 @@ export class CategoryEffects {
           );
 
           // Apply modifications to custom categories
-          const processedCustomCategories = customCategories.map((cat: any) =>
+          const processedCustomCategories = customCategories.map((cat: BirthdayCategory) =>
             modifiedMap.get(cat.id) || cat
           );
 
@@ -46,7 +46,7 @@ export class CategoryEffects {
           const allCategories = [...defaultCategories, ...processedCustomCategories];
 
           // Get custom category IDs
-          const customIds = customCategories.map((cat: any) => cat.id);
+          const customIds = customCategories.map((cat: BirthdayCategory) => cat.id);
 
           return CategoryActions.loadCategoriesSuccess({
             categories: allCategories,
@@ -99,7 +99,7 @@ export class CategoryEffects {
             : [];
 
           const index = modifiedCategories.findIndex(
-            (c: any) => c.id === category.id
+            (c: BirthdayCategory) => c.id === category.id
           );
 
           if (index !== -1) {
