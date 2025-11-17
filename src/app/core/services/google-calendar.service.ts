@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Birthday } from '../../shared';
 import { environment } from '../../../environments/environment';
 
@@ -11,6 +11,11 @@ export interface GoogleCalendarSettings {
   calendarId: string;
   syncMode: 'one-way' | 'two-way';
   reminderMinutes: number;
+}
+
+export interface GoogleCalendarItem {
+  id: string;
+  summary: string;
 }
 
 export interface CalendarEvent {
@@ -138,7 +143,7 @@ export class GoogleCalendarService {
     }
   }
 
-  async getCalendars(): Promise<any[]> {
+  async getCalendars(): Promise<GoogleCalendarItem[]> {
     if (!this.isSignedInSubject.value) {
       throw new Error('Not signed in to Google Calendar');
     }

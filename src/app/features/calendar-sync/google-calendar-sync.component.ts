@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { MaterialModule } from '../../shared';
-import { GoogleCalendarService, GoogleCalendarSettings, BirthdayFacadeService } from '../../core';
+import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, BirthdayFacadeService } from '../../core';
 
 @Component({
   selector: 'app-google-calendar-sync',
@@ -378,7 +378,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   isSignedIn = false;
   isConnecting = false;
   isSyncing = false;
-  calendars: any[] = [];
+  calendars: GoogleCalendarItem[] = [];
   settingsForm: FormGroup;
   lastSyncResult: { success: number; failed: number; errors: string[] } | null = null;
 
@@ -479,7 +479,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackByCalendar(index: number, calendar: any): string {
+  trackByCalendar(index: number, calendar: GoogleCalendarItem): string {
     return calendar.id;
   }
 }

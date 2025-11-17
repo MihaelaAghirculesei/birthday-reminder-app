@@ -4,4 +4,4 @@ export { CategoryFacadeService } from './category-facade.service';
 export { NotificationService, NotificationMessage } from './notification.service';
 export { NetworkService } from './network.service';
 export { IndexedDBStorageService } from './offline-storage.service';
-export { GoogleCalendarService, GoogleCalendarSettings } from './google-calendar.service';
+export { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem } from './google-calendar.service';

@@ -86,7 +86,7 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
     return birthday.id;
   }
 
-  trackByMessage(_index: number, message: any): string {
+  trackByMessage(_index: number, message: ScheduledMessage): string {
     return message.id;
   }
 

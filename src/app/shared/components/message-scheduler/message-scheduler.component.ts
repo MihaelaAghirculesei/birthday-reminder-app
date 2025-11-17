@@ -10,7 +10,7 @@ import {
 
 import { MaterialModule } from '../../material.module';
 import { ScheduledMessage, Birthday, calculateAge } from '../..';
-import { ScheduledMessageService } from '../../../features/scheduled-messages/scheduled-message.service';
+import { ScheduledMessageService, MessageTemplate } from '../../../features/scheduled-messages/scheduled-message.service';
 import { NotificationService, BirthdayFacadeService } from '../../../core';
 
 @Component({
@@ -31,7 +31,7 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
 
   messageForm: FormGroup;
   messages: ScheduledMessage[] = [];
-  templates: any[] = [];
+  templates: MessageTemplate[] = [];
   timeSlots: string[] = [];
   isCreatingMessage = false;
   editingMessage: ScheduledMessage | null = null;
@@ -99,7 +99,7 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  applyTemplate(template: any): void {
+  applyTemplate(template: MessageTemplate): void {
     this.messageForm.patchValue({
       title: template.title,
       message: template.message,
@@ -196,7 +196,7 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
     return message.id;
   }
 
-  trackByTemplate(index: number, template: any): string {
+  trackByTemplate(index: number, template: MessageTemplate): string {
     return template.title || index.toString();
   }
 

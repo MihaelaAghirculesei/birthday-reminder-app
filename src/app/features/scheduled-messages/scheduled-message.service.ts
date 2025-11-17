@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { ScheduledMessage } from '../../shared';
 
+export interface MessageTemplate {
+  title: string;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +25,7 @@ export class ScheduledMessageService {
     };
   }
 
-  getMessageTemplates() {
+  getMessageTemplates(): MessageTemplate[] {
     return [
       {
         title: 'Simple Happy Birthday',
