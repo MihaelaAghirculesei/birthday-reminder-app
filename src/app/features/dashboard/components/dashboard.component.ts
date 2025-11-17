@@ -42,13 +42,13 @@ export class DashboardComponent implements OnDestroy {
   chartData$: Observable<ChartDataItem[]>;
   maxCount$: Observable<number>;
   categoriesStats$: Observable<CategoryStats[]>;
-  allBirthdays$: Observable<any[]>;
+  allBirthdays$: Observable<Birthday[]>;
   categories$: Observable<BirthdayCategory[]>;
 
   selectedCategory: string | null = null;
   currentMonth = new Date().getMonth();
   dashboardSearchTerm = '';
-  lastAction: { type: string; data: any } | null = null;
+  lastAction: { type: string; data: Birthday | BirthdayCategory } | null = null;
 
   constructor(
     public birthdayFacade: BirthdayFacadeService,
@@ -304,7 +304,7 @@ export class DashboardComponent implements OnDestroy {
     return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
   }
 
-  private reassignBirthdaysToCategory(birthdays: any[], newCategoryId: string): void {
+  private reassignBirthdaysToCategory(birthdays: Birthday[], newCategoryId: string): void {
     birthdays.forEach(birthday => {
       const updatedBirthday = {
         ...birthday,
@@ -328,7 +328,7 @@ export class DashboardComponent implements OnDestroy {
     this.updateAllBirthdays();
   }
 
-  getSortedFilteredBirthdays(birthdays: any[] | null, categories: BirthdayCategory[]): any[] {
+  getSortedFilteredBirthdays(birthdays: Birthday[] | null, categories: BirthdayCategory[]): Birthday[] {
     if (!birthdays) return [];
 
     let filtered = [...birthdays];
@@ -392,7 +392,7 @@ export class DashboardComponent implements OnDestroy {
     return nextBirthday;
   }
 
-  onBirthdayDeleted(birthday: any): void {
+  onBirthdayDeleted(birthday: Birthday): void {
     this.lastAction = { type: 'delete', data: { ...birthday } };
   }
 

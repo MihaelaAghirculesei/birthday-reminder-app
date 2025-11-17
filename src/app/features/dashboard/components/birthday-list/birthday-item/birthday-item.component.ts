@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, BirthdayCategory, calculateAge } from '../../../../../shared';
 import { RememberPhotoComponent } from '../../remember-photo/remember-photo.component';
+import { EditingBirthdayData } from '../../../services/birthday-edit.service';
 
 @Component({
   selector: 'app-birthday-item',
@@ -24,7 +25,7 @@ import { RememberPhotoComponent } from '../../remember-photo/remember-photo.comp
 export class BirthdayItemComponent implements OnChanges {
   @Input() birthday!: Birthday;
   @Input() isEditing: boolean = false;
-  @Input() editingData: any = {};
+  @Input() editingData: EditingBirthdayData | null = null;
   @Input() daysUntilBirthday: number = 0;
   @Input() defaultCategory: string = '';
   @Input() categories: BirthdayCategory[] = [];

@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Birthday, BirthdayCategory } from '../../../shared';
+import { BirthdayFacadeService } from '../../../core';
 
 export interface DashboardStats {
   total: number;
@@ -33,7 +35,7 @@ export class BirthdayStatsService {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  calculateStats(birthdays: any[], birthdayService: any): DashboardStats {
+  calculateStats(birthdays: Birthday[], birthdayService: BirthdayFacadeService): DashboardStats {
     const total = birthdays.length;
     const thisMonth = birthdayService.getBirthdaysThisMonth().length;
     const averageAge = birthdayService.getAverageAge();
@@ -49,7 +51,7 @@ export class BirthdayStatsService {
     };
   }
 
-  getChartData(birthdays: any[]): ChartDataItem[] {
+  getChartData(birthdays: Birthday[]): ChartDataItem[] {
     const monthCounts = new Array(12).fill(0);
 
     birthdays.forEach(birthday => {
@@ -68,7 +70,7 @@ export class BirthdayStatsService {
     return Math.max(...chartData.map(d => d.count), 0);
   }
 
-  getCategoriesStats(birthdays: any[]): CategoryStats[] {
+  getCategoriesStats(birthdays: Birthday[]): CategoryStats[] {
     const categoryCounts = new Map<string, number>();
 
     birthdays.forEach(birthday => {

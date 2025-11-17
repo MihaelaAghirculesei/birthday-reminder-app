@@ -1,10 +1,14 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule, BirthdayCategory } from '../../../../shared';
+import { MaterialModule, Birthday, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
 import { BirthdayFacadeService } from '../../../../core';
 import { BirthdayEditService } from '../../services/birthday-edit.service';
+
+interface EnrichedBirthday extends Birthday {
+  daysUntilBirthday: number;
+}
 
 @Component({
   selector: 'app-birthday-list',
@@ -19,13 +23,13 @@ import { BirthdayEditService } from '../../services/birthday-edit.service';
   styleUrls: ['./birthday-list.component.scss']
 })
 export class BirthdayListComponent implements OnChanges {
-  @Input() birthdays: any[] = [];
+  @Input() birthdays: Birthday[] = [];
   @Input() categories: BirthdayCategory[] = [];
   @Input() searchTerm: string = '';
-  @Input() lastAction: { type: string; data: any } | null = null;
+  @Input() lastAction: { type: string; data: Birthday | BirthdayCategory } | null = null;
   @Input() totalBirthdays: number = 0;
 
-  enrichedBirthdays: any[] = [];
+  enrichedBirthdays: EnrichedBirthday[] = [];
 
   @Output() searchTermChange = new EventEmitter<string>();
   @Output() clearSearch = new EventEmitter<void>();
@@ -50,8 +54,8 @@ export class BirthdayListComponent implements OnChanges {
     }
   }
 
-  onSearchChange(event: any): void {
-    this.searchTermChange.emit(event.target.value);
+  onSearchChange(event: Event): void {
+    this.searchTermChange.emit((event.target as HTMLInputElement).value);
   }
 
   onClearSearch(): void {
@@ -78,11 +82,11 @@ export class BirthdayListComponent implements OnChanges {
     }, 2000);
   }
 
-  trackByBirthday(index: number, birthday: any): any {
+  trackByBirthday(_index: number, birthday: Birthday): string {
     return birthday.id;
   }
 
-  editBirthday(birthday: any): void {
+  editBirthday(birthday: Birthday): void {
     this.editService.startEdit(
       birthday,
       this.formatDateForInput.bind(this),
@@ -90,11 +94,11 @@ export class BirthdayListComponent implements OnChanges {
     );
   }
 
-  deleteBirthday(birthday: any): void {
+  deleteBirthday(birthday: Birthday): void {
     this.birthdayFacade.deleteBirthday(birthday.id);
   }
 
-  saveBirthday(birthday: any): void {
+  saveBirthday(birthday: Birthday): void {
     const editingData = this.editService.currentEditingData;
     if (!editingData) return;
 
@@ -114,7 +118,7 @@ export class BirthdayListComponent implements OnChanges {
     this.editService.cancelEdit();
   }
 
-  quickEditName(birthday: any): void {
+  quickEditName(birthday: Birthday): void {
     this.editBirthday(birthday);
     setTimeout(() => {
       const nameInput = document.querySelector('.edit-name-input') as HTMLInputElement;
@@ -125,7 +129,7 @@ export class BirthdayListComponent implements OnChanges {
     }, 100);
   }
 
-  onEditInputChange(birthday: any): void {
+  onEditInputChange(birthday: Birthday): void {
     this.editService.scheduleAutoSave(() => {
       this.saveBirthday(birthday);
     });

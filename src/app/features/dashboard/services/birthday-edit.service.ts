@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Birthday } from '../../../shared';
 
 export interface EditingBirthdayData {
   name: string;
@@ -16,7 +17,7 @@ export interface EditingBirthdayData {
 export class BirthdayEditService {
   private editingBirthdayIdSubject = new BehaviorSubject<string | null>(null);
   private editingBirthdayDataSubject = new BehaviorSubject<EditingBirthdayData | null>(null);
-  private autoSaveTimer: any = null;
+  private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   editingBirthdayId$ = this.editingBirthdayIdSubject.asObservable();
   editingBirthdayData$ = this.editingBirthdayDataSubject.asObservable();
@@ -29,7 +30,7 @@ export class BirthdayEditService {
     return this.editingBirthdayDataSubject.value;
   }
 
-  startEdit(birthday: any, formatDateForInput: (date: Date) => string, defaultCategory: string): void {
+  startEdit(birthday: Birthday, formatDateForInput: (date: Date) => string, defaultCategory: string): void {
     if (this.editingBirthdayIdSubject.value && this.editingBirthdayIdSubject.value !== birthday.id) {
       this.cancelEdit();
     }
