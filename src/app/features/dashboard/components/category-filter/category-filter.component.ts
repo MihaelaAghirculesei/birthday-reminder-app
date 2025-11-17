@@ -5,6 +5,8 @@ import { MaterialModule, CategoryIconComponent } from '../../../../shared';
 export interface CategoryStats {
   id: string;
   name: string;
+  icon: string;
+  color: string;
   count: number;
 }
 

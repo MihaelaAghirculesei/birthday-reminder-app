@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, Subject, map, takeUntil, combineLatest, take } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { MaterialModule, DEFAULT_CATEGORY, BirthdayCategory } from '../../../shared';
+import { MaterialModule, Birthday, DEFAULT_CATEGORY, BirthdayCategory } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
 import { GoogleCalendarSyncComponent } from '../../calendar-sync/google-calendar-sync.component';
 import { DashboardStatsComponent } from './stats/dashboard-stats.component';
@@ -111,6 +111,8 @@ export class DashboardComponent implements OnDestroy {
         const categoryStats = allCategories.map(category => ({
           id: category.id,
           name: category.name,
+          icon: category.icon,
+          color: category.color,
           count: statsMap.get(category.id) || 0
         }));
 
@@ -119,6 +121,8 @@ export class DashboardComponent implements OnDestroy {
           categoryStats.unshift({
             id: '__orphaned__',
             name: '⚠️ Uncategorized',
+            icon: 'help_outline',
+            color: '#FF5722',
             count: orphanedCount
           });
         }
@@ -232,7 +236,6 @@ export class DashboardComponent implements OnDestroy {
                 icon: result.icon,
                 color: result.color
               };
-
               this.categoryFacade.updateCategory(updatedCategory);
             }
           });
@@ -367,7 +370,7 @@ export class DashboardComponent implements OnDestroy {
 
   undoLastAction(): void {
     if (this.lastAction && this.lastAction.type === 'delete') {
-      this.birthdayFacade.addBirthday(this.lastAction.data);
+      this.birthdayFacade.addBirthday(this.lastAction.data as Birthday);
       this.lastAction = null;
     }
   }
