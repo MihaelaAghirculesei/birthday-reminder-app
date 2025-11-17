@@ -69,6 +69,8 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
 })
 export class CategoryIconComponent implements OnInit, OnChanges {
   @Input() categoryId: string = 'friends';
+  @Input() icon?: string;
+  @Input() color?: string;
   @Input() cssClass: string = '';
 
   iconName: string = '';
@@ -80,14 +82,14 @@ export class CategoryIconComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['categoryId']) {
+    if (changes['categoryId'] || changes['icon'] || changes['color']) {
       this.updateCategoryData();
     }
   }
 
   private updateCategoryData(): void {
-    this.iconName = getCategoryIcon(this.categoryId);
-    this.iconColor = getCategoryColor(this.categoryId);
+    this.iconName = this.icon || getCategoryIcon(this.categoryId);
+    this.iconColor = this.color || getCategoryColor(this.categoryId);
     this.categoryName = getCategoryById(this.categoryId)?.name || 'Unknown';
   }
 }
