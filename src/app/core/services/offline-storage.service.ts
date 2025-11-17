@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Birthday } from '../../shared';
 
+interface StoredBirthday extends Omit<Birthday, 'birthDate'> {
+  birthDate: string;
+}
+
 export interface OfflineStorageService {
   getBirthdays(): Promise<Birthday[]>;
   saveBirthdays(birthdays: Birthday[]): Promise<void>;
@@ -46,7 +50,7 @@ export class IndexedDBStorageService implements OfflineStorageService {
 
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
-          const birthdays = request.result.map((b: any) => ({
+          const birthdays = request.result.map((b: StoredBirthday) => ({
             ...b,
             birthDate: new Date(b.birthDate)
           }));
