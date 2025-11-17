@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Birthday, BirthdayCategory } from '../../../shared';
-import { BirthdayFacadeService } from '../../../core';
+import { Birthday } from '../../../shared';
 
 export interface DashboardStats {
   total: number;
@@ -35,12 +34,20 @@ export class BirthdayStatsService {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  calculateStats(birthdays: Birthday[], birthdayService: BirthdayFacadeService): DashboardStats {
+  calculateStats(birthdays: Birthday[]): DashboardStats {
     const total = birthdays.length;
-    const thisMonth = birthdayService.getBirthdaysThisMonth().length;
-    const averageAge = birthdayService.getAverageAge();
-    const nextBirthdayDays = birthdayService.getNextBirthdayDays();
-    const nextBirthdayText = birthdayService.getNextBirthdayText();
+    const currentMonth = new Date().getMonth();
+    const thisMonth = birthdays.filter(b => new Date(b.birthDate).getMonth() === currentMonth).length;
+
+    const totalAge = birthdays.reduce((sum, b) => {
+      const age = new Date().getFullYear() - new Date(b.birthDate).getFullYear();
+      return sum + age;
+    }, 0);
+    const averageAge = birthdays.length > 0 ? Math.round(totalAge / birthdays.length) : 0;
+
+    const nextBirthday = this.getNextBirthday(birthdays);
+    const nextBirthdayDays = nextBirthday ? this.calculateDaysUntil(nextBirthday.birthDate) : 0;
+    const nextBirthdayText = nextBirthday ? nextBirthday.name : 'No upcoming birthdays';
 
     return {
       total,
@@ -49,6 +56,31 @@ export class BirthdayStatsService {
       nextBirthdayDays,
       nextBirthdayText
     };
+  }
+
+  private getNextBirthday(birthdays: Birthday[]): Birthday | null {
+    if (birthdays.length === 0) return null;
+
+    const sorted = [...birthdays].sort((a, b) => {
+      const daysA = this.calculateDaysUntil(a.birthDate);
+      const daysB = this.calculateDaysUntil(b.birthDate);
+      return daysA - daysB;
+    });
+
+    return sorted[0];
+  }
+
+  private calculateDaysUntil(birthDate: Date): number {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    const nextBirthday = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+
+    const diffTime = nextBirthday.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   getChartData(birthdays: Birthday[]): ChartDataItem[] {

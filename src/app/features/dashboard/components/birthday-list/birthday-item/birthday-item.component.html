@@ -23,7 +23,7 @@
       <input
         *ngIf="isEditing"
         type="text"
-        [(ngModel)]="editingData.name"
+        [(ngModel)]="editingData!.name"
         (input)="onEditInputChange()"
         class="edit-name-input"
         placeholder="Name"
@@ -42,7 +42,7 @@
         <mat-icon class="small-icon">cake</mat-icon>
         <input
           type="date"
-          [(ngModel)]="editingData.birthDate"
+          [(ngModel)]="editingData!.birthDate"
           (input)="onEditInputChange()"
           class="edit-date-input"
           placeholder="Birth Date"
@@ -59,7 +59,7 @@
         <mat-icon class="small-icon">note</mat-icon>
         <input
           type="text"
-          [(ngModel)]="editingData.notes"
+          [(ngModel)]="editingData!.notes"
           (input)="onEditInputChange()"
           class="edit-notes-input"
           placeholder="Notes"
@@ -142,7 +142,7 @@
     <div class="dashboard-category-edit" *ngIf="isEditing">
       <mat-icon class="small-icon">category</mat-icon>
       <select
-        [(ngModel)]="editingData.category"
+        [(ngModel)]="editingData!.category"
         (change)="onEditInputChange()"
         class="edit-category-select"
       >
@@ -161,7 +161,7 @@
         <span>Profile Photo</span>
       </div>
       <photo-upload
-        [currentPhoto]="editingData.photo"
+        [currentPhoto]="editingData!.photo"
         (photoSelected)="onPhotoSelected($event)"
         (photoRemoved)="onPhotoRemoved()"
       >
@@ -175,7 +175,7 @@
         <small>(For social sharing/messages)</small>
       </div>
       <photo-upload
-        [currentPhoto]="editingData.rememberPhoto"
+        [currentPhoto]="editingData!.rememberPhoto"
         (photoSelected)="onRememberPhotoSelected($event)"
         (photoRemoved)="onRememberPhotoRemoved()"
       >
