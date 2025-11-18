@@ -256,7 +256,11 @@ export class BirthdayEffects {
       { name: 'Mia Stewart', date: new Date(1993, 11, 10), category: 'friends', photo: 'https://i.pravatar.cc/200?img=43' },
       { name: 'Noah Morris', date: new Date(1991, 0, 28), category: 'acquaintances', photo: 'https://i.pravatar.cc/200?img=51' },
       { name: 'Penelope Cox', date: new Date(1988, 4, 16), category: 'family', photo: 'https://i.pravatar.cc/200?img=44' },
-      { name: 'Roberta Bailey', date: new Date(1997, 7, 3), category: 'friends', photo: 'https://i.pravatar.cc/200?img=45' }
+      { name: 'Roberta Bailey', date: new Date(1997, 7, 3), category: 'friends', photo: 'https://i.pravatar.cc/200?img=45' },
+      { name: 'Marcus "Ninja" Johnson', date: new Date(1995, 5, 14), category: 'gaming', photo: 'https://i.pravatar.cc/200?img=52' },
+      { name: 'Sarah "GamerGirl" Lee', date: new Date(1998, 8, 22), category: 'gaming', photo: 'https://i.pravatar.cc/200?img=46' },
+      { name: 'Alex "ProPlayer" Chen', date: new Date(1992, 11, 8), category: 'gaming', photo: 'https://i.pravatar.cc/200?img=53' },
+      { name: 'Tyler "Speedrunner" Walsh', date: new Date(1996, 3, 18), category: 'gaming', photo: 'https://i.pravatar.cc/200?img=54' }
     ];
 
     return testNames.map(({ name, date, category, photo }) => ({

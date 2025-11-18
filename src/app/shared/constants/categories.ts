@@ -41,6 +41,12 @@ export const BIRTHDAY_CATEGORIES: BirthdayCategory[] = [
     name: 'Other',
     icon: 'stars',
     color: '#607D8B'
+  },
+  {
+    id: 'gaming',
+    name: 'Gaming',
+    icon: 'sports_esports',
+    color: '#00BCD4'
   }
 ];
 
