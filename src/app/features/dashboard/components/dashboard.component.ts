@@ -120,9 +120,9 @@ export class DashboardComponent implements OnDestroy {
         if (orphanedCount > 0) {
           categoryStats.unshift({
             id: '__orphaned__',
-            name: '⚠️ Uncategorized',
-            icon: 'help_outline',
-            color: '#FF5722',
+            name: 'Work',
+            icon: 'business_center',
+            color: '#FF9800',
             count: orphanedCount
           });
         }
@@ -193,7 +193,7 @@ export class DashboardComponent implements OnDestroy {
             width: '600px',
             maxWidth: '95vw',
             data: {
-              categoryToDelete: { id: '__orphaned__', name: 'Uncategorized', icon: 'help_outline', color: '#9e9e9e' },
+              categoryToDelete: { id: '__orphaned__', name: 'Work', icon: 'business_center', color: '#FF9800' },
               affectedBirthdaysCount: uncategorizedBirthdays.length,
               availableCategories: allCategories,
               mode: 'reassign-only'
