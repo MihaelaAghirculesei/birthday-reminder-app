@@ -16,6 +16,7 @@ import { Birthday, getZodiacSign } from './shared';
 import { DashboardComponent } from './features/dashboard';
 import { BirthdayFacadeService, CategoryFacadeService } from './core';
 import { HeaderComponent, FooterComponent } from './layout';
+import { CustomSwRegistrationService } from './core/services/custom-sw-registration.service';
 
 @Component({
   selector: 'app-root',
@@ -63,7 +64,8 @@ export class AppComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private birthdayFacade: BirthdayFacadeService,
-    private categoryFacade: CategoryFacadeService
+    private categoryFacade: CategoryFacadeService,
+    private customSwRegistration: CustomSwRegistrationService
   ) {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
@@ -80,6 +82,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.categoryFacade.loadCategories();
+    this.customSwRegistration.registerCustomServiceWorker();
   }
 
   onSubmit() {
@@ -112,7 +115,6 @@ export class AppComponent implements OnInit {
   addTestData(): void {
     this.isAddingTestData = true;
     this.birthdayFacade.loadTestData();
-    // Reset loading state after a short delay to allow the effect to complete
     setTimeout(() => {
       this.isAddingTestData = false;
     }, 1000);
