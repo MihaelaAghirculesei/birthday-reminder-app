@@ -53,11 +53,12 @@
 
             <mat-form-field appearance="outline" class="time-field">
               <mat-label>Sending Time</mat-label>
-              <mat-select formControlName="deliveryTime">
-                <mat-option *ngFor="let time of timeSlots; trackBy: trackByIndex" [value]="time">
-                  {{ time }}
-                </mat-option>
-              </mat-select>
+              <input
+                matInput
+                type="time"
+                formControlName="scheduledTime"
+                placeholder="HH:mm"
+              />
               <mat-icon matSuffix>access_time</mat-icon>
             </mat-form-field>
           </div>
@@ -79,7 +80,7 @@
             </mat-form-field>
 
             <div class="toggle-field">
-              <mat-slide-toggle formControlName="isActive">
+              <mat-slide-toggle formControlName="active">
                 Active Message
               </mat-slide-toggle>
             </div>
@@ -108,7 +109,7 @@
               <p>{{ messagePreview }}</p>
               <small
                 >Will be sent at
-                {{ messageForm.get("deliveryTime")?.value }}</small
+                {{ messageForm.get("scheduledTime")?.value }}</small
               >
             </div>
           </div>
@@ -137,7 +138,7 @@
         <div
           class="message-item"
           *ngFor="let message of messages; trackBy: trackByMessageId"
-          [class.inactive]="!message.isActive"
+          [class.inactive]="!message.active"
         >
           <div class="message-header">
             <div class="message-title-row">
@@ -149,18 +150,18 @@
                 >
                   {{ message.priority }}
                 </span>
-                <span class="time-badge">{{ message.deliveryTime }}</span>
+                <span class="time-badge">{{ message.scheduledTime }}</span>
                 <mat-icon
                   class="status-icon"
-                  [class.active]="message.isActive"
+                  [class.active]="message.active"
                   [matTooltip]="
-                    message.isActive
+                    message.active
                       ? 'Active message'
                       : 'Disabled message'
                   "
                 >
                   {{
-                    message.isActive
+                    message.active
                       ? "notifications_active"
                       : "notifications_off"
                   }}
@@ -192,10 +193,10 @@
             <button
               mat-icon-button
               (click)="toggleMessageStatus(message)"
-              [title]="message.isActive ? 'Disable' : 'Enable'"
+              [title]="message.active ? 'Disable' : 'Enable'"
             >
               <mat-icon>{{
-                message.isActive ? "pause" : "play_arrow"
+                message.active ? "pause" : "play_arrow"
               }}</mat-icon>
             </button>
 

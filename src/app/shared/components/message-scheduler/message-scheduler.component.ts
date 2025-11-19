@@ -47,9 +47,9 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
     this.messageForm = this.fb.group({
       title: ['', Validators.required],
       message: ['', Validators.required],
-      deliveryTime: ['09:00', Validators.required],
+      scheduledTime: ['09:00', Validators.required],
       priority: ['normal', Validators.required],
-      isActive: [true],
+      active: [true],
     });
 
     this.templates = this.scheduledMessageService.getMessageTemplates();
@@ -93,9 +93,9 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
     this.isCreatingMessage = true;
     this.editingMessage = null;
     this.messageForm.reset({
-      deliveryTime: '09:00',
+      scheduledTime: '09:00',
       priority: 'normal',
-      isActive: true,
+      active: true,
     });
   }
 
@@ -116,9 +116,10 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
         );
         this.notificationService.show('Message updated!', 'success');
       } else {
-        const newMessage = this.scheduledMessageService.createMessage(
-          this.messageForm.value
-        );
+        const newMessage = this.scheduledMessageService.createMessage({
+          ...this.messageForm.value,
+          birthdayId: this.birthday.id
+        });
 
         await this.birthdayFacade.addMessageToBirthday(this.birthday.id, newMessage);
         this.notificationService.show('Scheduled message created!', 'success');
@@ -144,7 +145,7 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
   async toggleMessageStatus(message: ScheduledMessage): Promise<void> {
     if (this.birthday) {
       await this.birthdayFacade.updateMessageInBirthday(this.birthday.id, message.id, {
-        isActive: !message.isActive,
+        active: !message.active,
       });
       this.loadMessages();
     }

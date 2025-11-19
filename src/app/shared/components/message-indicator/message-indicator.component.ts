@@ -26,12 +26,12 @@ export class MessageIndicatorComponent implements OnChanges {
     if (!this.birthday?.scheduledMessages) {
       return false;
     }
-    return this.birthday.scheduledMessages.some((msg) => msg.isActive);
+    return this.birthday.scheduledMessages.some((msg) => msg.active);
   }
 
   get activeMessageCount(): number {
     if (!this.birthday?.scheduledMessages) return 0;
-    return this.birthday.scheduledMessages.filter((msg) => msg.isActive).length;
+    return this.birthday.scheduledMessages.filter((msg) => msg.active).length;
   }
 
   get totalMessageCount(): number {
@@ -59,9 +59,9 @@ export class MessageIndicatorComponent implements OnChanges {
 
     if (activeCount === 1 && totalCount === 1) {
       const message = this.birthday.scheduledMessages?.find(
-        (msg) => msg.isActive
+        (msg) => msg.active
       );
-      this.tooltipText = `✅ Message configured: "${message?.title}" - sending at ${message?.deliveryTime}`;
+      this.tooltipText = `✅ Message configured: "${message?.title}" - sending at ${message?.scheduledTime}`;
       return;
     }
 
@@ -77,15 +77,15 @@ export class MessageIndicatorComponent implements OnChanges {
     if (!this.hasActiveMessages) return '';
 
     const activeMessages =
-      this.birthday?.scheduledMessages?.filter((msg) => msg.isActive) || [];
+      this.birthday?.scheduledMessages?.filter((msg) => msg.active) || [];
 
     if (activeMessages.length === 0) return '';
 
     const sortedMessages = activeMessages.sort((a, b) => {
-      return a.deliveryTime.localeCompare(b.deliveryTime);
+      return a.scheduledTime.localeCompare(b.scheduledTime);
     });
 
     const nextMessage = sortedMessages[0];
-    return `Next: ${nextMessage.title} at ${nextMessage.deliveryTime}`;
+    return `Next: ${nextMessage.title} at ${nextMessage.scheduledTime}`;
   }
 }
