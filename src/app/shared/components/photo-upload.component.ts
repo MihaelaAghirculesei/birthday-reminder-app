@@ -230,7 +230,7 @@ export class PhotoUploadComponent {
         return;
       }
 
-      const reader = new FileReader();
+     const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = e.target?.result as string;
         this.photoSelected.emit(base64String);
