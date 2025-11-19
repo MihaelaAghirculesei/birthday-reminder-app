@@ -27,6 +27,8 @@
     [nextBirthdayText]="(nextBirthdayText$ | async) ?? ''"
   ></app-dashboard-stats>
 
+  <app-notification-permission-banner></app-notification-permission-banner>
+
   <app-category-filter
     [categoriesStats]="(categoriesStats$ | async) ?? []"
     [selectedCategory]="selectedCategory"

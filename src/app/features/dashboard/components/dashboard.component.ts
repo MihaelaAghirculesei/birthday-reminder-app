@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, Subject, map, takeUntil, combineLatest, take } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { MaterialModule, Birthday, DEFAULT_CATEGORY, BirthdayCategory } from '../../../shared';
+import { MaterialModule, Birthday, DEFAULT_CATEGORY, BirthdayCategory, NotificationPermissionBannerComponent } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
 import { GoogleCalendarSyncComponent } from '../../calendar-sync/google-calendar-sync.component';
 import { DashboardStatsComponent } from './stats/dashboard-stats.component';
@@ -26,7 +26,8 @@ import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../ser
     BirthdayChartComponent,
     CategoryFilterComponent,
     BirthdayListComponent,
-    GoogleCalendarSyncComponent
+    GoogleCalendarSyncComponent,
+    NotificationPermissionBannerComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -103,7 +104,6 @@ export class DashboardComponent implements OnDestroy {
         const validCategoryIds = new Set(allCategories.map(c => c.id));
         const statsMap = new Map(stats.map(s => [s.categoryId, s.count]));
 
-        // Count orphaned birthdays (with non-existent categories)
         const orphanedCount = birthdays.filter(b =>
           b.category && !validCategoryIds.has(b.category)
         ).length;
@@ -116,7 +116,6 @@ export class DashboardComponent implements OnDestroy {
           count: statsMap.get(category.id) || 0
         }));
 
-        // Add orphaned category if there are orphaned birthdays
         if (orphanedCount > 0) {
           categoryStats.unshift({
             id: '__orphaned__',
@@ -405,12 +404,10 @@ export class DashboardComponent implements OnDestroy {
 
     const target = event.target as HTMLElement;
 
-    // Ignore clicks on the Add Birthday header and other UI elements outside dashboard
     if (target.closest('.collapsible-header, .add-birthday-card, .category-filter')) {
       return;
     }
 
-    // Ignore clicks on buttons and icons globally (for dialogs, etc.)
     if (target.closest('button, mat-icon')) {
       return;
     }
@@ -423,7 +420,6 @@ export class DashboardComponent implements OnDestroy {
         this.editService.cancelEdit();
       }
     } else {
-      // Clicked outside of any birthday item - cancel edit
       this.editService.cancelEdit();
     }
   }
