@@ -35,13 +35,13 @@
           <div
             *ngFor="let message of birthday.scheduledMessages; trackBy: trackByMessage"
             class="message-item"
-            [class.inactive]="!message.isActive"
+            [class.inactive]="!message.active"
           >
             <div class="message-header">
               <span class="message-title">{{ message.title }}</span>
               <span class="message-time">
                 <mat-icon class="small-icon">schedule</mat-icon>
-                {{ message.deliveryTime }}
+                {{ message.scheduledTime }}
               </span>
             </div>
             <div class="message-content">{{ message.message }}</div>
@@ -49,8 +49,8 @@
               <span class="priority" [class]="'priority-' + message.priority">
                 {{ getPriorityLabel(message.priority) }}
               </span>
-              <span class="status" [class.active]="message.isActive">
-                {{ message.isActive ? "Attivo" : "Disattivo" }}
+              <span class="status" [class.active]="message.active">
+                {{ message.active ? "Attivo" : "Disattivo" }}
               </span>
               <div class="message-actions">
                 <button

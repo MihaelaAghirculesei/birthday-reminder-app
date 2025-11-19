@@ -17,11 +17,12 @@ export class ScheduledMessageService {
       id: this.generateId(),
       title: messageData.title || '',
       message: messageData.message || '',
-      deliveryTime: messageData.deliveryTime || '09:00',
-      isActive: messageData.isActive ?? true,
+      scheduledTime: messageData.scheduledTime || '09:00',
+      active: messageData.active ?? true,
       createdDate: new Date(),
       messageType: messageData.messageType || 'text',
-      priority: messageData.priority || 'normal'
+      priority: messageData.priority || 'normal',
+      birthdayId: messageData.birthdayId
     };
   }
 

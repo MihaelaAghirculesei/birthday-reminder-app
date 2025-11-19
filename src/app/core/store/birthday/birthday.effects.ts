@@ -149,8 +149,25 @@ export class BirthdayEffects {
   addMessageToBirthday$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BirthdayActions.addMessageToBirthday),
-      map(({ birthdayId, message }) =>
-        BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message })
+      mergeMap(({ birthdayId, message }) =>
+        this.offlineStorage.saveScheduledMessage(message).then(() =>
+          this.offlineStorage.getBirthdays()
+        ).then(birthdays => {
+          const birthday = birthdays.find(b => b.id === birthdayId);
+          if (birthday) {
+            const updatedBirthday = {
+              ...birthday,
+              scheduledMessages: [...(birthday.scheduledMessages || []), message]
+            };
+            return this.offlineStorage.updateBirthday(updatedBirthday);
+          }
+          return Promise.resolve();
+        }).then(() =>
+          BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message })
+        ).catch(error => {
+          console.error('Failed to add message:', error);
+          return BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message });
+        })
       )
     )
   );
@@ -158,8 +175,35 @@ export class BirthdayEffects {
   updateMessageInBirthday$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BirthdayActions.updateMessageInBirthday),
-      map(({ birthdayId, messageId, updates }) =>
-        BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates })
+      mergeMap(({ birthdayId, messageId, updates }) =>
+        this.offlineStorage.getScheduledMessagesByBirthday(birthdayId).then(messages => {
+          const message = messages.find(m => m.id === messageId);
+          if (message) {
+            const updatedMessage = { ...message, ...updates };
+            return this.offlineStorage.updateScheduledMessage(updatedMessage);
+          }
+          return Promise.resolve();
+        }).then(() =>
+          this.offlineStorage.getBirthdays()
+        ).then(birthdays => {
+          const birthday = birthdays.find(b => b.id === birthdayId);
+          if (birthday?.scheduledMessages) {
+            const updatedMessages = birthday.scheduledMessages.map(msg =>
+              msg.id === messageId ? { ...msg, ...updates } : msg
+            );
+            const updatedBirthday = {
+              ...birthday,
+              scheduledMessages: updatedMessages
+            };
+            return this.offlineStorage.updateBirthday(updatedBirthday);
+          }
+          return Promise.resolve();
+        }).then(() =>
+          BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates })
+        ).catch(error => {
+          console.error('Failed to update message:', error);
+          return BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates });
+        })
       )
     )
   );
@@ -167,8 +211,26 @@ export class BirthdayEffects {
   deleteMessageFromBirthday$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BirthdayActions.deleteMessageFromBirthday),
-      map(({ birthdayId, messageId }) =>
-        BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId })
+      mergeMap(({ birthdayId, messageId }) =>
+        this.offlineStorage.deleteScheduledMessage(messageId).then(() =>
+          this.offlineStorage.getBirthdays()
+        ).then(birthdays => {
+          const birthday = birthdays.find(b => b.id === birthdayId);
+          if (birthday?.scheduledMessages) {
+            const updatedMessages = birthday.scheduledMessages.filter(msg => msg.id !== messageId);
+            const updatedBirthday = {
+              ...birthday,
+              scheduledMessages: updatedMessages
+            };
+            return this.offlineStorage.updateBirthday(updatedBirthday);
+          }
+          return Promise.resolve();
+        }).then(() =>
+          BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId })
+        ).catch(error => {
+          console.error('Failed to delete message:', error);
+          return BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId });
+        })
       )
     )
   );
