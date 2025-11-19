@@ -16,10 +16,15 @@ export interface ScheduledMessage {
   id: string;
   title: string;
   message: string;
-  deliveryTime: string; // Format HH:mm (e.g., "09:30")
-  isActive: boolean;
+  scheduledTime: string;
+  active: boolean;
   createdDate: Date;
   lastSentDate?: Date;
   messageType: 'text' | 'html';
   priority: 'low' | 'normal' | 'high';
+  sentCount?: number;
+  nextScheduledDate?: Date;
+  notificationSent?: boolean;
+  lastNotificationId?: string;
+  birthdayId?: string;
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Birthday } from '../../shared';
+import { Birthday, ScheduledMessage } from '../../shared';
 
 interface StoredBirthday extends Omit<Birthday, 'birthDate'> {
   birthDate: string;
@@ -19,8 +19,9 @@ export interface OfflineStorageService {
 })
 export class IndexedDBStorageService implements OfflineStorageService {
   private dbName = 'BirthdayReminderDB';
-  private dbVersion = 1;
+  private dbVersion = 2;
   private storeName = 'birthdays';
+  private messagesStoreName = 'scheduledMessages';
 
   private async openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -31,10 +32,17 @@ export class IndexedDBStorageService implements OfflineStorageService {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+
         if (!db.objectStoreNames.contains(this.storeName)) {
           const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
           store.createIndex('name', 'name', { unique: false });
           store.createIndex('birthDate', 'birthDate', { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains(this.messagesStoreName)) {
+          const messageStore = db.createObjectStore(this.messagesStoreName, { keyPath: 'id' });
+          messageStore.createIndex('birthdayId', 'birthdayId', { unique: false });
+          messageStore.createIndex('active', 'active', { unique: false });
         }
       };
     });
@@ -158,6 +166,75 @@ export class IndexedDBStorageService implements OfflineStorageService {
     } catch (error) {
       console.error('Failed to clear IndexedDB:', error);
       throw error;
+    }
+  }
+
+  async saveScheduledMessage(message: ScheduledMessage): Promise<void> {
+    try {
+      const db = await this.openDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.messagesStoreName], 'readwrite');
+        const store = transaction.objectStore(this.messagesStoreName);
+        const request = store.add(message);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+      });
+    } catch (error) {
+      console.error('Failed to save scheduled message to IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  async updateScheduledMessage(message: ScheduledMessage): Promise<void> {
+    try {
+      const db = await this.openDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.messagesStoreName], 'readwrite');
+        const store = transaction.objectStore(this.messagesStoreName);
+        const request = store.put(message);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+      });
+    } catch (error) {
+      console.error('Failed to update scheduled message in IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  async deleteScheduledMessage(id: string): Promise<void> {
+    try {
+      const db = await this.openDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.messagesStoreName], 'readwrite');
+        const store = transaction.objectStore(this.messagesStoreName);
+        const request = store.delete(id);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+      });
+    } catch (error) {
+      console.error('Failed to delete scheduled message from IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  async getScheduledMessagesByBirthday(birthdayId: string): Promise<ScheduledMessage[]> {
+    try {
+      const db = await this.openDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.messagesStoreName], 'readonly');
+        const store = transaction.objectStore(this.messagesStoreName);
+        const index = store.index('birthdayId');
+        const request = index.getAll(birthdayId);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result || []);
+      });
+    } catch (error) {
+      console.error('Failed to get scheduled messages from IndexedDB:', error);
+      return [];
     }
   }
 }
