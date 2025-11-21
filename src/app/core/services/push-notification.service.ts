@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
+import { Capacitor } from '@capacitor/core';
 import { Birthday, ScheduledMessage } from '../../shared/models';
-import { NotificationPermissionService } from './notification-permission.service';
 import { IndexedDBStorageService } from './offline-storage.service';
 
 export interface BirthdayNotificationData {
@@ -15,43 +16,202 @@ export interface BirthdayNotificationData {
   providedIn: 'root'
 })
 export class PushNotificationService {
-  constructor(
-    private permissionService: NotificationPermissionService,
-    private storage: IndexedDBStorageService
-  ) {}
+  private isNative = Capacitor.isNativePlatform();
 
-  async sendBirthdayNotification(
+  constructor(private storage: IndexedDBStorageService) {
+    this.initializeNotifications();
+  }
+
+  private async initializeNotifications(): Promise<void> {
+    if (!this.isNative) return;
+
+    try {
+      const permission = await LocalNotifications.requestPermissions();
+      if (permission.display === 'granted') {
+        await this.setupNotificationListeners();
+      }
+    } catch (error) {
+      console.error('Error initializing notifications:', error);
+    }
+  }
+
+  private async setupNotificationListeners(): Promise<void> {
+    await LocalNotifications.addListener('localNotificationReceived', notification => {
+      console.log('Notification received:', notification);
+    });
+
+    await LocalNotifications.addListener('localNotificationActionPerformed', action => {
+      console.log('Notification action performed:', action);
+    });
+  }
+
+  async hasPermission(): Promise<boolean> {
+    if (!this.isNative) return false;
+
+    try {
+      const status = await LocalNotifications.checkPermissions();
+      return status.display === 'granted';
+    } catch {
+      return false;
+    }
+  }
+
+  async requestPermission(): Promise<boolean> {
+    if (!this.isNative) return false;
+
+    try {
+      const status = await LocalNotifications.requestPermissions();
+      return status.display === 'granted';
+    } catch {
+      return false;
+    }
+  }
+
+  async scheduleNotification(
     birthday: Birthday,
     message: ScheduledMessage
   ): Promise<boolean> {
-    if (!this.permissionService.hasPermission()) {
-      console.warn('No notification permission');
-      return false;
-    }
+    if (!this.isNative || !message.active) return false;
 
     try {
-      const registration = await navigator.serviceWorker.ready;
+      const hasPermission = await this.hasPermission();
+      if (!hasPermission) {
+        console.warn('No notification permission');
+        return false;
+      }
+
+      const scheduledDate = this.getNextNotificationDate(birthday, message);
+      if (!scheduledDate) return false;
+
+      const notificationId = this.generateNotificationId(birthday.id, message.id);
       const formattedMessage = this.formatMessage(message.message, birthday);
 
-      await registration.showNotification(message.title || '🎂 Birthday Reminder', {
-        body: formattedMessage,
-        icon: '/assets/icons/logo-reminder.png',
-        tag: `birthday-${birthday.id}-${message.id}`,
-        requireInteraction: message.priority === 'high',
-        data: {
-          birthdayId: birthday.id,
-          messageId: message.id,
-          name: birthday.name,
-          url: '/'
-        } as BirthdayNotificationData
-      } as NotificationOptions);
+      const options: ScheduleOptions = {
+        notifications: [
+          {
+            id: notificationId,
+            title: message.title || '🎂 Birthday Reminder',
+            body: formattedMessage,
+            schedule: { at: scheduledDate },
+            sound: 'default',
+            smallIcon: 'ic_notification',
+            largeIcon: 'ic_launcher',
+            extra: {
+              birthdayId: birthday.id,
+              messageId: message.id,
+              name: birthday.name
+            }
+          }
+        ]
+      };
 
-      await this.markMessageAsSent(birthday.id, message.id);
+      await LocalNotifications.schedule(options);
+      console.log(`Notification scheduled for ${birthday.name} at ${scheduledDate}`);
       return true;
     } catch (error) {
-      console.error('Error sending notification:', error);
+      console.error('Error scheduling notification:', error);
       return false;
     }
+  }
+
+  async cancelNotification(birthdayId: string, messageId: string): Promise<void> {
+    if (!this.isNative) return;
+
+    try {
+      const notificationId = this.generateNotificationId(birthdayId, messageId);
+      await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
+      console.log(`Notification cancelled for ${birthdayId}-${messageId}`);
+    } catch (error) {
+      console.error('Error cancelling notification:', error);
+    }
+  }
+
+  async cancelAllNotificationsForBirthday(birthdayId: string): Promise<void> {
+    if (!this.isNative) return;
+
+    try {
+      const pending = await LocalNotifications.getPending();
+      const toCancel = pending.notifications
+        .filter(n => n.extra?.birthdayId === birthdayId)
+        .map(n => ({ id: n.id }));
+
+      if (toCancel.length > 0) {
+        await LocalNotifications.cancel({ notifications: toCancel });
+      }
+    } catch (error) {
+      console.error('Error cancelling notifications:', error);
+    }
+  }
+
+  async rescheduleAllNotifications(): Promise<void> {
+    if (!this.isNative) return;
+
+    try {
+      const pending = await LocalNotifications.getPending();
+      if (pending.notifications.length > 0) {
+        await LocalNotifications.cancel({
+          notifications: pending.notifications.map(n => ({ id: n.id }))
+        });
+      }
+
+      const birthdays = await this.storage.getBirthdays();
+
+      for (const birthday of birthdays) {
+        if (!birthday.scheduledMessages) continue;
+
+        for (const message of birthday.scheduledMessages) {
+          if (message.active) {
+            await this.scheduleNotification(birthday, message);
+          }
+        }
+      }
+
+      console.log('All notifications rescheduled');
+    } catch (error) {
+      console.error('Error rescheduling notifications:', error);
+    }
+  }
+
+  private getNextNotificationDate(birthday: Birthday, message: ScheduledMessage): Date | null {
+    const now = new Date();
+    const birthDate = new Date(birthday.birthDate);
+
+    const [hours, minutes] = message.scheduledTime.split(':').map(Number);
+
+    let thisYearBirthday = new Date(
+      now.getFullYear(),
+      birthDate.getMonth(),
+      birthDate.getDate(),
+      hours,
+      minutes,
+      0,
+      0
+    );
+
+    if (thisYearBirthday <= now) {
+      thisYearBirthday = new Date(
+        now.getFullYear() + 1,
+        birthDate.getMonth(),
+        birthDate.getDate(),
+        hours,
+        minutes,
+        0,
+        0
+      );
+    }
+
+    return thisYearBirthday;
+  }
+
+  private generateNotificationId(birthdayId: string, messageId: string): number {
+    const combined = `${birthdayId}-${messageId}`;
+    let hash = 0;
+    for (let i = 0; i < combined.length; i++) {
+      const char = combined.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
   }
 
   private formatMessage(template: string, birthday: Birthday): string {
@@ -76,147 +236,36 @@ export class PushNotificationService {
     return age >= 0 ? age : null;
   }
 
-  private async markMessageAsSent(birthdayId: string, messageId: string): Promise<void> {
-    try {
-      const birthdays = await this.storage.getBirthdays();
-      const birthday = birthdays.find(b => b.id === birthdayId);
-
-      if (!birthday || !birthday.scheduledMessages) {
-        return;
-      }
-
-      const updatedMessages = birthday.scheduledMessages.map(msg => {
-        if (msg.id === messageId) {
-          return {
-            ...msg,
-            lastSentDate: new Date(),
-            sentCount: (msg.sentCount || 0) + 1,
-            notificationSent: true,
-            lastNotificationId: `notif-${Date.now()}`
-          };
-        }
-        return msg;
-      });
-
-      await this.storage.updateBirthday({
-        ...birthday,
-        scheduledMessages: updatedMessages
-      });
-    } catch (error) {
-      console.error('Error marking message as sent:', error);
-    }
-  }
-
-  async checkAndSendScheduledNotifications(): Promise<void> {
-    if (!this.permissionService.hasPermission()) {
-      return;
-    }
-
-    try {
-      const birthdays = await this.storage.getBirthdays();
-      const now = new Date();
-
-      for (const birthday of birthdays) {
-        if (!birthday.scheduledMessages) continue;
-
-        for (const message of birthday.scheduledMessages) {
-          if (!message.active) continue;
-
-          const shouldSend = this.shouldSendNotification(birthday, message, now);
-
-          if (shouldSend) {
-            await this.sendBirthdayNotification(birthday, message);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error checking scheduled notifications:', error);
-    }
-  }
-
-  private shouldSendNotification(
-    birthday: Birthday,
-    message: ScheduledMessage,
-    now: Date
-  ): boolean {
-    const birthDate = new Date(birthday.birthDate);
-    const thisYearBirthday = new Date(
-      now.getFullYear(),
-      birthDate.getMonth(),
-      birthDate.getDate()
-    );
-
-    const [hours, minutes] = message.scheduledTime.split(':').map(Number);
-    const scheduledTime = new Date(thisYearBirthday);
-    scheduledTime.setHours(hours, minutes, 0, 0);
-
-    const timeDiff = Math.abs(now.getTime() - scheduledTime.getTime());
-    const isWithinOneMinute = timeDiff < 60000;
-
-    const lastSent = message.lastSentDate ? new Date(message.lastSentDate) : null;
-    const notSentToday = !lastSent ||
-      lastSent.getFullYear() !== now.getFullYear() ||
-      lastSent.getMonth() !== now.getMonth() ||
-      lastSent.getDate() !== now.getDate();
-
-    return isWithinOneMinute && notSentToday;
-  }
-
   async getScheduledNotificationsCount(): Promise<number> {
+    if (!this.isNative) return 0;
+
     try {
-      const birthdays = await this.storage.getBirthdays();
-      let count = 0;
-
-      for (const birthday of birthdays) {
-        if (birthday.scheduledMessages) {
-          count += birthday.scheduledMessages.filter(msg => msg.active).length;
-        }
-      }
-
-      return count;
-    } catch (error) {
-      console.error('Error counting scheduled notifications:', error);
+      const pending = await LocalNotifications.getPending();
+      return pending.notifications.length;
+    } catch {
       return 0;
     }
   }
 
-  async getUpcomingNotifications(days: number = 7): Promise<Array<{
-    birthday: Birthday;
-    message: ScheduledMessage;
-    scheduledDate: Date;
+  async getPendingNotifications(): Promise<Array<{
+    id: number;
+    title: string;
+    body: string;
+    scheduledAt: Date;
+    birthdayId?: string;
   }>> {
+    if (!this.isNative) return [];
+
     try {
-      const birthdays = await this.storage.getBirthdays();
-      const now = new Date();
-      const futureDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-      const upcoming: Array<{ birthday: Birthday; message: ScheduledMessage; scheduledDate: Date }> = [];
-
-      for (const birthday of birthdays) {
-        if (!birthday.scheduledMessages) continue;
-
-        for (const message of birthday.scheduledMessages) {
-          if (!message.active) continue;
-
-          const birthDate = new Date(birthday.birthDate);
-          const thisYearBirthday = new Date(
-            now.getFullYear(),
-            birthDate.getMonth(),
-            birthDate.getDate()
-          );
-
-          const [hours, minutes] = message.scheduledTime.split(':').map(Number);
-          const scheduledDate = new Date(thisYearBirthday);
-          scheduledDate.setHours(hours, minutes, 0, 0);
-
-          if (scheduledDate >= now && scheduledDate <= futureDate) {
-            upcoming.push({ birthday, message, scheduledDate });
-          }
-        }
-      }
-
-      return upcoming.sort((a, b) => a.scheduledDate.getTime() - b.scheduledDate.getTime());
-    } catch (error) {
-      console.error('Error getting upcoming notifications:', error);
+      const pending = await LocalNotifications.getPending();
+      return pending.notifications.map(n => ({
+        id: n.id,
+        title: n.title || '',
+        body: n.body || '',
+        scheduledAt: n.schedule?.at ? new Date(n.schedule.at) : new Date(),
+        birthdayId: n.extra?.birthdayId
+      }));
+    } catch {
       return [];
     }
   }

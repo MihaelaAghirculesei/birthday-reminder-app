@@ -6,6 +6,7 @@ import * as BirthdayActions from './birthday.actions';
 import { IndexedDBStorageService } from '../../services/offline-storage.service';
 import { NotificationService } from '../../services/notification.service';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
+import { PushNotificationService } from '../../services/push-notification.service';
 import { Birthday } from '../../../shared/models/birthday.model';
 import { getZodiacSign, DEFAULT_CATEGORY } from '../../../shared';
 
@@ -107,6 +108,7 @@ export class BirthdayEffects {
           const birthday = birthdays.find(b => b.id === id);
           return birthday;
         }).then(birthday => {
+          this.pushNotificationService.cancelAllNotificationsForBirthday(id);
           if (birthday?.googleCalendarEventId) {
             return this.deleteFromGoogleCalendar(birthday.googleCalendarEventId).then(() => id);
           }
@@ -159,6 +161,7 @@ export class BirthdayEffects {
               ...birthday,
               scheduledMessages: [...(birthday.scheduledMessages || []), message]
             };
+            this.pushNotificationService.scheduleNotification(birthday, message);
             return this.offlineStorage.updateBirthday(updatedBirthday);
           }
           return Promise.resolve();
@@ -212,9 +215,10 @@ export class BirthdayEffects {
     this.actions$.pipe(
       ofType(BirthdayActions.deleteMessageFromBirthday),
       mergeMap(({ birthdayId, messageId }) =>
-        this.offlineStorage.deleteScheduledMessage(messageId).then(() =>
-          this.offlineStorage.getBirthdays()
-        ).then(birthdays => {
+        this.offlineStorage.deleteScheduledMessage(messageId).then(() => {
+          this.pushNotificationService.cancelNotification(birthdayId, messageId);
+          return this.offlineStorage.getBirthdays();
+        }).then(birthdays => {
           const birthday = birthdays.find(b => b.id === birthdayId);
           if (birthday?.scheduledMessages) {
             const updatedMessages = birthday.scheduledMessages.filter(msg => msg.id !== messageId);
@@ -269,7 +273,8 @@ export class BirthdayEffects {
     private actions$: Actions,
     private offlineStorage: IndexedDBStorageService,
     private notificationService: NotificationService,
-    private googleCalendarService: GoogleCalendarService
+    private googleCalendarService: GoogleCalendarService,
+    private pushNotificationService: PushNotificationService
   ) {}
 
   private generateId(): string {
