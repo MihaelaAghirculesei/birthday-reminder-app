@@ -17,13 +17,17 @@ export interface BirthdayNotificationData {
 })
 export class PushNotificationService {
   private isNative = Capacitor.isNativePlatform();
+  private browserCheckInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private storage: IndexedDBStorageService) {
     this.initializeNotifications();
   }
 
   private async initializeNotifications(): Promise<void> {
-    if (!this.isNative) return;
+    if (!this.isNative) {
+      await this.initializeBrowserNotifications();
+      return;
+    }
 
     try {
       const permission = await LocalNotifications.requestPermissions();
@@ -32,6 +36,112 @@ export class PushNotificationService {
       }
     } catch (error) {
       console.error('Error initializing notifications:', error);
+    }
+  }
+
+  private async initializeBrowserNotifications(): Promise<void> {
+    if (typeof window === 'undefined') return;
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
+
+    this.browserCheckInterval = setInterval(() => {
+      this.checkBrowserNotifications();
+    }, 30000);
+
+    this.checkBrowserNotifications();
+  }
+
+  private async checkBrowserNotifications(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      return;
+    }
+
+    try {
+      const birthdays = await this.storage.getBirthdays();
+      const now = new Date();
+
+      for (const birthday of birthdays) {
+        if (!birthday.scheduledMessages) continue;
+
+        for (const message of birthday.scheduledMessages) {
+          if (!message.active) continue;
+
+          const shouldShow = this.shouldShowBrowserNotification(birthday, message, now);
+          if (shouldShow) {
+            this.showBrowserNotification(birthday, message);
+            await this.markBrowserNotificationSent(birthday.id, message.id);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking browser notifications:', error);
+    }
+  }
+
+  private shouldShowBrowserNotification(birthday: Birthday, message: ScheduledMessage, now: Date): boolean {
+    const birthDate = new Date(birthday.birthDate);
+    const [hours, minutes] = message.scheduledTime.split(':').map(Number);
+
+    const thisYearBirthday = new Date(
+      now.getFullYear(),
+      birthDate.getMonth(),
+      birthDate.getDate(),
+      hours,
+      minutes,
+      0,
+      0
+    );
+
+    const timeDiff = now.getTime() - thisYearBirthday.getTime();
+    const isWithinWindow = timeDiff >= 0 && timeDiff < 60000;
+
+    const lastSent = message.lastSentDate ? new Date(message.lastSentDate) : null;
+    const notSentToday = !lastSent ||
+      lastSent.getFullYear() !== now.getFullYear() ||
+      lastSent.getMonth() !== now.getMonth() ||
+      lastSent.getDate() !== now.getDate();
+
+    return isWithinWindow && notSentToday;
+  }
+
+  private showBrowserNotification(birthday: Birthday, message: ScheduledMessage): void {
+    const body = this.formatMessage(message.message, birthday);
+    const notification = new Notification(message.title || '🎂 Birthday Reminder', {
+      body,
+      icon: '/assets/icons/logo-reminder.png',
+      tag: `birthday-${birthday.id}-${message.id}`,
+      requireInteraction: true
+    });
+
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  }
+
+  private async markBrowserNotificationSent(birthdayId: string, messageId: string): Promise<void> {
+    try {
+      const birthdays = await this.storage.getBirthdays();
+      const birthday = birthdays.find(b => b.id === birthdayId);
+
+      if (!birthday?.scheduledMessages) return;
+
+      const updatedMessages = birthday.scheduledMessages.map(msg => {
+        if (msg.id === messageId) {
+          return { ...msg, lastSentDate: new Date() };
+        }
+        return msg;
+      });
+
+      await this.storage.updateBirthday({
+        ...birthday,
+        scheduledMessages: updatedMessages
+      });
+    } catch (error) {
+      console.error('Error marking notification sent:', error);
     }
   }
 
@@ -71,7 +181,15 @@ export class PushNotificationService {
     birthday: Birthday,
     message: ScheduledMessage
   ): Promise<boolean> {
-    if (!this.isNative || !message.active) return false;
+    if (!message.active) return false;
+
+    const scheduledDate = this.getNextNotificationDate(birthday, message);
+    if (!scheduledDate) return false;
+
+    if (!this.isNative) {
+      console.log(`[Browser] Notification scheduled for ${birthday.name} at ${scheduledDate}`);
+      return true;
+    }
 
     try {
       const hasPermission = await this.hasPermission();
@@ -79,9 +197,6 @@ export class PushNotificationService {
         console.warn('No notification permission');
         return false;
       }
-
-      const scheduledDate = this.getNextNotificationDate(birthday, message);
-      if (!scheduledDate) return false;
 
       const notificationId = this.generateNotificationId(birthday.id, message.id);
       const formattedMessage = this.formatMessage(message.message, birthday);
@@ -237,7 +352,20 @@ export class PushNotificationService {
   }
 
   async getScheduledNotificationsCount(): Promise<number> {
-    if (!this.isNative) return 0;
+    if (!this.isNative) {
+      try {
+        const birthdays = await this.storage.getBirthdays();
+        let count = 0;
+        for (const birthday of birthdays) {
+          if (birthday.scheduledMessages) {
+            count += birthday.scheduledMessages.filter(m => m.active).length;
+          }
+        }
+        return count;
+      } catch {
+        return 0;
+      }
+    }
 
     try {
       const pending = await LocalNotifications.getPending();
@@ -254,7 +382,38 @@ export class PushNotificationService {
     scheduledAt: Date;
     birthdayId?: string;
   }>> {
-    if (!this.isNative) return [];
+    if (!this.isNative) {
+      try {
+        const birthdays = await this.storage.getBirthdays();
+        const notifications: Array<{
+          id: number;
+          title: string;
+          body: string;
+          scheduledAt: Date;
+          birthdayId?: string;
+        }> = [];
+
+        for (const birthday of birthdays) {
+          if (!birthday.scheduledMessages) continue;
+          for (const message of birthday.scheduledMessages) {
+            if (!message.active) continue;
+            const scheduledDate = this.getNextNotificationDate(birthday, message);
+            if (scheduledDate) {
+              notifications.push({
+                id: this.generateNotificationId(birthday.id, message.id),
+                title: message.title || '🎂 Birthday Reminder',
+                body: this.formatMessage(message.message, birthday),
+                scheduledAt: scheduledDate,
+                birthdayId: birthday.id
+              });
+            }
+          }
+        }
+        return notifications.sort((a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime());
+      } catch {
+        return [];
+      }
+    }
 
     try {
       const pending = await LocalNotifications.getPending();
