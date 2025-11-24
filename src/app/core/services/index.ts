@@ -6,3 +6,4 @@ export { PushNotificationService, BirthdayNotificationData } from './push-notifi
 export { NetworkService } from './network.service';
 export { IndexedDBStorageService } from './offline-storage.service';
 export { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem } from './google-calendar.service';
+export { BackupService, BackupData } from './backup.service';

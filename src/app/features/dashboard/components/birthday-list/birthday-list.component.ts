@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule, Birthday, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
-import { BirthdayFacadeService } from '../../../../core';
+import { BirthdayFacadeService, BackupService, NotificationService } from '../../../../core';
 import { BirthdayEditService } from '../../services/birthday-edit.service';
 
 interface EnrichedBirthday extends Birthday {
@@ -42,7 +42,9 @@ export class BirthdayListComponent implements OnChanges {
 
   constructor(
     public birthdayFacade: BirthdayFacadeService,
-    public editService: BirthdayEditService
+    public editService: BirthdayEditService,
+    private backupService: BackupService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -80,6 +82,32 @@ export class BirthdayListComponent implements OnChanges {
     setTimeout(() => {
       this.isClearingData = false;
     }, 2000);
+  }
+
+  onExportJSON(): void {
+    this.backupService.exportToJSON(this.birthdays);
+    this.notificationService.show('Backup JSON exported', 'success');
+  }
+
+  onExportCSV(): void {
+    this.backupService.exportToCSV(this.birthdays);
+    this.notificationService.show('Backup CSV exported', 'success');
+  }
+
+  async onImportBackup(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    try {
+      const birthdays = await this.backupService.importFromFile(file);
+      birthdays.forEach(b => this.birthdayFacade.addBirthday(b));
+      this.notificationService.show(`Imported ${birthdays.length} birthdays`, 'success');
+    } catch {
+      this.notificationService.show('Invalid backup file', 'error');
+    }
+
+    input.value = '';
   }
 
   trackByBirthday(_index: number, birthday: Birthday): string {

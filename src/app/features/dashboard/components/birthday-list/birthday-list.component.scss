@@ -199,14 +199,16 @@
 }
 
 .test-data-section,
-.clear-data-section {
+.clear-data-section,
+.backup-section {
   margin-top: 32px;
   display: flex;
   justify-content: center;
 }
 
 .test-data-card,
-.clear-data-card {
+.clear-data-card,
+.backup-card {
   background: linear-gradient(
     135deg,
     var(--primary) 0%,
@@ -229,13 +231,16 @@
 }
 
 .test-data-content,
-.clear-data-content {
+.clear-data-content,
+.backup-content {
   display: flex;
   align-items: center;
   gap: 24px;
   color: var(--text-inverse);
 
-  .test-icon {
+  .test-icon,
+  .clear-icon,
+  .backup-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
@@ -251,7 +256,9 @@
     border: 2px solid rgba(255, 255, 255, 0.3);
   }
 
-  .test-info {
+  .test-info,
+  .clear-info,
+  .backup-info {
     flex: 1;
 
     h3 {
@@ -301,6 +308,30 @@
       height: 20px;
     }
   }
+
+  .backup-actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+      background: rgba(255, 255, 255, 0.9) !important;
+      color: var(--primary) !important;
+      font-weight: 600 !important;
+      border-radius: var(--radius) !important;
+
+      &:hover {
+        background: var(--text-inverse) !important;
+        transform: translateY(-2px);
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        margin-right: 4px;
+      }
+    }
+  }
 }
 
 @keyframes fadeInUp {
@@ -324,25 +355,30 @@
   }
 
   .test-data-section,
-  .clear-data-section {
+  .clear-data-section,
+  .backup-section {
     margin-top: 24px;
     padding: 0 8px;
   }
 
   .test-data-card,
-  .clear-data-card {
+  .clear-data-card,
+  .backup-card {
     .mat-mdc-card-content {
       padding: 24px !important;
     }
   }
 
   .test-data-content,
-  .clear-data-content {
+  .clear-data-content,
+  .backup-content {
     flex-direction: column;
     text-align: center;
     gap: 16px;
 
-    .test-icon {
+    .test-icon,
+    .clear-icon,
+    .backup-icon {
       min-width: 64px;
       min-height: 64px;
       font-size: 40px;
@@ -351,7 +387,9 @@
       padding: 12px;
     }
 
-    .test-info {
+    .test-info,
+    .clear-info,
+    .backup-info {
       h3 {
         font-size: 1.3rem;
       }
@@ -364,6 +402,11 @@
     .add-test-btn {
       min-width: 160px;
       height: 44px;
+    }
+
+    .backup-actions {
+      flex-wrap: wrap;
+      justify-content: center;
     }
   }
 

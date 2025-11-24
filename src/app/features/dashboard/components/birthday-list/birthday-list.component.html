@@ -92,6 +92,41 @@
   </mat-card>
 </div>
 
+<div class="backup-section" *ngIf="totalBirthdays > 0">
+  <mat-card class="backup-card">
+    <mat-card-content>
+      <div class="backup-content">
+        <mat-icon class="backup-icon">backup</mat-icon>
+        <div class="backup-info">
+          <h3>Backup & Restore</h3>
+          <p>Export or import your birthday data</p>
+        </div>
+        <div class="backup-actions">
+          <button mat-stroked-button color="primary" (click)="onExportJSON()">
+            <mat-icon>download</mat-icon>
+            JSON
+          </button>
+          <button mat-stroked-button color="primary" (click)="onExportCSV()">
+            <mat-icon>table_chart</mat-icon>
+            CSV
+          </button>
+          <button mat-stroked-button color="accent" (click)="fileInput.click()">
+            <mat-icon>upload</mat-icon>
+            Import
+          </button>
+          <input
+            #fileInput
+            type="file"
+            accept=".json"
+            (change)="onImportBackup($event)"
+            hidden
+          />
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
 <div class="clear-data-section" *ngIf="totalBirthdays > 0">
   <mat-card class="clear-data-card">
     <mat-card-content>
