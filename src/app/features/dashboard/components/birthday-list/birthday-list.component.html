@@ -110,15 +110,26 @@
             <mat-icon>table_chart</mat-icon>
             CSV
           </button>
-          <button mat-stroked-button color="accent" (click)="fileInput.click()">
+          <button mat-stroked-button color="accent" (click)="jsonInput.click()">
             <mat-icon>upload</mat-icon>
-            Import
+            Import JSON
+          </button>
+          <button mat-stroked-button color="accent" (click)="csvInput.click()">
+            <mat-icon>upload_file</mat-icon>
+            Import CSV
           </button>
           <input
-            #fileInput
+            #jsonInput
             type="file"
             accept=".json"
             (change)="onImportBackup($event)"
+            hidden
+          />
+          <input
+            #csvInput
+            type="file"
+            accept=".csv"
+            (change)="onImportCSV($event)"
             hidden
           />
         </div>

@@ -101,10 +101,36 @@ export class BirthdayListComponent implements OnChanges {
 
     try {
       const birthdays = await this.backupService.importFromFile(file);
-      birthdays.forEach(b => this.birthdayFacade.addBirthday(b));
+
+      for (const birthday of birthdays) {
+        this.birthdayFacade.addBirthday(birthday);
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
       this.notificationService.show(`Imported ${birthdays.length} birthdays`, 'success');
     } catch {
       this.notificationService.show('Invalid backup file', 'error');
+    }
+
+    input.value = '';
+  }
+
+  async onImportCSV(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    try {
+      const birthdays = await this.backupService.importFromCSV(file);
+
+      for (const birthday of birthdays) {
+        this.birthdayFacade.addBirthday(birthday);
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      this.notificationService.show(`Imported ${birthdays.length} birthdays from CSV`, 'success');
+    } catch {
+      this.notificationService.show('Invalid CSV file', 'error');
     }
 
     input.value = '';
