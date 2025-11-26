@@ -220,6 +220,7 @@
   max-width: 600px;
   width: 100%;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible !important;
 
   &:hover {
     transform: translateY(-4px) scale(1.02);
@@ -227,6 +228,7 @@
 
   .mat-mdc-card-content {
     padding: 32px !important;
+    overflow: visible !important;
   }
 }
 
@@ -311,6 +313,7 @@
 
   .backup-actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
 
     button {

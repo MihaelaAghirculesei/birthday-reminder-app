@@ -102,20 +102,20 @@
           <p>Export or import your birthday data</p>
         </div>
         <div class="backup-actions">
-          <button mat-stroked-button color="primary" (click)="onExportJSON()">
+          <button mat-stroked-button color="primary" (click)="onExportJSON()" matTooltip="Export all birthdays to JSON file">
             <mat-icon>download</mat-icon>
             JSON
           </button>
-          <button mat-stroked-button color="primary" (click)="onExportCSV()">
-            <mat-icon>table_chart</mat-icon>
+          <button mat-stroked-button color="primary" (click)="onExportCSV()" matTooltip="Export all birthdays to CSV file">
+            <mat-icon>download</mat-icon>
             CSV
           </button>
-          <button mat-stroked-button color="accent" (click)="jsonInput.click()">
+          <button mat-stroked-button color="accent" (click)="jsonInput.click()" matTooltip="Import birthdays from JSON file">
             <mat-icon>upload</mat-icon>
             Import JSON
           </button>
-          <button mat-stroked-button color="accent" (click)="csvInput.click()">
-            <mat-icon>upload_file</mat-icon>
+          <button mat-stroked-button color="accent" (click)="csvInput.click()" matTooltip="Import birthdays from CSV file">
+            <mat-icon>upload</mat-icon>
             Import CSV
           </button>
           <input
