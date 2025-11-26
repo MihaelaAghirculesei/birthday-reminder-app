@@ -94,6 +94,18 @@ export class BackupService {
     return birthdays;
   }
 
+  async importFromVCard(file: File): Promise<Birthday[]> {
+    const text = await file.text();
+    return text.split('BEGIN:VCARD')
+      .filter(v => v.includes('FN:') && v.includes('BDAY'))
+      .flatMap(v => {
+        const name = v.match(/FN:(.+)/)?.[1].trim();
+        const bday = v.match(/BDAY[;:](.+)/)?.[1].split(':').pop()?.trim();
+        const birthDate = bday ? this.parseDate(bday) : null;
+        return name && birthDate ? [{ id: crypto.randomUUID(), name, birthDate, category: 'friends' }] : [];
+      });
+  }
+
   private parseCSVLine(line: string): string[] {
     const values: string[] = [];
     let current = '';

@@ -118,20 +118,13 @@
             <mat-icon>upload</mat-icon>
             Import CSV
           </button>
-          <input
-            #jsonInput
-            type="file"
-            accept=".json"
-            (change)="onImportBackup($event)"
-            hidden
-          />
-          <input
-            #csvInput
-            type="file"
-            accept=".csv"
-            (change)="onImportCSV($event)"
-            hidden
-          />
+          <button mat-stroked-button color="accent" (click)="vcardInput.click()" matTooltip="Import birthdays from vCard file">
+            <mat-icon>upload</mat-icon>
+            Import vCard
+          </button>
+          <input #jsonInput type="file" accept=".json" (change)="onImportBackup($event)" hidden />
+          <input #csvInput type="file" accept=".csv" (change)="onImportCSV($event)" hidden />
+          <input #vcardInput type="file" accept=".vcf" (change)="onImportVCard($event)" hidden />
         </div>
       </div>
     </mat-card-content>
