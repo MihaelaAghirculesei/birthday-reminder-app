@@ -26,13 +26,17 @@ export class BackupService {
 
   exportToCSV(birthdays: Birthday[]): void {
     const headers = ['Name', 'Birth Date', 'Category', 'Notes', 'Zodiac Sign'];
-    const rows = birthdays.map(b => [
-      this.escapeCSV(b.name),
-      new Date(b.birthDate).toLocaleDateString(),
-      this.escapeCSV(b.category || ''),
-      this.escapeCSV(b.notes || ''),
-      this.escapeCSV(b.zodiacSign || '')
-    ]);
+    const rows = birthdays.map(b => {
+      const date = new Date(b.birthDate);
+      const isoDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      return [
+        this.escapeCSV(b.name),
+        isoDate,
+        this.escapeCSV(b.category || ''),
+        this.escapeCSV(b.notes || ''),
+        this.escapeCSV(b.zodiacSign || '')
+      ];
+    });
 
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -52,6 +56,81 @@ export class BackupService {
       birthDate: new Date(b.birthDate),
       id: b.id || crypto.randomUUID()
     }));
+  }
+
+  async importFromCSV(file: File): Promise<Birthday[]> {
+    const text = await file.text();
+    const lines = text.split('\n').filter(line => line.trim());
+
+    if (lines.length < 2) {
+      throw new Error('CSV file is empty or has no data rows');
+    }
+
+    const birthdays: Birthday[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = this.parseCSVLine(lines[i]);
+      if (values.length < 2) continue;
+
+      const [name, dateStr, category, notes, zodiacSign] = values;
+      const birthDate = this.parseDate(dateStr);
+
+      if (!name || !birthDate) continue;
+
+      birthdays.push({
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        birthDate,
+        category: category?.trim() || undefined,
+        notes: notes?.trim() || undefined,
+        zodiacSign: zodiacSign?.trim() || undefined
+      });
+    }
+
+    if (birthdays.length === 0) {
+      throw new Error('No valid birthdays found in CSV');
+    }
+
+    return birthdays;
+  }
+
+  private parseCSVLine(line: string): string[] {
+    const values: string[] = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        values.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    values.push(current.trim());
+    return values;
+  }
+
+  private parseDate(dateStr: string): Date | null {
+    if (!dateStr) return null;
+
+    const cleaned = dateStr.trim();
+
+    const dmyMatch = cleaned.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (dmyMatch) {
+      return new Date(+dmyMatch[3], +dmyMatch[2] - 1, +dmyMatch[1]);
+    }
+
+    const isoMatch = cleaned.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoMatch) {
+      return new Date(+isoMatch[1], +isoMatch[2] - 1, +isoMatch[3]);
+    }
+
+    const parsed = new Date(cleaned);
+    return isNaN(parsed.getTime()) ? null : parsed;
   }
 
   private downloadFile(blob: Blob, filename: string): void {

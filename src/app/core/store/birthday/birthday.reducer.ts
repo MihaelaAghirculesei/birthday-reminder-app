@@ -6,7 +6,7 @@ import * as BirthdayActions from './birthday.actions';
 
 export const birthdayAdapter: EntityAdapter<Birthday> = createEntityAdapter<Birthday>({
   selectId: (birthday: Birthday) => birthday.id,
-  sortComparer: false // We'll handle sorting via selectors
+  sortComparer: false 
 });
 
 export const initialBirthdayState: BirthdayState = birthdayAdapter.getInitialState({
@@ -19,7 +19,6 @@ export const initialBirthdayState: BirthdayState = birthdayAdapter.getInitialSta
 export const birthdayReducer = createReducer(
   initialBirthdayState,
 
-  // Load Birthdays
   on(BirthdayActions.loadBirthdays, (state) => ({
     ...state,
     loading: true,
@@ -40,7 +39,6 @@ export const birthdayReducer = createReducer(
     error
   })),
 
-  // Add Birthday
   on(BirthdayActions.addBirthday, (state) => ({
     ...state,
     loading: true,
@@ -61,7 +59,6 @@ export const birthdayReducer = createReducer(
     error
   })),
 
-  // Update Birthday
   on(BirthdayActions.updateBirthday, (state) => ({
     ...state,
     loading: true,
@@ -85,7 +82,7 @@ export const birthdayReducer = createReducer(
     error
   })),
 
-  // Delete Birthday
+
   on(BirthdayActions.deleteBirthday, (state) => ({
     ...state,
     loading: true,
@@ -107,13 +104,11 @@ export const birthdayReducer = createReducer(
     error
   })),
 
-  // Select Birthday
   on(BirthdayActions.selectBirthday, (state, { id }) => ({
     ...state,
     selectedId: id
   })),
 
-  // Filter Actions
   on(BirthdayActions.setSearchTerm, (state, { searchTerm }) => ({
     ...state,
     filters: {
@@ -159,7 +154,6 @@ export const birthdayReducer = createReducer(
     }
   })),
 
-  // Clear All
   on(BirthdayActions.clearAllBirthdays, (state) => ({
     ...state,
     loading: true,
@@ -181,7 +175,6 @@ export const birthdayReducer = createReducer(
     error
   })),
 
-  // Scheduled Messages
   on(BirthdayActions.addMessageToBirthdaySuccess, (state, { birthdayId, message }) => {
     const birthday = state.entities[birthdayId];
     if (!birthday) return state;
@@ -233,7 +226,6 @@ export const birthdayReducer = createReducer(
     );
   }),
 
-  // Test Data Loading - no reducer needed for success since addBirthday handles it
   on(BirthdayActions.loadTestData, (state) => ({
     ...state,
     loading: true,
