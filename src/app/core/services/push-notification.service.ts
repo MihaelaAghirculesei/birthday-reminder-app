@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { Birthday, ScheduledMessage } from '../../shared/models';
@@ -15,12 +15,19 @@ export interface BirthdayNotificationData {
 @Injectable({
   providedIn: 'root'
 })
-export class PushNotificationService {
+export class PushNotificationService implements OnDestroy {
   private isNative = Capacitor.isNativePlatform();
   private browserCheckInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private storage: IndexedDBStorageService) {
     this.initializeNotifications();
+  }
+
+  ngOnDestroy(): void {
+    if (this.browserCheckInterval) {
+      clearInterval(this.browserCheckInterval);
+      this.browserCheckInterval = null;
+    }
   }
 
   private async initializeNotifications(): Promise<void> {
