@@ -1,14 +1,15 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, Observable, fromEvent, merge, of } from 'rxjs';
+import { BehaviorSubject, Observable, fromEvent, merge, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class NetworkService {
+export class NetworkService implements OnDestroy {
   private onlineSubject = new BehaviorSubject<boolean>(true);
   public online$ = this.onlineSubject.asObservable();
+  private networkSubscription?: Subscription;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
@@ -17,12 +18,18 @@ export class NetworkService {
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.networkSubscription) {
+      this.networkSubscription.unsubscribe();
+    }
+  }
+
   private initializeNetworkListener(): void {
     if (typeof window !== 'undefined' && window.navigator) {
       const online$ = fromEvent(window, 'online').pipe(map(() => true));
       const offline$ = fromEvent(window, 'offline').pipe(map(() => false));
-      
-      merge(online$, offline$).subscribe((isOnline: boolean) => {
+
+      this.networkSubscription = merge(online$, offline$).subscribe((isOnline: boolean) => {
         this.onlineSubject.next(isOnline);
       });
     }
