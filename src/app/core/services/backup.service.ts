@@ -151,7 +151,7 @@ export class BackupService {
     a.href = url;
     a.download = filename;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 
   private getDateString(): string {
