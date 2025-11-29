@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -51,7 +51,7 @@ import { HeaderComponent, FooterComponent } from './layout';
     ]),
   ],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Birthday Reminder App';
   birthdayForm!: FormGroup;
   birthdays$!: Observable<Birthday[]>;
@@ -59,6 +59,7 @@ export class AppComponent implements OnInit {
   selectedPhoto: string | null = null;
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
+  private testDataTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -112,9 +113,17 @@ export class AppComponent implements OnInit {
   addTestData(): void {
     this.isAddingTestData = true;
     this.birthdayFacade.loadTestData();
-    setTimeout(() => {
+    this.testDataTimer = setTimeout(() => {
       this.isAddingTestData = false;
+      this.testDataTimer = null;
     }, 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.testDataTimer) {
+      clearTimeout(this.testDataTimer);
+      this.testDataTimer = null;
+    }
   }
 
   toggleAddBirthdaySection(): void {
