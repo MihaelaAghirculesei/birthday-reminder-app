@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Birthday } from '../../../shared';
 
@@ -14,13 +14,20 @@ export interface EditingBirthdayData {
 @Injectable({
   providedIn: 'root'
 })
-export class BirthdayEditService {
+export class BirthdayEditService implements OnDestroy {
   private editingBirthdayIdSubject = new BehaviorSubject<string | null>(null);
   private editingBirthdayDataSubject = new BehaviorSubject<EditingBirthdayData | null>(null);
   private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   editingBirthdayId$ = this.editingBirthdayIdSubject.asObservable();
   editingBirthdayData$ = this.editingBirthdayDataSubject.asObservable();
+
+  ngOnDestroy(): void {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
+  }
 
   get currentEditingId(): string | null {
     return this.editingBirthdayIdSubject.value;
