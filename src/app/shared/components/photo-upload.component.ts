@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material.module';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'photo-upload',
@@ -210,6 +211,8 @@ export class PhotoUploadComponent {
   @Output() photoSelected = new EventEmitter<string>();
   @Output() photoRemoved = new EventEmitter<void>();
 
+  constructor(private notificationService: NotificationService) {}
+
   triggerFileInput() {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fileInput?.click();
@@ -219,14 +222,14 @@ export class PhotoUploadComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      
+
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
+        this.notificationService.show('File size must be less than 5MB', 'error');
         return;
       }
-      
+
       if (!file.type.startsWith('image/')) {
-        alert('Please select a valid image file');
+        this.notificationService.show('Please select a valid image file', 'error');
         return;
       }
 
@@ -237,7 +240,7 @@ export class PhotoUploadComponent {
       };
       reader.onerror = () => {
         console.error('Failed to read file:', reader.error);
-        alert('Failed to read the selected file. Please try again.');
+        this.notificationService.show('Failed to read the selected file. Please try again.', 'error');
       };
       reader.readAsDataURL(file);
     }
