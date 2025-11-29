@@ -45,7 +45,13 @@ export class BackupService {
 
   async importFromFile(file: File): Promise<Birthday[]> {
     const text = await file.text();
-    const backup: BackupData = JSON.parse(text);
+
+    let backup: BackupData;
+    try {
+      backup = JSON.parse(text);
+    } catch (error) {
+      throw new Error('Invalid JSON file. Please select a valid backup file.');
+    }
 
     if (!backup.birthdays || !Array.isArray(backup.birthdays)) {
       throw new Error('Invalid backup file format');
