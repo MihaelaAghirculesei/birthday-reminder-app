@@ -53,11 +53,13 @@ export class PushNotificationService implements OnDestroy {
       await Notification.requestPermission();
     }
 
+    // Check immediately on init
+    this.checkBrowserNotifications();
+
+    // Check every 5 minutes instead of 30 seconds to reduce resource usage
     this.browserCheckInterval = setInterval(() => {
       this.checkBrowserNotifications();
-    }, 30000);
-
-    this.checkBrowserNotifications();
+    }, 300000);
   }
 
   private async checkBrowserNotifications(): Promise<void> {
