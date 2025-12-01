@@ -39,6 +39,8 @@ export class BirthdayListComponent implements OnChanges {
 
   isAddingTestData = false;
   isClearingData = false;
+  private testDataTimer?: ReturnType<typeof setTimeout>;
+  private clearDataTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     public birthdayFacade: BirthdayFacadeService,
@@ -71,7 +73,7 @@ export class BirthdayListComponent implements OnChanges {
   onAddTestData(): void {
     this.isAddingTestData = true;
     this.addTestData.emit();
-    setTimeout(() => {
+    this.testDataTimer = setTimeout(() => {
       this.isAddingTestData = false;
     }, 2000);
   }
@@ -79,9 +81,14 @@ export class BirthdayListComponent implements OnChanges {
   onClearAllData(): void {
     this.isClearingData = true;
     this.clearAllData.emit();
-    setTimeout(() => {
+    this.clearDataTimer = setTimeout(() => {
       this.isClearingData = false;
     }, 2000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.testDataTimer) clearTimeout(this.testDataTimer);
+    if (this.clearDataTimer) clearTimeout(this.clearDataTimer);
   }
 
   onExportJSON(): void {
@@ -284,7 +291,9 @@ export class BirthdayListComponent implements OnChanges {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const currentYear = today.getFullYear();
-    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+    const nextBirthday = new Date(birthDate);
+    nextBirthday.setFullYear(currentYear);
+    nextBirthday.setHours(0, 0, 0, 0);
     if (nextBirthday < today) {
       nextBirthday.setFullYear(currentYear + 1);
     }

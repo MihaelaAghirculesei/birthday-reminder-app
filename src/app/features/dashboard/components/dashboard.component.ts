@@ -387,7 +387,9 @@ export class DashboardComponent implements OnDestroy {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const currentYear = today.getFullYear();
-    const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+    const nextBirthday = new Date(birthDate);
+    nextBirthday.setFullYear(currentYear);
+    nextBirthday.setHours(0, 0, 0, 0);
     if (nextBirthday < today) {
       nextBirthday.setFullYear(currentYear + 1);
     }

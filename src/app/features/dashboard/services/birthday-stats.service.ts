@@ -72,8 +72,11 @@ export class BirthdayStatsService {
 
   private calculateDaysUntil(birthDate: Date): number {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const birth = new Date(birthDate);
-    const nextBirthday = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+    const nextBirthday = new Date(birth);
+    nextBirthday.setFullYear(today.getFullYear());
+    nextBirthday.setHours(0, 0, 0, 0);
 
     if (nextBirthday < today) {
       nextBirthday.setFullYear(today.getFullYear() + 1);
