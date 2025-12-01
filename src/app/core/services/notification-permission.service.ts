@@ -11,11 +11,15 @@ export class NotificationPermissionService {
 
   constructor() {
     if ('permissions' in navigator) {
-      navigator.permissions.query({ name: 'notifications' as PermissionName }).then(permissionStatus => {
-        permissionStatus.onchange = () => {
-          this.permissionStatus$.next(this.getCurrentPermission());
-        };
-      });
+      navigator.permissions.query({ name: 'notifications' as PermissionName })
+        .then(permissionStatus => {
+          permissionStatus.onchange = () => {
+            this.permissionStatus$.next(this.getCurrentPermission());
+          };
+        })
+        .catch(() => {
+          // Fallback if permissions API not supported
+        });
     }
   }
 
