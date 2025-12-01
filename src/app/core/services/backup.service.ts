@@ -57,11 +57,17 @@ export class BackupService {
       throw new Error('Invalid backup file format');
     }
 
-    return backup.birthdays.map(b => ({
-      ...b,
-      birthDate: new Date(b.birthDate),
-      id: b.id || crypto.randomUUID()
-    }));
+    return backup.birthdays.map(b => {
+      const date = new Date(b.birthDate);
+      if (isNaN(date.getTime())) {
+        throw new Error(`Invalid date for ${b.name || 'birthday'}`);
+      }
+      return {
+        ...b,
+        birthDate: date,
+        id: b.id || crypto.randomUUID()
+      };
+    });
   }
 
   async importFromCSV(file: File): Promise<Birthday[]> {
