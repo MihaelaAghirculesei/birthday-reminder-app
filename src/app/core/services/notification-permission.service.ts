@@ -17,9 +17,7 @@ export class NotificationPermissionService {
             this.permissionStatus$.next(this.getCurrentPermission());
           };
         })
-        .catch(() => {
-          // Fallback if permissions API not supported
-        });
+        .catch(() => {});
     }
   }
 
@@ -46,7 +44,6 @@ export class NotificationPermissionService {
 
   async requestPermission(): Promise<boolean> {
     if (!this.isSupported()) {
-      console.warn('Le notifiche non sono supportate in questo browser');
       return false;
     }
 
@@ -55,7 +52,6 @@ export class NotificationPermissionService {
     }
 
     if (this.getCurrentPermission() === 'denied') {
-      console.warn('I permessi per le notifiche sono stati negati');
       return false;
     }
 
@@ -68,7 +64,6 @@ export class NotificationPermissionService {
 
       return permission === 'granted';
     } catch (error) {
-      console.error('Errore nella richiesta dei permessi:', error);
       return false;
     }
   }
@@ -79,7 +74,6 @@ export class NotificationPermissionService {
 
   async showTestNotification(): Promise<void> {
     if (!this.hasPermission()) {
-      console.warn('Permessi non concessi');
       return;
     }
 
@@ -96,7 +90,6 @@ export class NotificationPermissionService {
         }
       } as NotificationOptions);
     } catch (error) {
-      console.error('Errore nell\'invio della notifica di test:', error);
     }
   }
 

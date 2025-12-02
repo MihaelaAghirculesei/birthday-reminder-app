@@ -90,7 +90,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         transaction.onerror = () => reject(transaction.error);
       });
     } catch (error) {
-      console.error('Failed to save birthdays to IndexedDB:', error);
       throw error;
     }
   }
@@ -110,7 +109,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to add birthday to IndexedDB:', error);
       throw error;
     }
   }
@@ -130,7 +128,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to update birthday in IndexedDB:', error);
       throw error;
     }
   }
@@ -147,7 +144,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to delete birthday from IndexedDB:', error);
       throw error;
     }
   }
@@ -164,7 +160,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to clear IndexedDB:', error);
       throw error;
     }
   }
@@ -181,7 +176,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to save scheduled message to IndexedDB:', error);
       throw error;
     }
   }
@@ -198,7 +192,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to update scheduled message in IndexedDB:', error);
       throw error;
     }
   }
@@ -215,7 +208,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('Failed to delete scheduled message from IndexedDB:', error);
       throw error;
     }
   }
@@ -233,7 +225,6 @@ export class IndexedDBStorageService implements OfflineStorageService {
         request.onsuccess = () => resolve(request.result || []);
       });
     } catch (error) {
-      console.error('Failed to get scheduled messages from IndexedDB:', error);
       return [];
     }
   }

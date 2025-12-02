@@ -58,7 +58,6 @@ export function getCustomCategories(): BirthdayCategory[] {
     const stored = localStorage.getItem('customCategories');
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('Failed to parse customCategories from localStorage:', error);
     return [];
   }
 }
@@ -69,7 +68,6 @@ function getModifiedCategories(): BirthdayCategory[] {
     const stored = localStorage.getItem('modifiedCategories');
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('Failed to parse modifiedCategories from localStorage:', error);
     return [];
   }
 }
@@ -80,7 +78,6 @@ function getDeletedCategoryIds(): string[] {
     const stored = localStorage.getItem('deletedCategoryIds');
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('Failed to parse deletedCategoryIds from localStorage:', error);
     return [];
   }
 }

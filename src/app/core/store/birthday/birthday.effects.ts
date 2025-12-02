@@ -167,8 +167,7 @@ export class BirthdayEffects {
           return Promise.resolve();
         }).then(() =>
           BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message })
-        ).catch(error => {
-          console.error('Failed to add message:', error);
+        ).catch(() => {
           return BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message });
         })
       )
@@ -203,8 +202,7 @@ export class BirthdayEffects {
           return Promise.resolve();
         }).then(() =>
           BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates })
-        ).catch(error => {
-          console.error('Failed to update message:', error);
+        ).catch(() => {
           return BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates });
         })
       )
@@ -231,8 +229,7 @@ export class BirthdayEffects {
           return Promise.resolve();
         }).then(() =>
           BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId })
-        ).catch(error => {
-          console.error('Failed to delete message:', error);
+        ).catch(() => {
           return BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId });
         })
       )

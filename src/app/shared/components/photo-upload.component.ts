@@ -239,7 +239,6 @@ export class PhotoUploadComponent {
         this.photoSelected.emit(base64String);
       };
       reader.onerror = () => {
-        console.error('Failed to read file:', reader.error);
         this.notificationService.show('Failed to read the selected file. Please try again.', 'error');
       };
       reader.readAsDataURL(file);

@@ -81,7 +81,6 @@ export class CategoryEffects {
           customCategories.push(category);
           localStorage.setItem('customCategories', JSON.stringify(customCategories));
         } catch (error) {
-          console.error('Failed to save custom category:', error);
         }
       }),
       map(({ category }) => CategoryActions.addCategorySuccess({ category }))
@@ -113,7 +112,6 @@ export class CategoryEffects {
             JSON.stringify(modifiedCategories)
           );
         } catch (error) {
-          console.error('Failed to save category modification:', error);
         }
       }),
       map(({ category }) => CategoryActions.updateCategorySuccess({ category }))
@@ -133,7 +131,6 @@ export class CategoryEffects {
             localStorage.setItem('deletedCategoryIds', JSON.stringify(deletedIds));
           }
         } catch (error) {
-          console.error('Failed to save deleted category ID:', error);
         }
       }),
       map(({ categoryId }) =>
@@ -153,7 +150,6 @@ export class CategoryEffects {
           const updatedIds = deletedIds.filter((id: string) => id !== categoryId);
           localStorage.setItem('deletedCategoryIds', JSON.stringify(updatedIds));
         } catch (error) {
-          console.error('Failed to restore category:', error);
         }
       }),
       map(({ categoryId }) =>

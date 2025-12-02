@@ -256,7 +256,6 @@ export class GoogleCalendarService {
       try {
         localStorage.setItem('googleCalendarSettings', JSON.stringify(settings));
       } catch (error) {
-        console.error('Failed to save settings to localStorage:', error);
       }
     }
   }
@@ -269,7 +268,6 @@ export class GoogleCalendarService {
           const settings = JSON.parse(stored);
           this.settingsSubject.next(settings);
         } catch (error) {
-          // Silent failure for settings loading
         }
       }
     }
