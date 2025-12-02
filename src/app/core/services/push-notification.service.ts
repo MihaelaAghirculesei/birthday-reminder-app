@@ -42,7 +42,6 @@ export class PushNotificationService implements OnDestroy {
         await this.setupNotificationListeners();
       }
     } catch (error) {
-      console.error('Error initializing notifications:', error);
     }
   }
 
@@ -53,13 +52,11 @@ export class PushNotificationService implements OnDestroy {
       await Notification.requestPermission();
     }
 
-    // Check immediately on init
     this.checkBrowserNotifications();
 
-    // Check every 5 minutes instead of 30 seconds to reduce resource usage
     this.browserCheckInterval = setInterval(() => {
       this.checkBrowserNotifications();
-    }, 300000);
+    }, 60000);
   }
 
   private async checkBrowserNotifications(): Promise<void> {
@@ -86,7 +83,6 @@ export class PushNotificationService implements OnDestroy {
         }
       }
     } catch (error) {
-      console.error('Error checking browser notifications:', error);
     }
   }
 
@@ -105,7 +101,7 @@ export class PushNotificationService implements OnDestroy {
     );
 
     const timeDiff = now.getTime() - thisYearBirthday.getTime();
-    const isWithinWindow = timeDiff >= 0 && timeDiff < 60000;
+    const isWithinWindow = timeDiff >= 0 && timeDiff < 120000;
 
     const lastSent = message.lastSentDate ? new Date(message.lastSentDate) : null;
     const notSentToday = !lastSent ||
@@ -150,18 +146,12 @@ export class PushNotificationService implements OnDestroy {
         scheduledMessages: updatedMessages
       });
     } catch (error) {
-      console.error('Error marking notification sent:', error);
     }
   }
 
   private async setupNotificationListeners(): Promise<void> {
-    await LocalNotifications.addListener('localNotificationReceived', notification => {
-      console.log('Notification received:', notification);
-    });
-
-    await LocalNotifications.addListener('localNotificationActionPerformed', action => {
-      console.log('Notification action performed:', action);
-    });
+    await LocalNotifications.addListener('localNotificationReceived', () => {});
+    await LocalNotifications.addListener('localNotificationActionPerformed', () => {});
   }
 
   async hasPermission(): Promise<boolean> {
@@ -196,14 +186,12 @@ export class PushNotificationService implements OnDestroy {
     if (!scheduledDate) return false;
 
     if (!this.isNative) {
-      console.log(`[Browser] Notification scheduled for ${birthday.name} at ${scheduledDate}`);
       return true;
     }
 
     try {
       const hasPermission = await this.hasPermission();
       if (!hasPermission) {
-        console.warn('No notification permission');
         return false;
       }
 
@@ -230,10 +218,8 @@ export class PushNotificationService implements OnDestroy {
       };
 
       await LocalNotifications.schedule(options);
-      console.log(`Notification scheduled for ${birthday.name} at ${scheduledDate}`);
       return true;
     } catch (error) {
-      console.error('Error scheduling notification:', error);
       return false;
     }
   }
@@ -244,9 +230,7 @@ export class PushNotificationService implements OnDestroy {
     try {
       const notificationId = this.generateNotificationId(birthdayId, messageId);
       await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
-      console.log(`Notification cancelled for ${birthdayId}-${messageId}`);
     } catch (error) {
-      console.error('Error cancelling notification:', error);
     }
   }
 
@@ -263,7 +247,6 @@ export class PushNotificationService implements OnDestroy {
         await LocalNotifications.cancel({ notifications: toCancel });
       }
     } catch (error) {
-      console.error('Error cancelling notifications:', error);
     }
   }
 
@@ -289,10 +272,7 @@ export class PushNotificationService implements OnDestroy {
           }
         }
       }
-
-      console.log('All notifications rescheduled');
     } catch (error) {
-      console.error('Error rescheduling notifications:', error);
     }
   }
 
