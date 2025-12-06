@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export interface NotificationMessage {
@@ -11,17 +11,12 @@ export interface NotificationMessage {
 @Injectable({
   providedIn: 'root'
 })
-export class NotificationService implements OnDestroy {
+export class NotificationService {
   private notifications$ = new BehaviorSubject<NotificationMessage[]>([]);
   public notifications = this.notifications$.asObservable();
   private timers = new Map<string, ReturnType<typeof setTimeout>>();
 
   constructor() {}
-
-  ngOnDestroy(): void {
-    this.timers.forEach(timer => clearTimeout(timer));
-    this.timers.clear();
-  }
 
   show(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 3000): void {
     const notification: NotificationMessage = {
