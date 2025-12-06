@@ -98,21 +98,25 @@ export class GoogleCalendarService {
         return;
       }
 
-      const maxAttempts = 50;
-      let attempts = 0;
-      
-      const checkGapi = () => {
-        attempts++;
-        if (typeof gapi !== 'undefined') {
-          resolve();
-        } else if (attempts >= maxAttempts) {
-          reject(new Error('Google API script failed to load'));
-        } else {
-          setTimeout(checkGapi, 100);
-        }
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        const checkGapi = () => {
+          if (typeof gapi !== 'undefined') {
+            resolve();
+          } else {
+            setTimeout(checkGapi, 100);
+          }
+        };
+        checkGapi();
       };
-      
-      checkGapi();
+
+      script.onerror = () => reject(new Error('Failed to load Google API script'));
+
+      document.head.appendChild(script);
     });
   }
 
