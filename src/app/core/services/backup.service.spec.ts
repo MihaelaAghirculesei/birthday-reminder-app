@@ -1,0 +1,147 @@
+import { TestBed } from '@angular/core/testing';
+import { BackupService } from './backup.service';
+import { Birthday } from '../../shared';
+
+describe('BackupService', () => {
+  let service: BackupService;
+
+  beforeEach(() => {
+    service = TestBed.inject(BackupService);
+  });
+
+  it('should create', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('importFromFile', () => {
+    it('should import valid JSON backup', async () => {
+      const backup = {
+        version: 1,
+        exportDate: '2025-12-09T00:00:00.000Z',
+        birthdays: [
+          { id: '1', name: 'John', birthDate: '1990-05-15T00:00:00.000Z', category: 'friends' }
+        ]
+      };
+      const file = new File([JSON.stringify(backup)], 'backup.json', { type: 'application/json' });
+
+      const result = await service.importFromFile(file);
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe('John');
+      expect(result[0].birthDate).toEqual(jasmine.any(Date));
+    });
+
+    it('should throw error for invalid JSON', async () => {
+      const file = new File(['invalid json'], 'backup.json', { type: 'application/json' });
+
+      await expectAsync(service.importFromFile(file)).toBeRejectedWithError('Invalid JSON file. Please select a valid backup file.');
+    });
+
+    it('should throw error for missing birthdays array', async () => {
+      const file = new File([JSON.stringify({ version: 1 })], 'backup.json', { type: 'application/json' });
+
+      await expectAsync(service.importFromFile(file)).toBeRejectedWithError('Invalid backup file format');
+    });
+
+    it('should throw error for invalid date', async () => {
+      const backup = {
+        version: 1,
+        exportDate: '2025-12-09T00:00:00.000Z',
+        birthdays: [
+          { id: '1', name: 'John', birthDate: 'invalid-date', category: 'friends' }
+        ]
+      };
+      const file = new File([JSON.stringify(backup)], 'backup.json', { type: 'application/json' });
+
+      await expectAsync(service.importFromFile(file)).toBeRejectedWithError('Invalid date for John');
+    });
+
+    it('should generate new id if missing', async () => {
+      const backup = {
+        version: 1,
+        exportDate: '2025-12-09T00:00:00.000Z',
+        birthdays: [
+          { name: 'John', birthDate: '1990-05-15T00:00:00.000Z' }
+        ]
+      };
+      const file = new File([JSON.stringify(backup)], 'backup.json', { type: 'application/json' });
+
+      const result = await service.importFromFile(file);
+
+      expect(result[0].id).toBeTruthy();
+    });
+  });
+
+  describe('importFromCSV', () => {
+    it('should import valid CSV', async () => {
+      const csv = 'Name,Birth Date,Category,Notes,Zodiac Sign\nJohn,1990-05-15,friends,Test note,Taurus';
+      const file = new File([csv], 'backup.csv', { type: 'text/csv' });
+
+      const result = await service.importFromCSV(file);
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe('John');
+      expect(result[0].category).toBe('friends');
+      expect(result[0].notes).toBe('Test note');
+    });
+
+    it('should handle CSV with quoted values', async () => {
+      const csv = 'Name,Birth Date,Category,Notes,Zodiac Sign\n"Smith, John",1990-05-15,friends,"Note, with comma",Taurus';
+      const file = new File([csv], 'backup.csv', { type: 'text/csv' });
+
+      const result = await service.importFromCSV(file);
+
+      expect(result[0].name).toBe('Smith, John');
+      expect(result[0].notes).toBe('Note, with comma');
+    });
+
+    it('should parse different date formats', async () => {
+      const csv = 'Name,Birth Date,Category\nJohn,15/05/1990,friends\nJane,1990-05-15,family';
+      const file = new File([csv], 'backup.csv', { type: 'text/csv' });
+
+      const result = await service.importFromCSV(file);
+
+      expect(result.length).toBe(2);
+      expect(result[0].birthDate).toEqual(jasmine.any(Date));
+      expect(result[1].birthDate).toEqual(jasmine.any(Date));
+    });
+
+    it('should skip rows with invalid data', async () => {
+      const csv = 'Name,Birth Date,Category\nJohn,1990-05-15,friends\n,invalid,test\nJane,1990-06-20,family';
+      const file = new File([csv], 'backup.csv', { type: 'text/csv' });
+
+      const result = await service.importFromCSV(file);
+
+      expect(result.length).toBe(2);
+    });
+
+    it('should throw error for empty CSV', async () => {
+      const file = new File(['Name,Birth Date\n'], 'backup.csv', { type: 'text/csv' });
+
+      await expectAsync(service.importFromCSV(file)).toBeRejectedWithError('CSV file is empty or has no data rows');
+    });
+  });
+
+  describe('importFromVCard', () => {
+    it('should import vCard with birthday', async () => {
+      const vcard = 'BEGIN:VCARD\nFN:John Smith\nBDAY:1990-05-15\nEND:VCARD';
+      const file = new File([vcard], 'contacts.vcf', { type: 'text/vcard' });
+
+      const result = await service.importFromVCard(file);
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe('John Smith');
+      expect(result[0].birthDate).toEqual(jasmine.any(Date));
+      expect(result[0].category).toBe('friends');
+    });
+
+    it('should skip vCards without birthday', async () => {
+      const vcard = 'BEGIN:VCARD\nFN:John Smith\nEND:VCARD';
+      const file = new File([vcard], 'contacts.vcf', { type: 'text/vcard' });
+
+      const result = await service.importFromVCard(file);
+
+      expect(result.length).toBe(0);
+    });
+  });
+});
