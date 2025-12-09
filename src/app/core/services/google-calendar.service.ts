@@ -39,6 +39,7 @@ export class GoogleCalendarService {
   private readonly API_KEY = environment.googleCalendar.apiKey;
   private readonly DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
   private readonly SCOPES = 'https://www.googleapis.com/auth/calendar';
+  private readonly TOKEN_REFRESH_THRESHOLD_SECONDS = 300;
 
   private isInitialized = false;
   private isSignedInSubject = new BehaviorSubject<boolean>(false);
@@ -77,9 +78,9 @@ export class GoogleCalendarService {
           scope: this.SCOPES
         });
 
-        const authInstance = gapi.auth2.getAuthInstance();
+        const authInstance = this.getAuthInstance();
         this.isSignedInSubject.next(authInstance.isSignedIn.get());
-        
+
         authInstance.isSignedIn.listen((isSignedIn: boolean) => {
           this.isSignedInSubject.next(isSignedIn);
         });
@@ -125,12 +126,7 @@ export class GoogleCalendarService {
       await this.initialize();
     }
 
-    try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      await authInstance.signIn();
-    } catch (error) {
-      throw error;
-    }
+    await this.getAuthInstance().signIn();
   }
 
   async signOut(): Promise<void> {
@@ -138,11 +134,49 @@ export class GoogleCalendarService {
       return;
     }
 
+    await this.getAuthInstance().signOut();
+    this.updateSettings({ ...this.settingsSubject.value, enabled: false });
+  }
+
+  private getAuthInstance() {
+    return gapi.auth2.getAuthInstance();
+  }
+
+  private async ensureValidToken(): Promise<void> {
+    if (!this.isInitialized || !this.isSignedInSubject.value) {
+      return;
+    }
+
     try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      await authInstance.signOut();
-      this.updateSettings({ ...this.settingsSubject.value, enabled: false });
+      const user = this.getAuthInstance().currentUser.get();
+      const authResponse = user.getAuthResponse(true);
+      const expiresIn = (authResponse.expires_at - Date.now()) / 1000;
+
+      if (expiresIn < this.TOKEN_REFRESH_THRESHOLD_SECONDS) {
+        await user.reloadAuthResponse();
+      }
     } catch (error) {
+      // Silent fail - will retry on actual API call if needed
+    }
+  }
+
+  private async executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
+    await this.ensureValidToken();
+
+    try {
+      return await operation();
+    } catch (error: any) {
+      const status = error?.result?.error?.code || error?.status;
+
+      if (status === 401 || status === 403) {
+        try {
+          await this.getAuthInstance().currentUser.get().reloadAuthResponse();
+          return await operation();
+        } catch (retryError) {
+          throw error;
+        }
+      }
+
       throw error;
     }
   }
@@ -152,12 +186,10 @@ export class GoogleCalendarService {
       throw new Error('Not signed in to Google Calendar');
     }
 
-    try {
+    return this.executeWithRetry(async () => {
       const response = await gapi.client.calendar.calendarList.list();
       return response.result.items || [];
-    } catch (error) {
-      throw error;
-    }
+    });
   }
 
   async syncBirthdayToCalendar(birthday: Birthday): Promise<string> {
@@ -165,17 +197,15 @@ export class GoogleCalendarService {
       throw new Error('Google Calendar sync is not enabled');
     }
 
-    try {
+    return this.executeWithRetry(async () => {
       const event = this.createBirthdayEvent(birthday);
       const response = await gapi.client.calendar.events.insert({
         calendarId: this.settingsSubject.value.calendarId,
         resource: event
       });
-      
+
       return response.result.id;
-    } catch (error) {
-      throw error;
-    }
+    });
   }
 
   async updateBirthdayInCalendar(birthday: Birthday, eventId: string): Promise<void> {
@@ -183,16 +213,14 @@ export class GoogleCalendarService {
       throw new Error('Google Calendar sync is not enabled');
     }
 
-    try {
+    return this.executeWithRetry(async () => {
       const event = this.createBirthdayEvent(birthday);
       await gapi.client.calendar.events.update({
         calendarId: this.settingsSubject.value.calendarId,
         eventId: eventId,
         resource: event
       });
-    } catch (error) {
-      throw error;
-    }
+    });
   }
 
   async deleteBirthdayFromCalendar(eventId: string): Promise<void> {
@@ -200,14 +228,12 @@ export class GoogleCalendarService {
       return;
     }
 
-    try {
+    return this.executeWithRetry(async () => {
       await gapi.client.calendar.events.delete({
         calendarId: this.settingsSubject.value.calendarId,
         eventId: eventId
       });
-    } catch (error) {
-      throw error;
-    }
+    });
   }
 
   async syncAllBirthdays(birthdays: Birthday[]): Promise<{ success: number; failed: number; errors: string[] }> {
