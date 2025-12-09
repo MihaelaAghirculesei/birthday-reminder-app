@@ -1,4 +1,4 @@
-import { ApplicationConfig, isDevMode } from '@angular/core';
+import { ApplicationConfig, isDevMode, ErrorHandler } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -7,7 +7,7 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 import { routes } from './app.routes';
-import { NotificationService } from './core';
+import { NotificationService, GlobalErrorHandler } from './core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { birthdayReducer } from './core/store/birthday/birthday.reducer';
 import { BirthdayEffects } from './core/store/birthday/birthday.effects';
@@ -32,6 +32,7 @@ export const appConfig: ApplicationConfig = {
       traceLimit: 75
     }),
     NotificationService,
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'
