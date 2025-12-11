@@ -1,11 +1,14 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
 import { NetworkStatusComponent } from '../../shared/components/network-status.component';
+import { ThemeService } from '../../core';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, NetworkStatusComponent],
+  imports: [CommonModule, NetworkStatusComponent, MatSlideToggleModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-header">
@@ -14,7 +17,16 @@ import { NetworkStatusComponent } from '../../shared/components/network-status.c
           <img src="assets/icons/logo-reminder.png" alt="Birthday Reminder Logo" class="app-logo">
           Birthday Memories
         </h1>
-        <app-network-status></app-network-status>
+        <div class="header-controls">
+          <mat-slide-toggle
+            [checked]="(themeService.darkMode$ | async) ?? false"
+            (change)="themeService.toggleDarkMode()"
+            class="theme-toggle"
+            color="primary">
+            <mat-icon>{{ (themeService.darkMode$ | async) ? 'dark_mode' : 'light_mode' }}</mat-icon>
+          </mat-slide-toggle>
+          <app-network-status></app-network-status>
+        </div>
       </div>
       <p class="hero-subtitle">Never forget the special moments that matter most. Keep track of all your loved ones' birthdays with style.</p>
     </div>
@@ -62,10 +74,31 @@ import { NetworkStatusComponent } from '../../shared/components/network-status.c
       font-weight: 300;
     }
 
-    app-network-status {
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       position: absolute;
       right: 0;
       top: 0;
+    }
+
+    .theme-toggle {
+      ::ng-deep .mdc-switch {
+        opacity: 0.9;
+      }
+
+      mat-icon {
+        margin-left: 8px;
+        vertical-align: middle;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    app-network-status {
+      position: static;
     }
 
     @media (max-width: 768px) {
@@ -91,10 +124,17 @@ import { NetworkStatusComponent } from '../../shared/components/network-status.c
         gap: 0.5rem;
       }
 
-      app-network-status {
+      .header-controls {
         position: static;
+        justify-content: center;
+      }
+
+      .theme-toggle {
+        font-size: 0.9rem;
       }
     }
   `]
 })
-export class HeaderComponent {}
+export class HeaderComponent {
+  constructor(public themeService: ThemeService) {}
+}

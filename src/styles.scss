@@ -28,6 +28,32 @@
   --radius-lg: 24px;
 }
 
+body.dark-theme {
+  --primary: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  --primary-dark: linear-gradient(135deg, #6d28d9 0%, #9333ea 100%);
+  --secondary: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+  --accent: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  --success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --warning: linear-gradient(135deg, #dc2626 0%, #f59e0b 100%);
+
+  --surface: #1a1a1a;
+  --surface-elevated: #2a2a2a;
+  --surface-hover: #3a3a3a;
+  --background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  --background-alt: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  --background-tertiary: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+
+  --text-primary: #f5f5f5;
+  --text-secondary: #d4d4d4;
+  --text-muted: #a3a3a3;
+  --text-inverse: #0a0a0a;
+
+  --border: #333333;
+  --border-light: #444444;
+  --shadow: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+  --shadow-elevated: 0 25px 50px -12px rgb(0 0 0 / 0.8);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

@@ -7,12 +7,13 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 import { routes } from './app.routes';
-import { NotificationService, GlobalErrorHandler } from './core';
+import { NotificationService, GlobalErrorHandler, ThemeService } from './core';
 import { provideServiceWorker } from '@angular/service-worker';
 import { birthdayReducer } from './core/store/birthday/birthday.reducer';
 import { BirthdayEffects } from './core/store/birthday/birthday.effects';
 import { categoryReducer } from './core/store/category/category.reducer';
 import { CategoryEffects } from './core/store/category/category.effects';
+import { uiReducer } from './core/store/ui/ui.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,7 +22,8 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideStore({
       birthdays: birthdayReducer,
-      categories: categoryReducer
+      categories: categoryReducer,
+      ui: uiReducer
     }),
     provideEffects([BirthdayEffects, CategoryEffects]),
     provideStoreDevtools({
@@ -32,6 +34,7 @@ export const appConfig: ApplicationConfig = {
       traceLimit: 75
     }),
     NotificationService,
+    ThemeService,
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),

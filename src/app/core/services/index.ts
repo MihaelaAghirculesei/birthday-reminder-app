@@ -8,3 +8,4 @@ export { IndexedDBStorageService } from './offline-storage.service';
 export { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem } from './google-calendar.service';
 export { BackupService, BackupData } from './backup.service';
 export { GlobalErrorHandler } from './global-error-handler.service';
+export { ThemeService } from './theme.service';

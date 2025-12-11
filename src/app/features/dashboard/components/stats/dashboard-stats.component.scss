@@ -60,27 +60,27 @@
 
     &.total {
       background: linear-gradient(135deg, var(--primary));
-      color: var(--text-inverse);
+      color: white;
       box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
     }
     &.month {
       background: linear-gradient(135deg, var(--secondary));
-      color: var(--text-inverse);
+      color: white;
       box-shadow: 0 8px 16px rgba(240, 147, 251, 0.3);
     }
     &.age {
       background: linear-gradient(135deg, var(--success));
-      color: var(--text-inverse);
+      color: white;
       box-shadow: 0 8px 16px rgba(17, 153, 142, 0.3);
     }
     &.next {
       background: linear-gradient(135deg, var(--accent));
-      color: var(--text-inverse);
+      color: white;
       box-shadow: 0 8px 16px rgba(79, 172, 254, 0.3);
     }
     &.upcoming {
       background: linear-gradient(135deg, var(--warning));
-      color: var(--text-inverse);
+      color: white;
       box-shadow: 0 8px 16px rgba(252, 70, 107, 0.3);
     }
   }

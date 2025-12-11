@@ -23,7 +23,7 @@
     var(--primary) 0%,
     var(--secondary) 100%
   );
-  color: var(--text-primary);
+  color: white;
   padding: 32px;
   display: flex;
   justify-content: space-between;
@@ -43,7 +43,7 @@
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0;
-    color: var(--text-primary);
+    color: white;
     text-shadow: none;
   }
 }
@@ -87,7 +87,7 @@
     width: 300px;
   }
 
-  * {
+  input, label {
     color: #000000 !important;
   }
 }
