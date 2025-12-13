@@ -8,13 +8,11 @@
     border-radius: 16px !important;
     overflow: hidden;
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3) !important;
-  }
-}
 
-:host-context(body.dark-theme) ::ng-deep .mat-mdc-dialog-container {
-  .mdc-dialog__surface {
-    background: #2a2a2a !important;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8) !important;
+    :host-context(body.dark-theme) & {
+      background: #2a2a2a !important;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8) !important;
+    }
   }
 }
 
