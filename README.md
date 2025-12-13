@@ -77,6 +77,7 @@ The app manages birthdays with features like:
 - Syncs when back online
 
 **Other**
+- Dark mode with automatic theme switching
 - Undo last deletion
 - Reassign categories in bulk
 - Test data generator (40+ entries)
@@ -370,7 +371,6 @@ birthday-reminder-app/
 - E2E tests
 
 **Future ideas**
-- Dark mode
 - i18n support
 - iOS app
 - Cloud backup
