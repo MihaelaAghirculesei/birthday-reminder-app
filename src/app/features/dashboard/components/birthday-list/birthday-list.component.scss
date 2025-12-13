@@ -30,6 +30,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+
+  :host-context(body.dark-theme) & {
+    background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%);
+  }
 }
 
 .header-title-section {
@@ -43,22 +47,27 @@
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0;
-    color: white;
+    color: var(--text-primary);
     text-shadow: none;
+
+    :host-context(body.dark-theme) & {
+      color: white;
+    }
   }
 }
 
 .undo-button-enhanced {
-  background: linear-gradient(
-    135deg,
-    #ff6b6b 0%,
-    #feca57 100%
-  ) !important;
+  background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%) !important;
   color: white !important;
   font-weight: 600 !important;
   border-radius: 25px !important;
   animation: pulse-undo 2s infinite;
   box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
+
+  :host-context(body.dark-theme) & {
+    background: linear-gradient(135deg, #f87171 0%, #fbbf24 100%) !important;
+    animation: pulse-undo-dark 2s infinite;
+  }
 
   mat-icon {
     margin-right: 8px;
@@ -67,16 +76,28 @@
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6) !important;
+
+    :host-context(body.dark-theme) & {
+      box-shadow: 0 6px 20px rgba(248, 113, 113, 0.7) !important;
+    }
   }
 }
 
 @keyframes pulse-undo {
-  0%,
-  100% {
+  0%, 100% {
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
   }
   50% {
     box-shadow: 0 6px 25px rgba(255, 107, 107, 0.7);
+  }
+}
+
+@keyframes pulse-undo-dark {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(248, 113, 113, 0.5);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(248, 113, 113, 0.8);
   }
 }
 
@@ -85,10 +106,6 @@
 
   .dashboard-search-field {
     width: 300px;
-  }
-
-  input, label {
-    color: #000000 !important;
   }
 }
 
@@ -99,6 +116,7 @@
     background: transparent !important;
     box-shadow: none !important;
     border: none !important;
+    padding: 0 !important;
   }
 
   .mat-mdc-form-field-flex {
@@ -106,6 +124,8 @@
     border-radius: var(--radius) !important;
     padding-left: 26px !important;
     border: 2px solid var(--border) !important;
+    margin: 0 !important;
+    overflow: hidden !important;
   }
 
   .mat-mdc-form-field-underline,
@@ -117,8 +137,40 @@
   input[matInput],
   input,
   .mat-mdc-form-field-infix input {
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
+    color: #1a1a1a !important;
+    -webkit-text-fill-color: #1a1a1a !important;
+  }
+
+  .mat-mdc-form-field-label,
+  label {
+    color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  :host-context(body.dark-theme) & {
+    .mat-mdc-input-element,
+    input[matInput],
+    input,
+    .mat-mdc-form-field-infix input {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+    }
+
+    .mat-mdc-form-field-label,
+    label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .mat-mdc-form-field-flex {
+      background: var(--surface-hover) !important;
+      border-color: var(--border-light) !important;
+    }
+  }
+
+  .mat-mdc-form-field-focus-overlay,
+  &:hover .mat-mdc-form-field-flex,
+  &.mat-focused .mat-mdc-form-field-flex,
+  &.mat-form-field-should-float .mat-mdc-form-field-flex {
+    border-radius: var(--radius) !important;
   }
 
   &.mat-focused .mat-mdc-form-field-flex {
@@ -292,16 +344,31 @@
     justify-content: center;
     gap: 8px;
 
+    :host-context(body.dark-theme) & {
+      background: rgba(255, 255, 255, 0.95) !important;
+      color: #3b82f6 !important;
+    }
+
     &:hover:not([disabled]) {
       background: rgba(255, 255, 255, 0.9) !important;
       transform: translateY(-2px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+      :host-context(body.dark-theme) & {
+        background: rgba(255, 255, 255, 1) !important;
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+      }
     }
 
     &[disabled] {
       background: rgba(255, 255, 255, 0.7) !important;
       color: rgba(102, 126, 234, 0.7) !important;
       cursor: not-allowed;
+
+      :host-context(body.dark-theme) & {
+        background: rgba(255, 255, 255, 0.5) !important;
+        color: rgba(59, 130, 246, 0.5) !important;
+      }
     }
 
     mat-icon {
@@ -322,9 +389,18 @@
       font-weight: 600 !important;
       border-radius: var(--radius) !important;
 
+      :host-context(body.dark-theme) & {
+        background: rgba(59, 130, 246, 0.9) !important;
+        color: white !important;
+      }
+
       &:hover {
         background: var(--text-inverse) !important;
         transform: translateY(-2px);
+
+        :host-context(body.dark-theme) & {
+          background: rgba(37, 99, 235, 0.9) !important;
+        }
       }
 
       mat-icon {
