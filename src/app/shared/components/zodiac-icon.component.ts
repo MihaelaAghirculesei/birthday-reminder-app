@@ -104,10 +104,26 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
 
     .zodiac-button:not([class*="zodiac-"]) {
       color: #95a5a6;
-      background-image: linear-gradient(white, white), 
+      background-image: linear-gradient(white, white),
                        linear-gradient(45deg, #95a5a6, #bdc3c7, #95a5a6) !important;
       background-origin: border-box !important;
       background-clip: content-box, border-box !important;
+    }
+
+    :host-context(body.dark-theme) .zodiac-aries,
+    :host-context(body.dark-theme) .zodiac-leo,
+    :host-context(body.dark-theme) .zodiac-sagittarius,
+    :host-context(body.dark-theme) .zodiac-taurus,
+    :host-context(body.dark-theme) .zodiac-virgo,
+    :host-context(body.dark-theme) .zodiac-capricorn,
+    :host-context(body.dark-theme) .zodiac-gemini,
+    :host-context(body.dark-theme) .zodiac-libra,
+    :host-context(body.dark-theme) .zodiac-aquarius,
+    :host-context(body.dark-theme) .zodiac-cancer,
+    :host-context(body.dark-theme) .zodiac-scorpio,
+    :host-context(body.dark-theme) .zodiac-pisces,
+    :host-context(body.dark-theme) .zodiac-button:not([class*="zodiac-"]) {
+      background-image: linear-gradient(#1a1a1a, #1a1a1a), linear-gradient(45deg, currentColor, transparent, currentColor) !important;
     }
   `]
 })
