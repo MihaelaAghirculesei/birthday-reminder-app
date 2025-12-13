@@ -52,6 +52,12 @@ body.dark-theme {
   --border-light: #444444;
   --shadow: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.5);
   --shadow-elevated: 0 25px 50px -12px rgb(0 0 0 / 0.8);
+
+  --button-edit: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --button-save: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  --button-cancel: linear-gradient(135deg, #71717a 0%, #52525b 100%);
+  --button-delete: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --button-undo: linear-gradient(135deg, #f87171 0%, #fbbf24 100%);
 }
 
 * {
@@ -184,7 +190,7 @@ body {
 
 .mat-mdc-card .mat-mdc-card-content {
   color: var(--text-primary) !important;
-  
+i  
   .mat-mdc-form-field {
     .mat-mdc-form-field-label {
       color: var(--text-secondary) !important;
