@@ -14,7 +14,6 @@ export class CategoryEffects {
       ofType(CategoryActions.loadCategories),
       map(() => {
         try {
-          // Load from localStorage
           const customCategoriesStr = localStorage.getItem('customCategories');
           const modifiedCategoriesStr = localStorage.getItem('modifiedCategories');
           const deletedIdsStr = localStorage.getItem('deletedCategoryIds');
@@ -27,25 +26,19 @@ export class CategoryEffects {
             : [];
           const deletedIds = deletedIdsStr ? JSON.parse(deletedIdsStr) : [];
 
-          // Create a map of modifications
           const modifiedMap = new Map(
             modifiedCategories.map((cat: BirthdayCategory) => [cat.id, cat])
           );
 
-          // Apply modifications to default categories
           const defaultCategories = BIRTHDAY_CATEGORIES.map((cat) =>
             modifiedMap.get(cat.id) || cat
           );
-
-          // Apply modifications to custom categories
           const processedCustomCategories = customCategories.map((cat: BirthdayCategory) =>
             modifiedMap.get(cat.id) || cat
           );
 
-          // Combine all categories
           const allCategories = [...defaultCategories, ...processedCustomCategories];
 
-          // Get custom category IDs
           const customIds = customCategories.map((cat: BirthdayCategory) => cat.id);
 
           return CategoryActions.loadCategoriesSuccess({

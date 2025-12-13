@@ -18,7 +18,6 @@ import { uiReducer } from './core/store/ui/ui.reducer';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    // provideClientHydration(), // Temporarily disabled
     provideAnimationsAsync(),
     provideStore({
       birthdays: birthdayReducer,

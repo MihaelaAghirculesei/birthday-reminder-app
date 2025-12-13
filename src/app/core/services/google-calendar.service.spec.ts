@@ -45,7 +45,7 @@ describe('GoogleCalendarService', () => {
   it('should check if calendar is enabled', () => {
     expect(service.isEnabled()).toBe(false);
     service.updateSettings({ ...service.getCurrentSettings(), enabled: true });
-    expect(service.isEnabled()).toBe(false); // still false because not signed in
+    expect(service.isEnabled()).toBe(false); 
   });
 
   describe('Token Refresh', () => {

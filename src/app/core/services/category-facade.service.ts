@@ -10,7 +10,6 @@ import * as CategorySelectors from '../store/category/category.selectors';
   providedIn: 'root',
 })
 export class CategoryFacadeService {
-  // Observables
   categories$ = this.store.select(CategorySelectors.selectAllCategories);
   defaultCategories$ = this.store.select(CategorySelectors.selectDefaultCategories);
   customCategories$ = this.store.select(CategorySelectors.selectCustomCategories);

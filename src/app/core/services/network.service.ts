@@ -39,7 +39,7 @@ export class NetworkService implements OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       return this.onlineSubject.value;
     }
-    return true; // Assume online on server
+    return true;
   }
 
   get isOffline(): boolean {

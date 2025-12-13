@@ -4,10 +4,8 @@ import { birthdayAdapter } from './birthday.reducer';
 import { Birthday } from '../../../shared/models/birthday.model';
 import { calculateAge, DEFAULT_CATEGORY } from '../../../shared';
 
-// Feature Selector
 export const selectBirthdayState = createFeatureSelector<BirthdayState>('birthdays');
 
-// Entity Selectors
 const {
   selectIds,
   selectEntities,
@@ -20,7 +18,6 @@ export const selectBirthdayEntities = selectEntities;
 export const selectBirthdayIds = selectIds;
 export const selectBirthdayTotal = selectTotal;
 
-// Meta Selectors
 export const selectBirthdayLoading = createSelector(
   selectBirthdayState,
   (state) => state.loading
@@ -42,7 +39,6 @@ export const selectSelectedBirthday = createSelector(
   (entities, selectedId) => selectedId ? entities[selectedId] : null
 );
 
-// Filter Selectors
 export const selectBirthdayFilters = createSelector(
   selectBirthdayState,
   (state) => state.filters
@@ -68,7 +64,6 @@ export const selectSortOrder = createSelector(
   (filters) => filters.sortOrder
 );
 
-// Helper function for next birthday date
 const getNextBirthdayDate = (birthDate: Date): Date => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -82,35 +77,30 @@ const getNextBirthdayDate = (birthDate: Date): Date => {
   return nextBirthday;
 };
 
-// Filtered and Sorted Birthdays
 export const selectFilteredBirthdays = createSelector(
   selectAllBirthdays,
   selectBirthdayFilters,
   (birthdays, filters) => {
     let filtered = [...birthdays];
 
-    // Apply search filter
     if (filters.searchTerm.trim()) {
       filtered = filtered.filter(birthday =>
         birthday.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
       );
     }
 
-    // Apply month filter
     if (filters.selectedMonth !== null) {
       filtered = filtered.filter(birthday =>
         birthday.birthDate.getMonth() === filters.selectedMonth
       );
     }
 
-    // Apply category filter
     if (filters.selectedCategory !== null) {
       filtered = filtered.filter(birthday =>
         (birthday.category || DEFAULT_CATEGORY) === filters.selectedCategory
       );
     }
 
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (filters.sortOrder) {
         case 'name':
@@ -130,7 +120,6 @@ export const selectFilteredBirthdays = createSelector(
   }
 );
 
-// Upcoming Birthdays
 export const selectUpcomingBirthdays = (days: number = 30) => createSelector(
   selectAllBirthdays,
   (birthdays) => {
@@ -152,7 +141,6 @@ export const selectUpcomingBirthdays = (days: number = 30) => createSelector(
   }
 );
 
-// Birthdays This Month
 export const selectBirthdaysThisMonth = createSelector(
   selectAllBirthdays,
   (birthdays) => {
@@ -163,7 +151,6 @@ export const selectBirthdaysThisMonth = createSelector(
   }
 );
 
-// Next 5 Birthdays
 export const selectNext5Birthdays = createSelector(
   selectAllBirthdays,
   (birthdays) => {
@@ -178,7 +165,6 @@ export const selectNext5Birthdays = createSelector(
   }
 );
 
-// Helper function for days until birthday
 const getDaysUntilBirthday = (birthDate: Date): number => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -188,7 +174,6 @@ const getDaysUntilBirthday = (birthDate: Date): number => {
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 };
 
-// Average Age
 export const selectAverageAge = createSelector(
   selectAllBirthdays,
   (birthdays) => {
@@ -200,7 +185,6 @@ export const selectAverageAge = createSelector(
   }
 );
 
-// Birthdays by Month
 export const selectBirthdaysByMonth = createSelector(
   selectAllBirthdays,
   (birthdays) => {
@@ -220,7 +204,6 @@ export const selectBirthdaysByMonth = createSelector(
   }
 );
 
-// Scheduled Messages for a Birthday
 export const selectMessagesByBirthday = (birthdayId: string) => createSelector(
   selectBirthdayEntities,
   (entities) => {
@@ -229,7 +212,6 @@ export const selectMessagesByBirthday = (birthdayId: string) => createSelector(
   }
 );
 
-// Birthday by ID
 export const selectBirthdayById = (id: string) => createSelector(
   selectBirthdayEntities,
   (entities) => entities[id]

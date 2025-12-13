@@ -2,7 +2,6 @@ import { createAction, props } from '@ngrx/store';
 import { Birthday, ScheduledMessage } from '../../../shared/models/birthday.model';
 import { BirthdayFilters } from './birthday.state';
 
-// Load Actions
 export const loadBirthdays = createAction(
   '[Birthday] Load Birthdays'
 );
@@ -17,7 +16,6 @@ export const loadBirthdaysFailure = createAction(
   props<{ error: string }>()
 );
 
-// Add Actions
 export const addBirthday = createAction(
   '[Birthday] Add Birthday',
   props<{ birthday: Omit<Birthday, 'id'> }>()
@@ -33,7 +31,6 @@ export const addBirthdayFailure = createAction(
   props<{ error: string }>()
 );
 
-// Update Actions
 export const updateBirthday = createAction(
   '[Birthday] Update Birthday',
   props<{ birthday: Birthday }>()
@@ -49,7 +46,6 @@ export const updateBirthdayFailure = createAction(
   props<{ error: string }>()
 );
 
-// Delete Actions
 export const deleteBirthday = createAction(
   '[Birthday] Delete Birthday',
   props<{ id: string }>()
@@ -65,13 +61,11 @@ export const deleteBirthdayFailure = createAction(
   props<{ error: string }>()
 );
 
-// Select Actions
 export const selectBirthday = createAction(
   '[Birthday] Select Birthday',
   props<{ id: string | null }>()
 );
 
-// Filter Actions
 export const setSearchTerm = createAction(
   '[Birthday] Set Search Term',
   props<{ searchTerm: string }>()
@@ -101,7 +95,6 @@ export const updateFilters = createAction(
   props<{ filters: Partial<BirthdayFilters> }>()
 );
 
-// Clear All
 export const clearAllBirthdays = createAction(
   '[Birthday] Clear All Birthdays'
 );
@@ -115,7 +108,6 @@ export const clearAllBirthdaysFailure = createAction(
   props<{ error: string }>()
 );
 
-// Scheduled Messages Actions
 export const addMessageToBirthday = createAction(
   '[Birthday] Add Message To Birthday',
   props<{ birthdayId: string; message: ScheduledMessage }>()
@@ -146,7 +138,6 @@ export const deleteMessageFromBirthdaySuccess = createAction(
   props<{ birthdayId: string; messageId: string }>()
 );
 
-// Test Data Actions
 export const loadTestData = createAction(
   '[Birthday] Load Test Data'
 );
