@@ -246,7 +246,7 @@
   margin-right: 8px !important;
 
   :host-context(body.dark-theme) & {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    background: var(--button-edit) !important;
     box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4) !important;
   }
 
@@ -292,7 +292,7 @@
   margin-right: 8px !important;
 
   :host-context(body.dark-theme) & {
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    background: var(--button-save) !important;
     box-shadow: 0 4px 8px rgba(34, 197, 94, 0.4) !important;
   }
 
@@ -337,7 +337,7 @@
   margin-top: 29px !important;
 
   :host-context(body.dark-theme) & {
-    background: linear-gradient(135deg, #71717a 0%, #52525b 100%) !important;
+    background: var(--button-cancel) !important;
     box-shadow: 0 4px 8px rgba(113, 113, 122, 0.4) !important;
   }
 
@@ -478,7 +478,7 @@
   margin-top: 29px !important;
 
   :host-context(body.dark-theme) & {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    background: var(--button-delete) !important;
     box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4) !important;
   }
 

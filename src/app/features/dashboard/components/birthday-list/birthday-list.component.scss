@@ -65,7 +65,7 @@
   box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4) !important;
 
   :host-context(body.dark-theme) & {
-    background: linear-gradient(135deg, #f87171 0%, #fbbf24 100%) !important;
+    background: var(--button-undo) !important;
     animation: pulse-undo-dark 2s infinite;
   }
 
