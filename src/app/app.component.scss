@@ -76,7 +76,7 @@
   .hero-title {
     font-size: 3.5rem;
     font-weight: 900;
-    background: linear-gradient(135deg, var(--text-inverse) 0%, rgba(255,255,255,0.8) 100%);
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.8) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -140,9 +140,13 @@
   
   .mat-mdc-card-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: var(--text-primary);
+    color: white;
     padding: 20px 32px;
     transition: all 0.3s ease;
+
+    :host-context(body.dark-theme) & {
+      background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%);
+    }
 
     .mat-mdc-card-title {
       font-size: 1.75rem;
@@ -151,6 +155,10 @@
       color: var(--text-primary);
       text-shadow: none;
       transition: all 0.3s ease;
+
+      :host-context(body.dark-theme) & {
+        color: white;
+      }
     }
     
     &.collapsible-header {
@@ -164,6 +172,10 @@
       &:hover {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         filter: brightness(1.1);
+
+        :host-context(body.dark-theme) & {
+          background: linear-gradient(135deg, #333333 0%, #3a3a3a 100%);
+        }
       }
       
       .expand-icon {
@@ -427,7 +439,7 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  color: var(--text-inverse);
+  color: white;
   
   .test-icon {
     font-size: 48px;
@@ -447,14 +459,14 @@
   
   .test-info {
     flex: 1;
-    
+
     h3 {
       margin: 0 0 8px 0;
       font-size: 1.5rem;
       font-weight: 700;
       color: #ffffff !important;
     }
-    
+
     p {
       margin: 0;
       font-size: 1rem;
