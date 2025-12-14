@@ -82,12 +82,12 @@ body.dark-theme {
   padding: 0;
 }
 
-html, body { 
-  height: 100%; 
+html, body {
+  height: 100%;
   overflow-x: hidden;
 }
 
-body { 
+body {
   font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--background);
   color: var(--text-primary);
@@ -164,7 +164,7 @@ body {
   color: var(--text-inverse) !important;
   box-shadow: var(--shadow) !important;
   border: none !important;
-  
+
   &:hover {
     background: var(--primary-dark) !important;
     transform: translateY(-2px);
@@ -177,7 +177,7 @@ body {
   background: var(--surface) !important;
   color: var(--text-primary) !important;
   border-radius: var(--radius-sm) !important;
-  
+
   &:hover {
     background: var(--surface-hover) !important;
     transform: translateY(-1px);
@@ -190,7 +190,7 @@ body {
   background: var(--surface) !important;
   border: 1px solid var(--border-light) !important;
   overflow: hidden;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-elevated) !important;
@@ -206,12 +206,12 @@ body {
 
 .mat-mdc-card .mat-mdc-card-content {
   color: var(--text-primary) !important;
- 
+
   .mat-mdc-form-field {
     .mat-mdc-form-field-label {
       color: var(--text-secondary) !important;
     }
-    
+
     .mat-mdc-input-element {
       color: var(--text-primary) !important;
     }
