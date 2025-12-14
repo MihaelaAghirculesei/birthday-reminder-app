@@ -1,7 +1,7 @@
 /**
  * Calculate the age based on a birth date
- * @param birthDate 
- * @returns 
+ * @param birthDate
+ * @returns
  */
 export function calculateAge(birthDate: Date): number {
   const today = new Date();

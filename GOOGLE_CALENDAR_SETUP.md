@@ -12,7 +12,7 @@ Your Birthday Memories app now supports automatic synchronization with Google Ca
 2. Create a new project or select an existing one
 3. Enable the **Google Calendar API**:
    - Go to "APIs & Services" → "Library"
-   - Search for "Calendar API" 
+   - Search for "Calendar API"
    - Click "Enable"
 
 ### 2. Configure OAuth 2.0
@@ -25,7 +25,7 @@ Your Birthday Memories app now supports automatic synchronization with Google Ca
    Authorized JavaScript origins:
    - http://localhost:4200
    - https://yourdomain.com
-   
+
    Authorized redirect URIs:
    - http://localhost:4200
    - https://yourdomain.com
@@ -57,7 +57,7 @@ export const environment = {
 export const environment = {
   production: true,
   googleCalendar: {
-    clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com', 
+    clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
     apiKey: 'YOUR_API_KEY'
   }
 };
@@ -67,7 +67,7 @@ export const environment = {
 
 ### ✨ Automatic Synchronization
 - **Add birthday** → Creates event in Google Calendar
-- **Edit birthday** → Updates existing event  
+- **Edit birthday** → Updates existing event
 - **Delete birthday** → Removes event from calendar
 
 ### 🔄 Sync Modes

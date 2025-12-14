@@ -6,7 +6,7 @@ import * as BirthdayActions from './birthday.actions';
 
 export const birthdayAdapter: EntityAdapter<Birthday> = createEntityAdapter<Birthday>({
   selectId: (birthday: Birthday) => birthday.id,
-  sortComparer: false 
+  sortComparer: false
 });
 
 export const initialBirthdayState: BirthdayState = birthdayAdapter.getInitialState({

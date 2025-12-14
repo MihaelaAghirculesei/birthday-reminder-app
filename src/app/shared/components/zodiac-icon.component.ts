@@ -33,7 +33,7 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
       line-height: 1;
       text-align: center;
       vertical-align: middle;
-      
+
       &::before {
         content: '';
         position: absolute;
@@ -47,11 +47,11 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
         opacity: 0;
         transition: opacity 0.4s ease;
       }
-      
+
       &:hover {
         transform: scale(1.1);
         filter: drop-shadow(0 0 8px currentColor);
-        
+
         &::before {
           opacity: 0.3;
           animation: rotate 2s linear infinite;
@@ -61,7 +61,7 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
       &:focus {
         outline: none;
         filter: drop-shadow(0 0 12px currentColor);
-        
+
         &::before {
           opacity: 0.5;
         }
@@ -80,25 +80,25 @@ import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
 
     .zodiac-aries, .zodiac-leo, .zodiac-sagittarius {
       color: #e74c3c;
-      background-image: linear-gradient(white, white), 
+      background-image: linear-gradient(white, white),
                        linear-gradient(45deg, #e74c3c, #f39c12, #e74c3c) !important;
     }
 
     .zodiac-taurus, .zodiac-virgo, .zodiac-capricorn {
       color: #27ae60;
-      background-image: linear-gradient(white, white), 
+      background-image: linear-gradient(white, white),
                        linear-gradient(45deg, #27ae60, #2ecc71, #27ae60) !important;
     }
 
     .zodiac-gemini, .zodiac-libra, .zodiac-aquarius {
       color: #3498db;
-      background-image: linear-gradient(white, white), 
+      background-image: linear-gradient(white, white),
                        linear-gradient(45deg, #3498db, #5dade2, #3498db) !important;
     }
 
     .zodiac-cancer, .zodiac-scorpio, .zodiac-pisces {
       color: #9b59b6;
-      background-image: linear-gradient(white, white), 
+      background-image: linear-gradient(white, white),
                        linear-gradient(45deg, #9b59b6, #bb8fce, #9b59b6) !important;
     }
 

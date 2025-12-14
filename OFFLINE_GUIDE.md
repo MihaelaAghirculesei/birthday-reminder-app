@@ -10,7 +10,7 @@
 
 ### 💾 Storage Offline
 - ✅ **IndexedDB** per storage robusto dei dati
-- ✅ **Fallback a localStorage** se IndexedDB non è disponibile  
+- ✅ **Fallback a localStorage** se IndexedDB non è disponibile
 - ✅ **Migrazione automatica** da localStorage a IndexedDB
 - ✅ **Backup doppio** per massima affidabilità
 

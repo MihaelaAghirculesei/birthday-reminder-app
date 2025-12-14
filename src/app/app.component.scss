@@ -3,7 +3,7 @@
   background: var(--background);
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -14,7 +14,7 @@
     background: var(--background);
     z-index: 0;
   }
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -54,7 +54,7 @@
   margin: 40px 0 60px 0;
   position: relative;
   z-index: 2;
-  
+
   .header-top {
     display: flex;
     align-items: center;
@@ -65,14 +65,14 @@
     margin-left: auto;
     margin-right: auto;
     padding: 0 32px;
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: 16px;
       align-items: center;
     }
   }
-  
+
   .hero-title {
     font-size: 3.5rem;
     font-weight: 900;
@@ -87,20 +87,20 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
-    
+
     .app-logo {
       width: 48px;
       height: 48px;
       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
       animation: fadeInUp 0.8s ease-out 0.2s both;
       transition: transform 0.3s ease;
-      
+
       &:hover {
         transform: scale(1.1) rotate(5deg);
       }
     }
   }
-  
+
   .hero-subtitle {
     font-size: 1.25rem;
     color: rgba(255,255,255,0.9);
@@ -132,12 +132,12 @@
   overflow: hidden;
   animation: fadeInUp 0.6s ease-out 0.4s both;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-elevated) !important;
   }
-  
+
   .mat-mdc-card-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: white;
@@ -160,7 +160,7 @@
         color: white;
       }
     }
-    
+
     &.collapsible-header {
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -168,7 +168,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      
+
       &:hover {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         filter: brightness(1.1);
@@ -177,7 +177,7 @@
           background: linear-gradient(135deg, #333333 0%, #3a3a3a 100%);
         }
       }
-      
+
       .expand-icon {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 2rem;
@@ -207,7 +207,7 @@
       }
     }
   }
-  
+
   .mat-mdc-card-content {
     padding: 32px;
   }
@@ -272,15 +272,15 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   mat-icon {
     margin-right: 12px;
   }
-  
+
   &:hover {
     transform: translateY(-3px) scale(1.02);
   }
-  
+
   &:active {
     transform: translateY(-1px) scale(0.98);
   }
@@ -326,17 +326,17 @@
 @media (max-width: 768px) {
   .app-header {
     margin: 20px 0 40px 0;
-    
+
     .hero-title {
       font-size: 2.5rem;
     }
-    
+
     .hero-subtitle {
       font-size: 1.1rem;
       padding: 0 20px;
     }
   }
-  
+
   .content-container {
     padding: 24px 16px;
     gap: 24px;
@@ -344,7 +344,7 @@
 
   .form-actions {
     justify-content: stretch;
-    
+
     .submit-button {
       width: 100%;
       min-width: auto;
@@ -355,7 +355,7 @@
 @media (max-width: 480px) {
   .app-header {
     margin: 12px 0 20px 0;
-    
+
     .hero-title {
       font-size: 1.7rem;
       gap: 8px;
@@ -367,30 +367,30 @@
         height: 40px;
       }
     }
-    
+
     .hero-subtitle {
       font-size: 0.9rem;
       padding: 0 12px;
       line-height: 1.4;
     }
   }
-  
+
   .content-container {
     padding: 16px 8px;
     gap: 16px;
   }
-  
+
   .content-sections {
     gap: 16px;
   }
-  
+
   .add-birthday-card .mat-mdc-card-content {
     padding: 24px !important;
   }
 
   .birthday-form {
     gap: 14px;
-    
+
     .form-actions .submit-button {
       font-size: 0.9rem;
       padding: 10px 18px;
@@ -425,11 +425,11 @@
   width: 100%;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeInUp 0.6s ease-out 0.3s both;
-  
+
   &:hover {
     transform: translateY(-4px) scale(1.02);
   }
-  
+
   .mat-mdc-card-content {
     padding: 32px !important;
   }
@@ -440,7 +440,7 @@
   align-items: center;
   gap: 24px;
   color: white;
-  
+
   .test-icon {
     font-size: 48px;
     width: 48px;
@@ -456,7 +456,7 @@
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255,255,255,0.3);
   }
-  
+
   .test-info {
     flex: 1;
 
@@ -474,7 +474,7 @@
       line-height: 1.4;
     }
   }
-  
+
   .add-test-btn {
     background: var(--text-inverse) !important;
     color: var(--primary) !important;
@@ -488,19 +488,19 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    
+
     &:hover:not([disabled]) {
       background: rgba(255,255,255,0.9) !important;
       transform: translateY(-2px);
       box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
-    
+
     &[disabled] {
       background: rgba(255,255,255,0.7) !important;
       color: rgba(102, 126, 234, 0.7) !important;
       cursor: not-allowed;
     }
-    
+
     mat-icon {
       font-size: 20px;
       width: 20px;
@@ -525,7 +525,7 @@
     flex-direction: column;
     text-align: center;
     gap: 16px;
-    
+
     .test-icon {
       min-width: 64px;
       min-height: 64px;
@@ -534,17 +534,17 @@
       height: 40px;
       padding: 12px;
     }
-    
+
     .test-info {
       h3 {
         font-size: 1.3rem;
       }
-      
+
       p {
         font-size: 0.9rem;
       }
     }
-    
+
     .add-test-btn {
       min-width: 160px;
       height: 44px;

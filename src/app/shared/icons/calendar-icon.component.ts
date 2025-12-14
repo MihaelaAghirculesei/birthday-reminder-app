@@ -5,16 +5,16 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg 
-      xmlns="http://www.w3.org/2000/svg"  
-      [attr.width]="size"  
-      [attr.height]="size"  
-      viewBox="0 0 24 24"  
-      fill="none"  
-      stroke="currentColor"  
-      [attr.stroke-width]="strokeWidth"  
-      stroke-linecap="round"  
-      stroke-linejoin="round"  
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      [attr.width]="size"
+      [attr.height]="size"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      [attr.stroke-width]="strokeWidth"
+      stroke-linecap="round"
+      stroke-linejoin="round"
       class="calendar-icon"
       [class]="cssClass">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -33,19 +33,19 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
       vertical-align: middle;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .calendar-icon:hover {
       transform: scale(1.1);
     }
-    
+
     .hero-icon {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     }
-    
+
     .small-icon {
       opacity: 0.8;
     }
-    
+
     .primary-icon {
       color: var(--primary);
     }
@@ -61,7 +61,7 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .stat-icon.month { 
+    .stat-icon.month {
       background: linear-gradient(135deg, var(--secondary));
       color: var(--text-inverse);
       box-shadow: 0 8px 16px rgba(240, 147, 251, 0.3);

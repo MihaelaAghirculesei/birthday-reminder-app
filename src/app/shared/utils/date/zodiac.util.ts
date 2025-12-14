@@ -94,7 +94,7 @@ export const ZODIAC_SIGNS: ZodiacSign[] = [
 ];
 
 export function getZodiacSign(birthDate: Date): ZodiacSign {
-  const month = birthDate.getMonth() + 1; 
+  const month = birthDate.getMonth() + 1;
   const day = birthDate.getDate();
 
   for (const sign of ZODIAC_SIGNS) {

@@ -29,12 +29,12 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 8px rgba(0,0,0,0.15);
       position: relative;
-      
+
       &:hover {
         transform: scale(1.1);
         box-shadow: 0 6px 12px rgba(0,0,0,0.25);
       }
-      
+
       .category-icon {
         color: white !important;
         font-size: 28px !important;
@@ -43,22 +43,22 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
         text-shadow: 0 2px 4px rgba(0,0,0,0.4);
       }
     }
-    
+
     .dashboard-category-inline.category-icon-wrapper {
       width: 55px;
       height: 55px;
-      
+
       .category-icon {
         font-size: 28px !important;
         width: 28px !important;
         height: 28px !important;
       }
     }
-    
+
     .category-stat-icon.category-icon-wrapper {
       width: 40px;
       height: 40px;
-      
+
       .category-icon {
         font-size: 24px !important;
         width: 24px !important;

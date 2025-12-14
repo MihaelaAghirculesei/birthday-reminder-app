@@ -256,8 +256,8 @@ export class GoogleCalendarService {
     const birthDate = birthday.birthDate;
     const currentYear = new Date().getFullYear();
     const thisYearBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
-    
-    const eventDate = thisYearBirthday < new Date() 
+
+    const eventDate = thisYearBirthday < new Date()
       ? new Date(currentYear + 1, birthDate.getMonth(), birthDate.getDate())
       : thisYearBirthday;
 

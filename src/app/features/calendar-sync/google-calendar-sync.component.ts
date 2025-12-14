@@ -34,9 +34,9 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
             Connect your Google account to automatically sync birthdays to your calendar.
             Each birthday will be added as an annual recurring event.
           </p>
-          <button mat-raised-button 
-                  color="primary" 
-                  (click)="signIn()" 
+          <button mat-raised-button
+                  color="primary"
+                  (click)="signIn()"
                   [disabled]="isConnecting"
                   class="submit-button">
             <mat-icon>login</mat-icon>
@@ -46,7 +46,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
 
         <div class="settings-section" *ngIf="isSignedIn">
           <form [formGroup]="settingsForm" class="settings-form">
-            <mat-slide-toggle 
+            <mat-slide-toggle
               formControlName="enabled"
               color="primary"
               class="sync-toggle">
@@ -72,7 +72,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
                   <mat-option value="two-way">Two-way (Bidirectional)</mat-option>
                 </mat-select>
                 <mat-hint>
-                  One-way: Only sync from app to calendar. 
+                  One-way: Only sync from app to calendar.
                   Two-way: Sync changes in both directions.
                 </mat-hint>
                 <mat-icon matSuffix>sync</mat-icon>
@@ -91,16 +91,16 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
               </mat-form-field>
 
               <div class="sync-actions">
-                <button mat-raised-button 
-                        color="primary" 
+                <button mat-raised-button
+                        color="primary"
                         (click)="syncAllBirthdays()"
                         [disabled]="isSyncing"
                         class="sync-button">
                   <mat-icon>sync</mat-icon>
                   {{ isSyncing ? 'Syncing...' : 'Sync All Birthdays' }}
                 </button>
-                
-                <button mat-stroked-button 
+
+                <button mat-stroked-button
                         (click)="saveSettings()"
                         [disabled]="settingsForm.pristine"
                         class="save-button">
@@ -114,7 +114,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
                   {{ lastSyncResult.failed > 0 ? 'warning' : 'check_circle' }}
                 </mat-icon>
                 <span>
-                  Last sync: {{ lastSyncResult.success }} successful, 
+                  Last sync: {{ lastSyncResult.success }} successful,
                   {{ lastSyncResult.failed }} failed
                 </span>
               </div>
@@ -122,8 +122,8 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
           </form>
 
           <div class="disconnect-section">
-            <button mat-stroked-button 
-                    color="warn" 
+            <button mat-stroked-button
+                    color="warn"
                     (click)="signOut()"
                     class="disconnect-button">
               <mat-icon>logout</mat-icon>
@@ -142,12 +142,12 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
       border-radius: var(--radius-lg) !important;
       box-shadow: var(--shadow) !important;
       border: 1px solid var(--border-light) !important;
-      
+
       .mat-mdc-card-header {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         color: var(--text-primary);
         padding: 32px;
-        
+
         .mat-mdc-card-title {
           font-size: 1.75rem;
           font-weight: 700;
@@ -156,7 +156,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
           text-shadow: none;
         }
       }
-      
+
       .mat-mdc-card-content {
         padding: 32px !important;
       }
@@ -213,7 +213,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
         align-items: center;
         justify-content: center;
         gap: 8px;
-        
+
         mat-icon {
           font-size: 20px;
           width: 20px;
@@ -229,7 +229,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
 
       .sync-toggle {
         margin-bottom: 16px;
-        
+
         ::ng-deep .mat-slide-toggle-label {
           font-size: 1.1rem;
           font-weight: 600;
@@ -259,7 +259,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
         gap: 8px;
         padding: 12px 20px;
         font-weight: 600;
-        
+
         mat-icon {
           font-size: 18px;
           width: 18px;
@@ -297,7 +297,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
         align-items: center;
         gap: 8px;
         margin: 0 auto;
-        
+
         mat-icon {
           font-size: 18px;
           width: 18px;
@@ -310,14 +310,14 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
       .sync-card {
         margin: 0;
         border-radius: var(--radius) !important;
-        
+
         .mat-mdc-card-content {
           padding: 16px !important;
         }
-        
+
         .mat-mdc-card-header {
           padding: 16px;
-          
+
           .mat-mdc-card-title {
             font-size: 1.2rem;
           }
@@ -326,13 +326,13 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
 
       .auth-section {
         padding: 16px;
-        
+
         .connect-button {
           font-size: 0.9rem;
           padding: 10px 16px;
           white-space: nowrap;
           min-width: 0;
-          
+
           span {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -342,7 +342,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
 
       .settings-form {
         gap: 16px;
-        
+
         .full-width {
           margin-bottom: 8px;
         }
@@ -351,7 +351,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
       .sync-actions {
         flex-direction: column;
         gap: 12px;
-        
+
         button {
           width: 100%;
           justify-content: center;
@@ -363,7 +363,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
       .disconnect-section {
         margin-top: 24px;
         padding-top: 16px;
-        
+
         .disconnect-button {
           font-size: 0.9rem;
           padding: 8px 16px;
@@ -374,7 +374,7 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
 })
 export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  
+
   isSignedIn = false;
   isConnecting = false;
   isSyncing = false;

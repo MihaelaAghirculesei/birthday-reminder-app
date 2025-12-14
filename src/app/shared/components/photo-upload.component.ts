@@ -10,10 +10,10 @@ import { NotificationService } from '../../core/services/notification.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="photo-upload-container">
-      <div class="photo-preview" 
+      <div class="photo-preview"
            [class.has-photo]="currentPhoto"
            (click)="triggerFileInput()">
-        
+
         <div *ngIf="currentPhoto" class="photo-display">
           <img [src]="currentPhoto" alt="Contact photo" class="contact-photo">
           <div class="photo-overlay">
@@ -27,7 +27,7 @@ import { NotificationService } from '../../core/services/notification.service';
           <span class="upload-text">Add Remember Photo</span>
           <small class="upload-hint">Click to upload image</small>
         </div>
-        
+
         <input
           #fileInput
           type="file"
@@ -35,7 +35,7 @@ import { NotificationService } from '../../core/services/notification.service';
           (change)="onFileSelected($event)"
           style="display: none;">
       </div>
-      
+
       <button *ngIf="currentPhoto"
               mat-icon-button
               color="warn"
@@ -53,7 +53,7 @@ import { NotificationService } from '../../core/services/notification.service';
       gap: 12px;
       margin-bottom: 16px;
     }
-    
+
     .photo-preview {
       width: 120px;
       height: 120px;
@@ -64,34 +64,34 @@ import { NotificationService } from '../../core/services/notification.service';
       overflow: hidden;
       position: relative;
       background: var(--surface-elevated);
-      
+
       &:hover {
         border-color: var(--primary);
         transform: scale(1.02);
         box-shadow: var(--shadow);
       }
-      
+
       &.has-photo {
         border: 3px solid var(--primary);
-        
+
         &:hover .photo-overlay {
           opacity: 1;
         }
       }
     }
-    
+
     .photo-display {
       width: 100%;
       height: 100%;
       position: relative;
-      
+
       .contact-photo {
         width: 100%;
         height: 100%;
         object-fit: cover;
         border-radius: calc(var(--radius) - 3px);
       }
-      
+
       .photo-overlay {
         position: absolute;
         top: 0;
@@ -107,14 +107,14 @@ import { NotificationService } from '../../core/services/notification.service';
         transition: opacity 0.3s ease;
         border-radius: calc(var(--radius) - 3px);
         color: white;
-        
+
         mat-icon {
           font-size: 2rem;
           width: 2rem;
           height: 2rem;
           margin-bottom: 4px;
         }
-        
+
         span {
           font-size: 0.75rem;
           font-weight: 600;
@@ -122,7 +122,7 @@ import { NotificationService } from '../../core/services/notification.service';
         }
       }
     }
-    
+
     .photo-placeholder {
       display: flex;
       flex-direction: column;
@@ -131,7 +131,7 @@ import { NotificationService } from '../../core/services/notification.service';
       height: 100%;
       padding: 16px;
       text-align: center;
-      
+
       .upload-icon {
         font-size: 2.5rem;
         width: 2.5rem;
@@ -143,7 +143,7 @@ import { NotificationService } from '../../core/services/notification.service';
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
-      
+
       .upload-text {
         font-weight: 600;
         color: var(--text-primary);
@@ -151,7 +151,7 @@ import { NotificationService } from '../../core/services/notification.service';
         margin-bottom: 4px;
         display: block;
       }
-      
+
       .upload-hint {
         color: var(--text-muted);
         font-size: 0.75rem;
@@ -198,7 +198,7 @@ import { NotificationService } from '../../core/services/notification.service';
         align-items: center;
         gap: 16px;
       }
-      
+
       .photo-preview {
         width: 100px;
         height: 100px;

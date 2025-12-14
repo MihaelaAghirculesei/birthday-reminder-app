@@ -10,8 +10,8 @@ import { Birthday } from '../../../shared/models';
 import { BirthdayFacadeService } from '../../../core';
 
 interface MessageScheduleDialogData {
-  birthday?: Birthday; 
-  birthdayId?: string;  
+  birthday?: Birthday;
+  birthdayId?: string;
 }
 
 @Component({
