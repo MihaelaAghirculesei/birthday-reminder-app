@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
-import { MaterialModule, Birthday } from '../../shared';
-import { BirthdayFacadeService, NotificationService } from '../../core';
+import { MaterialModule, Birthday, ScheduledMessage } from '../../shared';
+import { BirthdayFacadeService } from '../../core';
 import { MessageScheduleDialogComponent } from './message-schedule-dialog/message-schedule-dialog.component';
 
 @Component({
@@ -23,7 +23,6 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
 
   constructor(
     private birthdayFacade: BirthdayFacadeService,
-    private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
 
