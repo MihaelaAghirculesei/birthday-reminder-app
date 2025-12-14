@@ -6,14 +6,10 @@
     color: var(--scheduler-text) !important;
 
     .mat-mdc-card-header {
-      background: linear-gradient(135deg, #9b59b6 0%, #bb8fce 100%) !important;
+      background: var(--scheduler-header) !important;
       color: white !important;
       margin: -24px -24px 24px -24px;
       padding: 24px;
-
-      :host-context(body.dark-theme) & {
-        background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%) !important;
-      }
 
       .mat-mdc-card-title {
         display: flex;
