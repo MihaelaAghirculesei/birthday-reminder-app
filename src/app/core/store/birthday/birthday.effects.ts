@@ -7,6 +7,7 @@ import { IndexedDBStorageService } from '../../services/offline-storage.service'
 import { NotificationService } from '../../services/notification.service';
 import { GoogleCalendarService } from '../../services/google-calendar.service';
 import { PushNotificationService } from '../../services/push-notification.service';
+import { IdGeneratorService } from '../../services/id-generator.service';
 import { Birthday } from '../../../shared/models/birthday.model';
 import { getZodiacSign, DEFAULT_CATEGORY } from '../../../shared';
 
@@ -38,7 +39,7 @@ export class BirthdayEffects {
       mergeMap(({ birthday }) => {
         const newBirthday: Birthday = {
           ...birthday,
-          id: this.generateId(),
+          id: this.idGenerator.generateId(),
           category: this.normalizeCategoryId(birthday.category || DEFAULT_CATEGORY),
           zodiacSign: birthday.zodiacSign || getZodiacSign(birthday.birthDate).name
         };
@@ -304,12 +305,9 @@ export class BirthdayEffects {
     private offlineStorage: IndexedDBStorageService,
     private notificationService: NotificationService,
     private googleCalendarService: GoogleCalendarService,
-    private pushNotificationService: PushNotificationService
+    private pushNotificationService: PushNotificationService,
+    private idGenerator: IdGeneratorService
   ) {}
-
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2);
-  }
 
   private generateTestData(): Birthday[] {
     const testNames = [
@@ -361,7 +359,7 @@ export class BirthdayEffects {
     ];
 
     return testNames.map(({ name, date, category, photo }) => ({
-      id: this.generateId(),
+      id: this.idGenerator.generateId(),
       name,
       birthDate: date,
       zodiacSign: getZodiacSign(date).name,
