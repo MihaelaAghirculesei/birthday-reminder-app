@@ -3,6 +3,7 @@ import { BirthdayState } from './birthday.state';
 import { birthdayAdapter } from './birthday.reducer';
 import { Birthday } from '../../../shared/models/birthday.model';
 import { calculateAge, DEFAULT_CATEGORY } from '../../../shared';
+import { getNextBirthdayDate, getDaysUntilBirthday } from '../../../shared/utils/date.utils';
 
 export const selectBirthdayState = createFeatureSelector<BirthdayState>('birthdays');
 
@@ -63,19 +64,6 @@ export const selectSortOrder = createSelector(
   selectBirthdayFilters,
   (filters) => filters.sortOrder
 );
-
-const getNextBirthdayDate = (birthDate: Date): Date => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const currentYear = today.getFullYear();
-  const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
-
-  if (nextBirthday < today) {
-    nextBirthday.setFullYear(currentYear + 1);
-  }
-
-  return nextBirthday;
-};
 
 export const selectFilteredBirthdays = createSelector(
   selectAllBirthdays,
@@ -164,15 +152,6 @@ export const selectNext5Birthdays = createSelector(
       .slice(0, 5);
   }
 );
-
-const getDaysUntilBirthday = (birthDate: Date): number => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const nextBirthday = getNextBirthdayDate(birthDate);
-  nextBirthday.setHours(0, 0, 0, 0);
-  const diffTime = nextBirthday.getTime() - today.getTime();
-  return Math.round(diffTime / (1000 * 60 * 60 * 24));
-};
 
 export const selectAverageAge = createSelector(
   selectAllBirthdays,

@@ -1,19 +1,18 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, Subject, map, takeUntil, combineLatest, take } from 'rxjs';
+import { Observable, Subject, map, takeUntil, combineLatest } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { MaterialModule, Birthday, DEFAULT_CATEGORY, BirthdayCategory, NotificationPermissionBannerComponent } from '../../../shared';
+import { MaterialModule, Birthday, BirthdayCategory, NotificationPermissionBannerComponent } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
 import { GoogleCalendarSyncComponent } from '../../calendar-sync/google-calendar-sync.component';
 import { DashboardStatsComponent } from './stats/dashboard-stats.component';
 import { BirthdayChartComponent } from './birthday-chart/birthday-chart.component';
 import { CategoryFilterComponent, CategoryStats } from './category-filter/category-filter.component';
 import { BirthdayListComponent } from './birthday-list/birthday-list.component';
-import { CategoryDialogComponent } from './category-dialog/category-dialog.component';
-import { CategoryReassignDialogComponent } from './category-reassign-dialog/category-reassign-dialog.component';
 import { MessageScheduleDialogComponent } from '../../scheduled-messages/message-schedule-dialog/message-schedule-dialog.component';
 import { BirthdayFacadeService, CategoryFacadeService } from '../../../core';
-import { BirthdayEditService, BirthdayStatsService, ChartDataItem } from '../services';
+import { BirthdayEditService, BirthdayStatsService, ChartDataItem, CategoryManagerService } from '../services';
+import { getDaysUntilBirthday } from '../../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-dashboard',
@@ -56,7 +55,8 @@ export class DashboardComponent implements OnDestroy {
     private categoryFacade: CategoryFacadeService,
     public editService: BirthdayEditService,
     private statsService: BirthdayStatsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private categoryManager: CategoryManagerService
   ) {
     this.totalBirthdays$ = this.birthdayFacade.birthdays$.pipe(
       map((birthdays) => birthdays.length)
@@ -151,138 +151,15 @@ export class DashboardComponent implements OnDestroy {
   }
 
   onAddCategory(): void {
-    const dialogRef = this.dialog.open(CategoryDialogComponent, {
-      width: '600px',
-      data: { mode: 'add' }
-    });
-
-    dialogRef.afterClosed()
-      .pipe(take(1))
-      .subscribe(result => {
-        if (result) {
-          const newCategory: BirthdayCategory = {
-            id: this.generateCategoryId(result.name),
-            name: result.name,
-            icon: result.icon,
-            color: result.color
-          };
-
-          this.categoryFacade.addCategory(newCategory);
-        }
-      });
+    this.categoryManager.addCategory();
   }
 
   onEditCategory(categoryId: string): void {
-    if (categoryId === '__orphaned__') {
-      combineLatest([
-        this.birthdayFacade.birthdays$,
-        this.categoryFacade.categories$
-      ])
-        .pipe(take(1))
-        .subscribe(([birthdays, allCategories]) => {
-          const validCategoryIds = new Set(allCategories.map(c => c.id));
-          const uncategorizedBirthdays = birthdays.filter(b => b.category && !validCategoryIds.has(b.category));
-
-          if (uncategorizedBirthdays.length === 0) {
-            alert('There are no uncategorized birthdays to reassign.');
-            return;
-          }
-
-          const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
-            width: '600px',
-            maxWidth: '95vw',
-            data: {
-              categoryToDelete: { id: '__orphaned__', name: 'Work', icon: 'business_center', color: '#FF9800' },
-              affectedBirthdaysCount: uncategorizedBirthdays.length,
-              availableCategories: allCategories,
-              mode: 'reassign-only'
-            }
-          });
-
-          dialogRef.afterClosed()
-            .pipe(take(1))
-            .subscribe(result => {
-              if (result && result.action === 'reassign' && result.newCategoryId) {
-                this.reassignBirthdaysToCategory(uncategorizedBirthdays, result.newCategoryId);
-              }
-            });
-        });
-      return;
-    }
-
-    this.categoryFacade.categories$
-      .pipe(take(1))
-      .subscribe(allCategories => {
-        const category = allCategories.find(c => c.id === categoryId);
-
-        if (!category) return;
-
-        const dialogRef = this.dialog.open(CategoryDialogComponent, {
-          width: '600px',
-          data: {
-            mode: 'edit',
-            category: category
-          }
-        });
-
-        dialogRef.afterClosed()
-          .pipe(take(1))
-          .subscribe(result => {
-            if (result) {
-              const updatedCategory: BirthdayCategory = {
-                ...category,
-                name: result.name,
-                icon: result.icon,
-                color: result.color
-              };
-              this.categoryFacade.updateCategory(updatedCategory);
-            }
-          });
-      });
+    this.categoryManager.editCategory(categoryId);
   }
 
   onDeleteCategory(categoryId: string): void {
-    combineLatest([
-      this.categoryFacade.categories$,
-      this.birthdayFacade.birthdays$
-    ])
-      .pipe(take(1))
-      .subscribe(([allCategories, birthdays]) => {
-        const category = allCategories.find(c => c.id === categoryId);
-
-        if (!category) return;
-
-        const affectedBirthdays = birthdays.filter(b => b.category === categoryId);
-
-        if (affectedBirthdays.length > 0) {
-          const dialogRef = this.dialog.open(CategoryReassignDialogComponent, {
-            width: '600px',
-            maxWidth: '95vw',
-            data: {
-              categoryToDelete: category,
-              affectedBirthdaysCount: affectedBirthdays.length,
-              availableCategories: allCategories
-            }
-          });
-
-          dialogRef.afterClosed()
-            .pipe(take(1))
-            .subscribe(result => {
-              if (result) {
-                if (result.action === 'reassign' && result.newCategoryId) {
-                  this.reassignBirthdaysToCategory(affectedBirthdays, result.newCategoryId);
-                  this.categoryFacade.deleteCategory(categoryId);
-                } else if (result.action === 'delete-orphan') {
-                  this.categoryFacade.deleteCategory(categoryId);
-                }
-              }
-            });
-        } else {
-          if (confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
-            this.categoryFacade.deleteCategory(categoryId);
-          }
-        }
-      });
+    this.categoryManager.deleteCategory(categoryId);
   }
 
   openMessageDialog(event?: MouseEvent): void {
@@ -299,20 +176,6 @@ export class DashboardComponent implements OnDestroy {
       maxHeight: '90vh',
       autoFocus: 'dialog',
       restoreFocus: true
-    });
-  }
-
-  private generateCategoryId(name: string): string {
-    return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
-  }
-
-  private reassignBirthdaysToCategory(birthdays: Birthday[], newCategoryId: string): void {
-    birthdays.forEach(birthday => {
-      const updatedBirthday = {
-        ...birthday,
-        category: newCategoryId
-      };
-      this.birthdayFacade.updateBirthday(updatedBirthday);
     });
   }
 
@@ -352,8 +215,8 @@ export class DashboardComponent implements OnDestroy {
     }
 
     return filtered.sort((a, b) => {
-      const daysA = this.getDaysUntilBirthday(a.birthDate);
-      const daysB = this.getDaysUntilBirthday(b.birthDate);
+      const daysA = getDaysUntilBirthday(a.birthDate);
+      const daysB = getDaysUntilBirthday(b.birthDate);
       return daysA - daysB;
     });
   }
@@ -372,28 +235,6 @@ export class DashboardComponent implements OnDestroy {
       this.birthdayFacade.addBirthday(this.lastAction.data as Birthday);
       this.lastAction = null;
     }
-  }
-
-  private getDaysUntilBirthday(birthDate: Date): number {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const nextBirthday = this.getNextBirthdayDate(birthDate);
-    nextBirthday.setHours(0, 0, 0, 0);
-    const diffTime = nextBirthday.getTime() - today.getTime();
-    return Math.round(diffTime / (1000 * 60 * 60 * 24));
-  }
-
-  private getNextBirthdayDate(birthDate: Date): Date {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const currentYear = today.getFullYear();
-    const nextBirthday = new Date(birthDate);
-    nextBirthday.setFullYear(currentYear);
-    nextBirthday.setHours(0, 0, 0, 0);
-    if (nextBirthday < today) {
-      nextBirthday.setFullYear(currentYear + 1);
-    }
-    return nextBirthday;
   }
 
   onBirthdayDeleted(birthday: Birthday): void {
