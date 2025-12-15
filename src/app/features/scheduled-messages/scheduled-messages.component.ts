@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, map } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
 import { MaterialModule, Birthday, ScheduledMessage } from '../../shared';
@@ -27,26 +27,20 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadScheduledMessages();
     this.birthdayFacade.birthdays$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.loadScheduledMessages();
-      });
-  }
-
-  loadScheduledMessages(): void {
-    this.birthdayFacade.birthdays$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(birthdays => {
-        this.birthdaysWithMessages = birthdays.filter(
+      .pipe(
+        takeUntil(this.destroy$),
+        map(birthdays => birthdays.filter(
           b => b.scheduledMessages && b.scheduledMessages.length > 0
-        );
+        ))
+      )
+      .subscribe(filteredBirthdays => {
+        this.birthdaysWithMessages = filteredBirthdays;
       });
   }
 
   openScheduleDialog(birthday?: Birthday): void {
-    const dialogRef = this.dialog.open(MessageScheduleDialogComponent, {
+    this.dialog.open(MessageScheduleDialogComponent, {
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
@@ -54,12 +48,6 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
       autoFocus: 'dialog',
       restoreFocus: true
     });
-
-    dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.loadScheduledMessages();
-      });
   }
 
   deleteMessage(birthdayId: string, messageId: string): void {
