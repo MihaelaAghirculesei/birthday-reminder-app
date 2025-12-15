@@ -7,19 +7,38 @@ interface ErrorContext {
   technicalMessage: string;
 }
 
+interface IndexedDBError extends Error {
+  name: 'QuotaExceededError' | 'InvalidStateError' | string;
+}
+
+interface GoogleAPIError {
+  result?: {
+    error?: {
+      code?: number | string;
+    };
+  };
+  message?: string;
+}
+
+interface NetworkError extends Error {
+  message: string;
+}
+
+type AppError = Error | IndexedDBError | GoogleAPIError | NetworkError;
+
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   constructor(private injector: Injector) {}
 
-  handleError(error: Error | any): void {
+  handleError(error: unknown): void {
     const context = this.categorizeError(error);
 
     this.logError(error, context);
     this.notifyUser(context);
   }
 
-  private categorizeError(error: any): ErrorContext {
-    const errorMessage = error?.message || error?.toString() || 'Unknown error';
+  private categorizeError(error: unknown): ErrorContext {
+    const errorMessage = this.getErrorMessage(error);
 
     if (this.isIndexedDBError(error)) {
       return {
@@ -60,32 +79,64 @@ export class GlobalErrorHandler implements ErrorHandler {
     };
   }
 
-  private isIndexedDBError(error: any): boolean {
-    return error?.name === 'QuotaExceededError' ||
-           error?.name === 'InvalidStateError' ||
-           error?.message?.includes('IndexedDB') ||
-           error?.message?.includes('IDB');
+  private isIndexedDBError(error: unknown): boolean {
+    if (!this.isErrorLike(error)) return false;
+    return error.name === 'QuotaExceededError' ||
+           error.name === 'InvalidStateError' ||
+           (typeof error.message === 'string' &&
+            (error.message.includes('IndexedDB') || error.message.includes('IDB')));
   }
 
-  private isGoogleAPIError(error: any): boolean {
-    return error?.result?.error?.code ||
-           error?.message?.includes('gapi') ||
-           error?.message?.includes('Google');
+  private isGoogleAPIError(error: unknown): boolean {
+    if (!this.isObject(error)) return false;
+    const hasResultError = this.isObject(error['result']) &&
+                          this.isObject(error['result']['error']) &&
+                          error['result']['error']['code'] !== undefined;
+    const hasGoogleMessage = typeof error['message'] === 'string' &&
+                            (error['message'].includes('gapi') || error['message'].includes('Google'));
+    return hasResultError || hasGoogleMessage;
   }
 
-  private isNetworkError(error: any): boolean {
-    return error?.message?.includes('Failed to fetch') ||
-           error?.message?.includes('NetworkError') ||
-           error instanceof TypeError && error.message.includes('fetch');
+  private isNetworkError(error: unknown): boolean {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return true;
+    }
+    if (!this.isErrorLike(error)) return false;
+    return typeof error.message === 'string' &&
+           (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'));
   }
 
-  private isNgRxError(error: any): boolean {
-    return error?.message?.includes('Effect') ||
-           error?.message?.includes('Action') ||
-           error?.message?.includes('Reducer');
+  private isNgRxError(error: unknown): boolean {
+    if (!this.isErrorLike(error)) return false;
+    return typeof error.message === 'string' &&
+           (error.message.includes('Effect') ||
+            error.message.includes('Action') ||
+            error.message.includes('Reducer'));
   }
 
-  private logError(error: any, context: ErrorContext): void {
+  private isErrorLike(error: unknown): error is Error {
+    return error instanceof Error ||
+           (this.isObject(error) && 'message' in error && 'name' in error);
+  }
+
+  private isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (this.isObject(error) && typeof error['message'] === 'string') {
+      return error['message'];
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    return 'Unknown error';
+  }
+
+  private logError(error: unknown, context: ErrorContext): void {
     if (isDevMode()) {
       console.group(`🔴 ${context.type} Error`);
       console.error('Error:', error);
