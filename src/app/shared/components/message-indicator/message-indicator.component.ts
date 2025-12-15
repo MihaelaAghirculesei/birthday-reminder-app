@@ -1,12 +1,12 @@
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../material.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Birthday } from '../../models';
 
 @Component({
   selector: 'app-message-indicator',
   standalone: true,
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MatTooltipModule],
   templateUrl: './message-indicator.component.html',
   styleUrls: ['./message-indicator.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

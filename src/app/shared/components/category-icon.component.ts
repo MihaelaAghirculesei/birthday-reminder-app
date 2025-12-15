@@ -1,12 +1,13 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../material.module';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants/categories';
 
 @Component({
   selector: 'category-icon',
   standalone: true,
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MatIconModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="category-icon-wrapper"
