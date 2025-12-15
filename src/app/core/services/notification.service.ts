@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { IdGeneratorService } from './id-generator.service';
 
 export interface NotificationMessage {
   id: string;
@@ -16,11 +17,11 @@ export class NotificationService {
   public notifications = this.notifications$.asObservable();
   private timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-  constructor() {}
+  constructor(private idGenerator: IdGeneratorService) {}
 
   show(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 3000): void {
     const notification: NotificationMessage = {
-      id: this.generateId(),
+      id: this.idGenerator.generateId(),
       message,
       type,
       duration
@@ -46,9 +47,5 @@ export class NotificationService {
       clearTimeout(timer);
       this.timers.delete(id);
     }
-  }
-
-  private generateId(): string {
-    return Math.random().toString(36).substr(2, 9);
   }
 }
