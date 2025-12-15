@@ -167,9 +167,9 @@ export class BirthdayEffects {
           return Promise.resolve();
         }).then(() =>
           BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message })
-        ).catch(() => {
-          return BirthdayActions.addMessageToBirthdaySuccess({ birthdayId, message });
-        })
+        ).catch(error =>
+          BirthdayActions.addMessageToBirthdayFailure({ error: error.message || 'Failed to add message' })
+        )
       )
     )
   );
@@ -202,9 +202,9 @@ export class BirthdayEffects {
           return Promise.resolve();
         }).then(() =>
           BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates })
-        ).catch(() => {
-          return BirthdayActions.updateMessageInBirthdaySuccess({ birthdayId, messageId, updates });
-        })
+        ).catch(error =>
+          BirthdayActions.updateMessageInBirthdayFailure({ error: error.message || 'Failed to update message' })
+        )
       )
     )
   );
@@ -229,11 +229,44 @@ export class BirthdayEffects {
           return Promise.resolve();
         }).then(() =>
           BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId })
-        ).catch(() => {
-          return BirthdayActions.deleteMessageFromBirthdaySuccess({ birthdayId, messageId });
-        })
+        ).catch(error =>
+          BirthdayActions.deleteMessageFromBirthdayFailure({ error: error.message || 'Failed to delete message' })
+        )
       )
     )
+  );
+
+  addMessageToBirthdayFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BirthdayActions.addMessageToBirthdayFailure),
+        tap(({ error }) => {
+          this.notificationService.show(`Failed to add message: ${error}`, 'error');
+        })
+      ),
+    { dispatch: false }
+  );
+
+  updateMessageInBirthdayFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BirthdayActions.updateMessageInBirthdayFailure),
+        tap(({ error }) => {
+          this.notificationService.show(`Failed to update message: ${error}`, 'error');
+        })
+      ),
+    { dispatch: false }
+  );
+
+  deleteMessageFromBirthdayFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(BirthdayActions.deleteMessageFromBirthdayFailure),
+        tap(({ error }) => {
+          this.notificationService.show(`Failed to delete message: ${error}`, 'error');
+        })
+      ),
+    { dispatch: false }
   );
 
   loadTestData$ = createEffect(() =>

@@ -118,6 +118,11 @@ export const addMessageToBirthdaySuccess = createAction(
   props<{ birthdayId: string; message: ScheduledMessage }>()
 );
 
+export const addMessageToBirthdayFailure = createAction(
+  '[Birthday] Add Message To Birthday Failure',
+  props<{ error: string }>()
+);
+
 export const updateMessageInBirthday = createAction(
   '[Birthday] Update Message In Birthday',
   props<{ birthdayId: string; messageId: string; updates: Partial<ScheduledMessage> }>()
@@ -128,6 +133,11 @@ export const updateMessageInBirthdaySuccess = createAction(
   props<{ birthdayId: string; messageId: string; updates: Partial<ScheduledMessage> }>()
 );
 
+export const updateMessageInBirthdayFailure = createAction(
+  '[Birthday] Update Message In Birthday Failure',
+  props<{ error: string }>()
+);
+
 export const deleteMessageFromBirthday = createAction(
   '[Birthday] Delete Message From Birthday',
   props<{ birthdayId: string; messageId: string }>()
@@ -136,6 +146,11 @@ export const deleteMessageFromBirthday = createAction(
 export const deleteMessageFromBirthdaySuccess = createAction(
   '[Birthday] Delete Message From Birthday Success',
   props<{ birthdayId: string; messageId: string }>()
+);
+
+export const deleteMessageFromBirthdayFailure = createAction(
+  '[Birthday] Delete Message From Birthday Failure',
+  props<{ error: string }>()
 );
 
 export const loadTestData = createAction(
