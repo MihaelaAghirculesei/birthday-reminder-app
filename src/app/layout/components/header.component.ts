@@ -1,14 +1,16 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { NetworkStatusComponent } from '../../shared/components/network-status.component';
 import { ThemeService } from '../../core';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, NetworkStatusComponent, MatSlideToggleModule, MatIconModule],
+  imports: [CommonModule, RouterModule, NetworkStatusComponent, MatSlideToggleModule, MatIconModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-header">
@@ -29,6 +31,20 @@ import { ThemeService } from '../../core';
         </div>
       </div>
       <p class="hero-subtitle">Never forget the special moments that matter most. Keep track of all your loved ones' birthdays with style.</p>
+      <nav class="nav-menu">
+        <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>home</mat-icon>
+          Dashboard
+        </a>
+        <a mat-button routerLink="/scheduled-messages" routerLinkActive="active">
+          <mat-icon>schedule_send</mat-icon>
+          Messages
+        </a>
+        <a mat-button routerLink="/calendar-sync" routerLinkActive="active">
+          <mat-icon>sync</mat-icon>
+          Calendar
+        </a>
+      </nav>
     </div>
   `,
   styles: [`
@@ -131,6 +147,49 @@ import { ThemeService } from '../../core';
 
       .theme-toggle {
         font-size: 0.9rem;
+      }
+
+      .nav-menu {
+        margin-top: 8px;
+      }
+    }
+
+    .nav-menu {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+      a {
+        color: white !important;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        border-radius: 24px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+
+        &.active {
+          background: rgba(255, 255, 255, 0.3);
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
       }
     }
   `]

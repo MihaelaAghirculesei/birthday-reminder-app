@@ -1,0 +1,95 @@
+<div class="test-data-section" *ngIf="(birthdays$ | async)?.length === 0">
+  <mat-card class="test-data-card">
+    <mat-card-content>
+      <div class="test-data-content">
+        <mat-icon class="test-icon">groups</mat-icon>
+        <div class="test-info">
+          <h3>Want to explore the app?</h3>
+          <p>Add some sample birthdays to discover all the dashboard features</p>
+        </div>
+        <button mat-raised-button color="primary" (click)="addTestData()" [disabled]="isAddingTestData" class="add-test-btn">
+          <mat-icon *ngIf="!isAddingTestData">visibility</mat-icon>
+          <mat-progress-spinner *ngIf="isAddingTestData" diameter="20" mode="indeterminate"></mat-progress-spinner>
+          {{ isAddingTestData ? 'Loading...' : 'Show Demo' }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="content-sections">
+  <mat-card class="add-birthday-card">
+    <mat-card-header class="collapsible-header"
+                     (click)="toggleAddBirthdaySection()"
+                     [title]="isAddBirthdayExpanded ? 'Click to close form' : 'Click to add new birthday'">
+      <mat-card-title>✨ Add New Birthday</mat-card-title>
+      <mat-icon class="expand-icon" [class.expanded]="isAddBirthdayExpanded">
+        {{ isAddBirthdayExpanded ? 'remove_circle' : 'add_circle' }}
+      </mat-icon>
+    </mat-card-header>
+    <mat-card-content *ngIf="isAddBirthdayExpanded" [@expandCollapse]>
+      <form [formGroup]="birthdayForm" (ngSubmit)="onSubmit()" class="birthday-form">
+        <photo-upload
+          [currentPhoto]="selectedPhoto"
+          (photoSelected)="onPhotoSelected($event)"
+          (photoRemoved)="onPhotoRemoved()">
+        </photo-upload>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. John Doe">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Birth Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="birthDate">
+          <mat-hint>Click the icon to open calendar</mat-hint>
+          <mat-error *ngIf="birthdayForm.get('birthDate')?.hasError('required')">
+            Birth date is required
+          </mat-error>
+          <mat-error *ngIf="birthdayForm.get('birthDate')?.hasError('futureDate')">
+            Birth date cannot be in the future
+          </mat-error>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let category of (categories$ | async); trackBy: trackByCategory" [value]="category.id">
+              <div class="category-option">
+                <mat-icon [style.color]="category.color">{{ category.icon }}</mat-icon>
+                <span>{{ category.name }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>label</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes (optional)</mat-label>
+          <textarea matInput formControlName="notes" placeholder="e.g. Gift: cooking book" rows="2"></textarea>
+          <mat-icon matSuffix>notes</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Reminder Days</mat-label>
+          <input matInput type="number" formControlName="reminderDays" min="1" max="365">
+          <mat-hint>How many days before do you want to be reminded?</mat-hint>
+          <mat-icon matSuffix>notifications</mat-icon>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="birthdayForm.invalid"
+            class="submit-button">
+            <mat-icon>add</mat-icon>
+            Add Birthday
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<app-dashboard *ngIf="(birthdays$ | async)?.length"></app-dashboard>
