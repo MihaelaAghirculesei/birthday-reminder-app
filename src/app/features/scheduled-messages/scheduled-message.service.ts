@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScheduledMessage } from '../../shared';
+import { IdGeneratorService } from '../../core/services/id-generator.service';
 
 export interface MessageTemplate {
   title: string;
@@ -10,11 +11,11 @@ export interface MessageTemplate {
   providedIn: 'root'
 })
 export class ScheduledMessageService {
-  constructor() {}
+  constructor(private idGenerator: IdGeneratorService) {}
 
   createMessage(messageData: Partial<ScheduledMessage>): ScheduledMessage {
     return {
-      id: this.generateId(),
+      id: this.idGenerator.generateId(),
       title: messageData.title || '',
       message: messageData.message || '',
       scheduledTime: messageData.scheduledTime || '09:00',
@@ -56,9 +57,5 @@ export class ScheduledMessageService {
       }
     }
     return slots;
-  }
-
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
 }
