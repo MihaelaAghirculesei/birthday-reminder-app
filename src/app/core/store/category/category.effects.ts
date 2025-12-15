@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
@@ -74,6 +74,9 @@ export class CategoryEffects {
           customCategories.push(category);
           localStorage.setItem('customCategories', JSON.stringify(customCategories));
         } catch (error) {
+          if (isDevMode()) {
+            console.error('Failed to save custom category to localStorage:', error);
+          }
         }
       }),
       map(({ category }) => CategoryActions.addCategorySuccess({ category }))
@@ -105,6 +108,9 @@ export class CategoryEffects {
             JSON.stringify(modifiedCategories)
           );
         } catch (error) {
+          if (isDevMode()) {
+            console.error('Failed to update category in localStorage:', error);
+          }
         }
       }),
       map(({ category }) => CategoryActions.updateCategorySuccess({ category }))
@@ -124,6 +130,9 @@ export class CategoryEffects {
             localStorage.setItem('deletedCategoryIds', JSON.stringify(deletedIds));
           }
         } catch (error) {
+          if (isDevMode()) {
+            console.error('Failed to delete category in localStorage:', error);
+          }
         }
       }),
       map(({ categoryId }) =>
@@ -143,6 +152,9 @@ export class CategoryEffects {
           const updatedIds = deletedIds.filter((id: string) => id !== categoryId);
           localStorage.setItem('deletedCategoryIds', JSON.stringify(updatedIds));
         } catch (error) {
+          if (isDevMode()) {
+            console.error('Failed to restore category in localStorage:', error);
+          }
         }
       }),
       map(({ categoryId }) =>

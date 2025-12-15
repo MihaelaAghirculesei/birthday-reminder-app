@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, isDevMode } from '@angular/core';
 import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { Birthday, ScheduledMessage } from '../../shared/models';
@@ -42,6 +42,9 @@ export class PushNotificationService implements OnDestroy {
         await this.setupNotificationListeners();
       }
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to initialize notifications:', error);
+      }
     }
   }
 
@@ -83,6 +86,9 @@ export class PushNotificationService implements OnDestroy {
         }
       }
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to check browser notifications:', error);
+      }
     }
   }
 
@@ -146,6 +152,9 @@ export class PushNotificationService implements OnDestroy {
         scheduledMessages: updatedMessages
       });
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to mark browser notification as sent:', error);
+      }
     }
   }
 
@@ -220,6 +229,9 @@ export class PushNotificationService implements OnDestroy {
       await LocalNotifications.schedule(options);
       return true;
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to schedule notification:', error);
+      }
       return false;
     }
   }
@@ -231,6 +243,9 @@ export class PushNotificationService implements OnDestroy {
       const notificationId = this.generateNotificationId(birthdayId, messageId);
       await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to cancel notification:', error);
+      }
     }
   }
 
@@ -247,6 +262,9 @@ export class PushNotificationService implements OnDestroy {
         await LocalNotifications.cancel({ notifications: toCancel });
       }
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to cancel all notifications for birthday:', error);
+      }
     }
   }
 
@@ -273,6 +291,9 @@ export class PushNotificationService implements OnDestroy {
         }
       }
     } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to reschedule notifications:', error);
+      }
     }
   }
 
