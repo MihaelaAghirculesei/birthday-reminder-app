@@ -1,9 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
-
-import { MaterialModule } from '../../../../shared/material.module';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
 import { BirthdayCategory } from '../../../../shared';
 
 export interface CategoryReassignDialogData {
@@ -19,10 +21,15 @@ export interface CategoryReassignDialogData {
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule
+    MatDialogModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule
   ],
   templateUrl: './category-reassign-dialog.component.html',
-  styleUrls: ['./category-reassign-dialog.component.scss']
+  styleUrls: ['./category-reassign-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryReassignDialogComponent {
   availableCategories: BirthdayCategory[] = [];

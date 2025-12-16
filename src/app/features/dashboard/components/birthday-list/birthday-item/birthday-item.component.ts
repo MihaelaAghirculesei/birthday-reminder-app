@@ -1,7 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule, ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, BirthdayCategory, calculateAge } from '../../../../../shared';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ZodiacIconComponent, CategoryIconComponent, PhotoUploadComponent, MessageSchedulerComponent, MessageIndicatorComponent, Birthday, BirthdayCategory, calculateAge } from '../../../../../shared';
 import { RememberPhotoComponent } from '../../remember-photo/remember-photo.component';
 import { EditingBirthdayData } from '../../../services/birthday-edit.service';
 
@@ -11,7 +14,9 @@ import { EditingBirthdayData } from '../../../services/birthday-edit.service';
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
     ZodiacIconComponent,
     CategoryIconComponent,
     PhotoUploadComponent,
@@ -21,6 +26,7 @@ import { EditingBirthdayData } from '../../../services/birthday-edit.service';
   ],
   templateUrl: './birthday-item.component.html',
   styleUrls: ['./birthday-item.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BirthdayItemComponent implements OnChanges {
   @Input() birthday!: Birthday;
