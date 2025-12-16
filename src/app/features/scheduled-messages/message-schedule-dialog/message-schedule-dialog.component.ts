@@ -1,10 +1,12 @@
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-
-import { MaterialModule } from '../../../shared/material.module';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { MessageSchedulerComponent } from '../../../shared/components/message-scheduler/message-scheduler.component';
 import { Birthday } from '../../../shared/models';
 import { BirthdayFacadeService } from '../../../core';
@@ -20,7 +22,11 @@ interface MessageScheduleDialogData {
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatIconModule,
+    MatButtonModule,
     MessageSchedulerComponent
   ],
   templateUrl: './message-schedule-dialog.component.html',
