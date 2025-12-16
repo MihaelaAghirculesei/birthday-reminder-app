@@ -1,7 +1,13 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule, Birthday, BirthdayCategory } from '../../../../shared';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Birthday, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
 import { BirthdayFacadeService, BackupService, NotificationService } from '../../../../core';
 import { BirthdayEditService } from '../../services/birthday-edit.service';
@@ -16,11 +22,17 @@ interface EnrichedBirthday extends Birthday {
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
     BirthdayItemComponent
   ],
   templateUrl: './birthday-list.component.html',
-  styleUrls: ['./birthday-list.component.scss']
+  styleUrls: ['./birthday-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BirthdayListComponent implements OnChanges {
   @Input() birthdays: Birthday[] = [];

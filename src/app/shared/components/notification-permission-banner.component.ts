@@ -1,13 +1,16 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-import { MaterialModule } from '../material.module';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { NotificationPermissionService } from '../../core/services/notification-permission.service';
 
 @Component({
   selector: 'app-notification-permission-banner',
   standalone: true,
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="notification-banner" *ngIf="shouldShow">
       <mat-card class="permission-card">

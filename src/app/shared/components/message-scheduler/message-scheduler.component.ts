@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import {
@@ -7,8 +7,16 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-
-import { MaterialModule } from '../../material.module';
+import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ScheduledMessage, Birthday, calculateAge } from '../..';
 import { ScheduledMessageService, MessageTemplate } from '../../../features/scheduled-messages/scheduled-message.service';
 import { NotificationService, BirthdayFacadeService } from '../../../core';
@@ -19,10 +27,20 @@ import { NotificationService, BirthdayFacadeService } from '../../../core';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MaterialModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
   ],
   templateUrl: './message-scheduler.component.html',
   styleUrls: ['./message-scheduler.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
   private destroy$ = new Subject<void>();
