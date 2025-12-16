@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { map, catchError, mergeMap, tap } from 'rxjs/operators';
@@ -413,6 +413,9 @@ export class BirthdayEffects {
       try {
         await this.googleCalendarService.updateBirthdayInCalendar(birthday, birthday.googleCalendarEventId);
       } catch (error) {
+        if (isDevMode()) {
+          console.error('[BirthdayEffects] Failed to update Google Calendar:', error);
+        }
       }
     }
   }
@@ -422,6 +425,9 @@ export class BirthdayEffects {
       try {
         await this.googleCalendarService.deleteBirthdayFromCalendar(eventId);
       } catch (error) {
+        if (isDevMode()) {
+          console.error('[BirthdayEffects] Failed to delete from Google Calendar:', error);
+        }
       }
     }
   }

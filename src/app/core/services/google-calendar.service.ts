@@ -1,4 +1,4 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, isDevMode } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { Birthday } from '../../shared';
@@ -286,6 +286,9 @@ export class GoogleCalendarService {
       try {
         localStorage.setItem('googleCalendarSettings', JSON.stringify(settings));
       } catch (error) {
+        if (isDevMode()) {
+          console.error('[GoogleCalendar] Failed to save settings:', error);
+        }
       }
     }
   }
@@ -298,6 +301,9 @@ export class GoogleCalendarService {
           const settings = JSON.parse(stored);
           this.settingsSubject.next(settings);
         } catch (error) {
+          if (isDevMode()) {
+            console.error('[GoogleCalendar] Failed to load settings:', error);
+          }
         }
       }
     }
