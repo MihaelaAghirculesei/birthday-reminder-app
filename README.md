@@ -190,25 +190,57 @@ src/app/
    npm install
    ```
 
-3. **Configure Google Calendar API** (Optional)
+3. **Configure Environment Files**
 
-   Create a Google Cloud Project and enable Calendar API:
+   The app requires environment configuration for Google Calendar API integration:
+
+   ```bash
+   # Copy example files to create your local environment configs
+   cp src/environments/environment.example.ts src/environments/environment.ts
+   cp src/environments/environment.prod.example.ts src/environments/environment.prod.ts
+   ```
+
+   > ⚠️ **Security Note**: `environment.ts` and `environment.prod.ts` are in `.gitignore` and should NEVER be committed to version control.
+
+4. **Configure Google Calendar API** (Optional)
+
+   To enable Google Calendar synchronization:
+
+   **a) Create Google Cloud Project:**
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project
-   - Enable Google Calendar API
-   - Create OAuth 2.0 credentials (Web application)
-   - Add authorized redirect URIs: `http://localhost:4200`
+   - Create a new project (e.g., "Birthday Reminder App")
+   - Enable the **Google Calendar API**
 
-   Update `src/environments/environment.ts`:
+   **b) Create OAuth 2.0 Credentials:**
+   - Navigate to **APIs & Services** > **Credentials**
+   - Click **Create Credentials** > **OAuth client ID**
+   - Application type: **Web application**
+   - Add authorized JavaScript origins:
+     - Development: `http://localhost:4200`
+     - Production: `https://your-domain.com`
+   - Click **Create**
+
+   **c) Get API Key:**
+   - Click **Create Credentials** > **API key**
+   - Restrict the key to Google Calendar API (recommended)
+   - Copy the API key
+
+   **d) Update Environment Files:**
+
+   Edit `src/environments/environment.ts`:
    ```typescript
    export const environment = {
      production: false,
      googleCalendar: {
-       clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
-       apiKey: 'YOUR_API_KEY'
+       clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com', // From step b
+       apiKey: 'YOUR_API_KEY'  // From step c
      }
    };
    ```
+
+   For production, update `src/environments/environment.prod.ts` with separate credentials.
+
+   > 💡 **Tip**: Use different OAuth credentials for development and production environments.
 
 ### Development Server
 
