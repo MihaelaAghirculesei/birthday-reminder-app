@@ -2,7 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
-import { MaterialModule } from '../../shared';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, BirthdayFacadeService } from '../../core';
 
 @Component({
@@ -11,7 +16,12 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MaterialModule
+    MatCardModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatIconModule,
+    MatButtonModule
   ],
   template: `
     <mat-card class="sync-card">

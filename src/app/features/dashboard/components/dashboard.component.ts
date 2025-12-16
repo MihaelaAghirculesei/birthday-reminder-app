@@ -2,7 +2,10 @@ import { Component, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, Subject, map, takeUntil, combineLatest } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { MaterialModule, Birthday, BirthdayCategory, NotificationPermissionBannerComponent } from '../../../shared';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { Birthday, BirthdayCategory, NotificationPermissionBannerComponent } from '../../../shared';
 import { CalendarIconComponent } from '../../../shared/icons/calendar-icon.component';
 import { GoogleCalendarSyncComponent } from '../../calendar-sync/google-calendar-sync.component';
 import { DashboardStatsComponent } from './stats/dashboard-stats.component';
@@ -19,7 +22,9 @@ import { getDaysUntilBirthday } from '../../../shared/utils/date.utils';
   standalone: true,
   imports: [
     CommonModule,
-    MaterialModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
     CalendarIconComponent,
     DashboardStatsComponent,
     BirthdayChartComponent,
