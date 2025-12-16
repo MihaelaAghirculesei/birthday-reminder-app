@@ -10,8 +10,15 @@ import {
 } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
-
-import { MaterialModule, PhotoUploadComponent, DEFAULT_CATEGORY, BirthdayCategory } from '../../shared';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PhotoUploadComponent, DEFAULT_CATEGORY, BirthdayCategory } from '../../shared';
 import { Birthday, getZodiacSign } from '../../shared';
 import { DashboardComponent } from '../dashboard';
 import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
@@ -22,7 +29,14 @@ import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MaterialModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatIconModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
     DashboardComponent,
     PhotoUploadComponent,
   ],
