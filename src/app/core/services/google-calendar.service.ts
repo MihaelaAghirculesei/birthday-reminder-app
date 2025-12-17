@@ -3,8 +3,9 @@ import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { Birthday } from '../../shared';
 import { environment } from '../../../environments/environment';
+import type { Gapi } from './google-api.types';
 
-declare const gapi: any;
+declare const gapi: Gapi;
 
 export interface GoogleCalendarSettings {
   enabled: boolean;
@@ -27,7 +28,7 @@ export interface CalendarEvent {
   recurrence?: string[];
   reminders?: {
     useDefault: boolean;
-    overrides?: Array<{ method: string; minutes: number }>;
+    overrides?: { method: string; minutes: number }[];
   };
 }
 
@@ -53,7 +54,7 @@ export class GoogleCalendarService {
   public isSignedIn$ = this.isSignedInSubject.asObservable();
   public settings$ = this.settingsSubject.asObservable();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
       this.loadSettings();
     }
@@ -203,6 +204,10 @@ export class GoogleCalendarService {
         calendarId: this.settingsSubject.value.calendarId,
         resource: event
       });
+
+      if (!response.result.id) {
+        throw new Error('Failed to create calendar event: No event ID returned');
+      }
 
       return response.result.id;
     });
