@@ -49,7 +49,7 @@ export class BackupService {
     let backup: BackupData;
     try {
       backup = JSON.parse(text);
-    } catch (error) {
+    } catch {
       throw new Error('Invalid JSON file. Please select a valid backup file.');
     }
 
@@ -123,8 +123,7 @@ export class BackupService {
     let current = '';
     let inQuotes = false;
 
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
+    for (const char of line) {
       if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === ',' && !inQuotes) {
@@ -143,7 +142,7 @@ export class BackupService {
 
     const cleaned = dateStr.trim();
 
-    const dmyMatch = cleaned.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    const dmyMatch = cleaned.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
     if (dmyMatch) {
       return new Date(+dmyMatch[3], +dmyMatch[2] - 1, +dmyMatch[1]);
     }

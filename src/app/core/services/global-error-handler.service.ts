@@ -24,8 +24,6 @@ interface NetworkError extends Error {
   message: string;
 }
 
-type AppError = Error | IndexedDBError | GoogleAPIError | NetworkError;
-
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   constructor(private injector: Injector) {}

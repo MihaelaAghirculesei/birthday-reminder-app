@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { BackupService } from './backup.service';
-import { Birthday } from '../../shared';
 
 describe('BackupService', () => {
   let service: BackupService;
