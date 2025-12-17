@@ -54,7 +54,7 @@ export class MessageSchedulerComponent implements OnInit, OnChanges, OnDestroy {
   isCreatingMessage = false;
   editingMessage: ScheduledMessage | null = null;
 
-  messagePreview: string = '';
+  messagePreview = '';
 
   constructor(
     private fb: FormBuilder,

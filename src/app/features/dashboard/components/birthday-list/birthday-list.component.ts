@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -34,12 +34,12 @@ interface EnrichedBirthday extends Birthday {
   styleUrls: ['./birthday-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BirthdayListComponent implements OnChanges {
+export class BirthdayListComponent implements OnChanges, OnDestroy {
   @Input() birthdays: Birthday[] = [];
   @Input() categories: BirthdayCategory[] = [];
-  @Input() searchTerm: string = '';
+  @Input() searchTerm = '';
   @Input() lastAction: { type: string; data: Birthday | BirthdayCategory } | null = null;
-  @Input() totalBirthdays: number = 0;
+  @Input() totalBirthdays = 0;
 
   enrichedBirthdays: EnrichedBirthday[] = [];
 

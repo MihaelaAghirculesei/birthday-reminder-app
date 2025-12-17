@@ -34,7 +34,7 @@ export interface CategoryReassignDialogData {
 export class CategoryReassignDialogComponent {
   availableCategories: BirthdayCategory[] = [];
   selectedCategoryId: string | null = null;
-  isReassignOnly: boolean = false;
+  isReassignOnly = false;
 
   constructor(
     private dialogRef: MatDialogRef<CategoryReassignDialogComponent>,

@@ -30,14 +30,14 @@ import { EditingBirthdayData } from '../../../services/birthday-edit.service';
 })
 export class BirthdayItemComponent implements OnChanges {
   @Input() birthday!: Birthday;
-  @Input() isEditing: boolean = false;
+  @Input() isEditing = false;
   @Input() editingData: EditingBirthdayData | null = null;
-  @Input() daysUntilBirthday: number = 0;
-  @Input() defaultCategory: string = '';
+  @Input() daysUntilBirthday = 0;
+  @Input() defaultCategory = '';
   @Input() categories: BirthdayCategory[] = [];
 
-  daysText: string = '';
-  daysChipClass: string = 'green-safe';
+  daysText = '';
+  daysChipClass = 'green-safe';
 
   @Output() edit = new EventEmitter<Birthday>();
   @Output() delete = new EventEmitter<Birthday>();
