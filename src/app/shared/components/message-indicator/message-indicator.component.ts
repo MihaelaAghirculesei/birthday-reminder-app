@@ -14,7 +14,7 @@ import { Birthday } from '../../models';
 export class MessageIndicatorComponent implements OnChanges {
   @Input() birthday: Birthday | null = null;
 
-  tooltipText: string = 'No information available';
+  tooltipText = 'No information available';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['birthday']) {

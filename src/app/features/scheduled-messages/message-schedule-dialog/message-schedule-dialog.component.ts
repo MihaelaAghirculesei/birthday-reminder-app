@@ -37,7 +37,7 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
 
   selectedBirthday: Birthday | null = null;
   allBirthdays$: Observable<Birthday[]>;
-  selectedBirthdayId: string = '';
+  selectedBirthdayId = '';
   showBirthdaySelector = false;
 
   constructor(

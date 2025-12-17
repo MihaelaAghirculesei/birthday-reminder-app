@@ -1,7 +1,7 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'calendar-icon',
+  selector: 'app-calendar-icon',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -69,7 +69,7 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
   `]
 })
 export class CalendarIconComponent {
-  @Input() size: string = '24';
-  @Input() strokeWidth: string = '2';
-  @Input() cssClass: string = '';
+  @Input() size = '24';
+  @Input() strokeWidth = '2';
+  @Input() cssClass = '';
 }

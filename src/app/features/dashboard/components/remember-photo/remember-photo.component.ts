@@ -12,7 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class RememberPhotoComponent {
   @Input() photoUrl: string | null | undefined = null;
-  @Input() birthdayName: string = '';
+  @Input() birthdayName = '';
 
   @Output() share = new EventEmitter<void>();
   @Output() download = new EventEmitter<void>();
