@@ -6,7 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
-  selector: 'photo-upload',
+  selector: 'app-photo-upload',
   standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,

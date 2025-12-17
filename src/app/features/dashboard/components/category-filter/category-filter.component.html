@@ -31,12 +31,12 @@
       <div class="category-card-background"></div>
       <div class="category-stat-content">
         <div class="category-icon-section">
-          <category-icon
+          <app-category-icon
             [categoryId]="categoryStats.id"
             [icon]="categoryStats.icon"
             [color]="categoryStats.color"
             cssClass="category-stat-icon"
-          ></category-icon>
+          ></app-category-icon>
           <div
             class="selection-indicator"
             *ngIf="selectedCategory === categoryStats.id"

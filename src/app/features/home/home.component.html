@@ -29,11 +29,11 @@
     </mat-card-header>
     <mat-card-content *ngIf="isAddBirthdayExpanded" [@expandCollapse]>
       <form [formGroup]="birthdayForm" (ngSubmit)="onSubmit()" class="birthday-form">
-        <photo-upload
+        <app-photo-upload
           [currentPhoto]="selectedPhoto"
           (photoSelected)="onPhotoSelected($event)"
           (photoRemoved)="onPhotoRemoved()">
-        </photo-upload>
+        </app-photo-upload>
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" placeholder="e.g. John Doe">

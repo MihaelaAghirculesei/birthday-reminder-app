@@ -69,15 +69,15 @@
 
     <div class="dashboard-icons" *ngIf="!isEditing">
       <div class="dashboard-icons-left">
-        <category-icon
+        <app-category-icon
           [categoryId]="birthday.category || defaultCategory"
           cssClass="dashboard-category-inline"
-        ></category-icon>
-        <zodiac-icon
+        ></app-category-icon>
+        <app-zodiac-icon
           [zodiacSign]="birthday.zodiacSign"
           *ngIf="birthday.zodiacSign"
           cssClass="dashboard-zodiac-inline"
-        ></zodiac-icon>
+        ></app-zodiac-icon>
         <app-message-indicator
           [birthday]="birthday"
         ></app-message-indicator>
@@ -160,12 +160,12 @@
         <mat-icon class="small-icon">photo_camera</mat-icon>
         <span>Profile Photo</span>
       </div>
-      <photo-upload
+      <app-photo-upload
         [currentPhoto]="editingData!.photo"
         (photoSelected)="onPhotoSelected($event)"
         (photoRemoved)="onPhotoRemoved()"
       >
-      </photo-upload>
+      </app-photo-upload>
     </div>
 
     <div class="dashboard-photo-edit" *ngIf="isEditing">
@@ -174,12 +174,12 @@
         <span>Remember Photo</span>
         <small>(For social sharing/messages)</small>
       </div>
-      <photo-upload
+      <app-photo-upload
         [currentPhoto]="editingData!.rememberPhoto"
         (photoSelected)="onRememberPhotoSelected($event)"
         (photoRemoved)="onRememberPhotoRemoved()"
       >
-      </photo-upload>
+      </app-photo-upload>
     </div>
 
     <div class="message-scheduler-section" *ngIf="isEditing">
