@@ -5,7 +5,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants/categories';
 
 @Component({
-  selector: 'category-icon',
+  selector: 'app-category-icon',
   standalone: true,
   imports: [CommonModule, MatIconModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,14 +69,14 @@ import { getCategoryIcon, getCategoryColor, getCategoryById } from '../constants
   `]
 })
 export class CategoryIconComponent implements OnInit, OnChanges {
-  @Input() categoryId: string = 'friends';
+  @Input() categoryId = 'friends';
   @Input() icon?: string;
   @Input() color?: string;
-  @Input() cssClass: string = '';
+  @Input() cssClass = '';
 
-  iconName: string = '';
-  iconColor: string = '';
-  categoryName: string = '';
+  iconName = '';
+  iconColor = '';
+  categoryName = '';
 
   ngOnInit(): void {
     this.updateCategoryData();

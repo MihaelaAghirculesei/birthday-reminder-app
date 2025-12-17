@@ -13,9 +13,9 @@ import { CalendarIconComponent } from '../../../../shared/icons/calendar-icon.co
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardStatsComponent {
-  @Input() totalBirthdays: number = 0;
-  @Input() birthdaysThisMonth: number = 0;
-  @Input() averageAge: number = 0;
-  @Input() nextBirthdayDays: number = 0;
-  @Input() nextBirthdayText: string = '';
+  @Input() totalBirthdays = 0;
+  @Input() birthdaysThisMonth = 0;
+  @Input() averageAge = 0;
+  @Input() nextBirthdayDays = 0;
+  @Input() nextBirthdayText = '';
 }

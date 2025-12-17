@@ -21,9 +21,9 @@ export class BirthdayChartComponent implements OnChanges {
   private readonly MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   @Input() chartData: ChartDataItem[] = [];
-  @Input() maxCount: number = 0;
+  @Input() maxCount = 0;
   @Input() currentMonth: number = new Date().getMonth();
-  @Input() totalBirthdays: number = 0;
+  @Input() totalBirthdays = 0;
 
   enrichedChartData: EnrichedChartDataItem[] = [];
 
