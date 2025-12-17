@@ -11,7 +11,7 @@ export class NetworkService implements OnDestroy {
   public online$ = this.onlineSubject.asObservable();
   private networkSubscription?: Subscription;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
       this.onlineSubject.next(navigator.onLine);
       this.initializeNetworkListener();

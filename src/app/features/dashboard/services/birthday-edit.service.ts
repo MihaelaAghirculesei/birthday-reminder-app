@@ -73,7 +73,7 @@ export class BirthdayEditService implements OnDestroy {
     return this.editingBirthdayIdSubject.value === birthdayId;
   }
 
-  scheduleAutoSave(callback: () => void, delay: number = 2000): void {
+  scheduleAutoSave(callback: () => void, delay = 2000): void {
     if (this.autoSaveTimer) {
       clearTimeout(this.autoSaveTimer);
     }

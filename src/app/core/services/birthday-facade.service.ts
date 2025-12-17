@@ -99,7 +99,7 @@ export class BirthdayFacadeService {
     return this.store.select(BirthdaySelectors.selectBirthdayById(id));
   }
 
-  getUpcomingBirthdays(days: number = 30): Observable<Birthday[]> {
+  getUpcomingBirthdays(days = 30): Observable<Birthday[]> {
     return this.store.select(BirthdaySelectors.selectUpcomingBirthdays(days));
   }
 

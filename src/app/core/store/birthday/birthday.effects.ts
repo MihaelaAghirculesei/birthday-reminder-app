@@ -379,7 +379,7 @@ export class BirthdayEffects {
   private normalizeCategoryId(category?: string): string {
     if (!category) return DEFAULT_CATEGORY;
 
-    const categoryMap: { [key: string]: string } = {
+    const categoryMap: Record<string, string> = {
       'Family': 'family',
       'Friends': 'friends',
       'Work': 'colleagues',

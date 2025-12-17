@@ -385,23 +385,23 @@ export class PushNotificationService implements OnDestroy {
     }
   }
 
-  async getPendingNotifications(): Promise<Array<{
+  async getPendingNotifications(): Promise<{
     id: number;
     title: string;
     body: string;
     scheduledAt: Date;
     birthdayId?: string;
-  }>> {
+  }[]> {
     if (!this.isNative) {
       try {
         const birthdays = await this.storage.getBirthdays();
-        const notifications: Array<{
+        const notifications: {
           id: number;
           title: string;
           body: string;
           scheduledAt: Date;
           birthdayId?: string;
-        }> = [];
+        }[] = [];
 
         for (const birthday of birthdays) {
           if (!birthday.scheduledMessages) continue;

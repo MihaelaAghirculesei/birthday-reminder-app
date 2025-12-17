@@ -108,7 +108,7 @@ export const selectFilteredBirthdays = createSelector(
   }
 );
 
-export const selectUpcomingBirthdays = (days: number = 30) => createSelector(
+export const selectUpcomingBirthdays = (days = 30) => createSelector(
   selectAllBirthdays,
   (birthdays) => {
     const today = new Date();
