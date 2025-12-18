@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { take } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -104,13 +105,21 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
   }
 
   onExportJSON(): void {
-    this.backupService.exportToJSON(this.birthdays);
-    this.notificationService.show('Backup JSON exported', 'success');
+    this.birthdayFacade.birthdays$.pipe(
+      take(1)
+    ).subscribe(allBirthdays => {
+      this.backupService.exportToJSON(allBirthdays);
+      this.notificationService.show(`Exported ${allBirthdays.length} birthdays to JSON`, 'success');
+    });
   }
 
   onExportCSV(): void {
-    this.backupService.exportToCSV(this.birthdays);
-    this.notificationService.show('Backup CSV exported', 'success');
+    this.birthdayFacade.birthdays$.pipe(
+      take(1)
+    ).subscribe(allBirthdays => {
+      this.backupService.exportToCSV(allBirthdays);
+      this.notificationService.show(`Exported ${allBirthdays.length} birthdays to CSV`, 'success');
+    });
   }
 
   async onImportBackup(event: Event): Promise<void> {
