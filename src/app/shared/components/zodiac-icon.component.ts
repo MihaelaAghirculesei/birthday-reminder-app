@@ -1,6 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ZODIAC_SIGNS, ZodiacSign } from '../utils/date/zodiac.util';
+import { ZODIAC_SIGNS } from '../utils/date/zodiac.util';
 
 @Component({
   selector: 'app-zodiac-icon',

@@ -57,7 +57,7 @@ export function getCustomCategories(): BirthdayCategory[] {
   try {
     const stored = localStorage.getItem('customCategories');
     return stored ? JSON.parse(stored) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -67,7 +67,7 @@ function getModifiedCategories(): BirthdayCategory[] {
   try {
     const stored = localStorage.getItem('modifiedCategories');
     return stored ? JSON.parse(stored) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -77,7 +77,7 @@ function getDeletedCategoryIds(): string[] {
   try {
     const stored = localStorage.getItem('deletedCategoryIds');
     return stored ? JSON.parse(stored) : [];
-  } catch (error) {
+  } catch {
     return [];
   }
 }
