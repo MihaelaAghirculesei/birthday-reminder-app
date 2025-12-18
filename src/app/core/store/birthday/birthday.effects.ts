@@ -402,6 +402,9 @@ export class BirthdayEffects {
       try {
         return await this.googleCalendarService.syncBirthdayToCalendar(birthday);
       } catch (error) {
+        if (isDevMode()) {
+          console.error('[BirthdayEffects] Failed to sync to Google Calendar:', error);
+        }
         return null;
       }
     }
