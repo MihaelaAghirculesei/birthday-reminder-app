@@ -9,6 +9,7 @@
         (click)="onUndo()"
         class="undo-button-enhanced"
         matTooltip="Undo last action"
+        aria-label="Undo last action"
       >
         <mat-icon>undo</mat-icon>
         UNDO
@@ -102,29 +103,29 @@
           <p>Export or import your birthday data</p>
         </div>
         <div class="backup-actions">
-          <button mat-stroked-button color="primary" (click)="onExportJSON()" matTooltip="Export all birthdays to JSON file">
+          <button mat-stroked-button color="primary" (click)="onExportJSON()" matTooltip="Export all birthdays to JSON file" aria-label="Export birthdays to JSON">
             <mat-icon>download</mat-icon>
             JSON
           </button>
-          <button mat-stroked-button color="primary" (click)="onExportCSV()" matTooltip="Export all birthdays to CSV file">
+          <button mat-stroked-button color="primary" (click)="onExportCSV()" matTooltip="Export all birthdays to CSV file" aria-label="Export birthdays to CSV">
             <mat-icon>download</mat-icon>
             CSV
           </button>
-          <button mat-stroked-button color="accent" (click)="jsonInput.click()" matTooltip="Import birthdays from JSON file">
+          <button mat-stroked-button color="accent" (click)="jsonInput.click()" matTooltip="Import birthdays from JSON file" aria-label="Import birthdays from JSON">
             <mat-icon>upload</mat-icon>
             Import JSON
           </button>
-          <button mat-stroked-button color="accent" (click)="csvInput.click()" matTooltip="Import birthdays from CSV file">
+          <button mat-stroked-button color="accent" (click)="csvInput.click()" matTooltip="Import birthdays from CSV file" aria-label="Import birthdays from CSV">
             <mat-icon>upload</mat-icon>
             Import CSV
           </button>
-          <button mat-stroked-button color="accent" (click)="vcardInput.click()" matTooltip="Import birthdays from vCard file">
+          <button mat-stroked-button color="accent" (click)="vcardInput.click()" matTooltip="Import birthdays from vCard file" aria-label="Import birthdays from vCard">
             <mat-icon>upload</mat-icon>
             Import vCard
           </button>
-          <input #jsonInput type="file" accept=".json" (change)="onImportBackup($event)" hidden />
-          <input #csvInput type="file" accept=".csv" (change)="onImportCSV($event)" hidden />
-          <input #vcardInput type="file" accept=".vcf" (change)="onImportVCard($event)" hidden />
+          <input #jsonInput type="file" accept=".json" (change)="onImportBackup($event)" hidden aria-label="JSON file input" />
+          <input #csvInput type="file" accept=".csv" (change)="onImportCSV($event)" hidden aria-label="CSV file input" />
+          <input #vcardInput type="file" accept=".vcf" (change)="onImportVCard($event)" hidden aria-label="vCard file input" />
         </div>
       </div>
     </mat-card-content>
