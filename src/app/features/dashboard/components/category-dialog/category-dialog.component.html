@@ -25,6 +25,8 @@
           [class.selected]="categoryForm.get('icon')?.value === icon"
           (click)="categoryForm.patchValue({ icon: icon })"
           [style.color]="categoryForm.get('icon')?.value === icon ? categoryForm.get('color')?.value : ''"
+          [attr.aria-label]="'Select ' + icon + ' icon'"
+          [attr.aria-pressed]="categoryForm.get('icon')?.value === icon"
         >
           <mat-icon>{{ icon }}</mat-icon>
         </button>
@@ -42,6 +44,8 @@
           [style.background-color]="colorOption.value"
           (click)="categoryForm.patchValue({ color: colorOption.value })"
           [matTooltip]="colorOption.name"
+          [attr.aria-label]="'Select ' + colorOption.name + ' color'"
+          [attr.aria-pressed]="categoryForm.get('color')?.value === colorOption.value"
         >
           <mat-icon *ngIf="categoryForm.get('color')?.value === colorOption.value" class="check-icon">
             check_circle
@@ -63,12 +67,13 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button (click)="onCancel()" aria-label="Cancel category editing">Cancel</button>
   <button
     mat-raised-button
     color="primary"
     (click)="onSubmit()"
     [disabled]="categoryForm.invalid"
+    [attr.aria-label]="data.mode === 'add' ? 'Add new category' : 'Save category changes'"
   >
     {{ data.mode === 'add' ? 'Add Category' : 'Save Changes' }}
   </button>

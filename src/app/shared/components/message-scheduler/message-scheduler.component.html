@@ -115,7 +115,7 @@
           </div>
 
           <div class="form-actions">
-            <button type="button" mat-stroked-button (click)="cancelEdit()">
+            <button type="button" mat-stroked-button (click)="cancelEdit()" aria-label="Cancel message editing">
               Cancel
             </button>
 
@@ -124,6 +124,7 @@
               mat-raised-button
               color="primary"
               [disabled]="messageForm.invalid"
+              [attr.aria-label]="(editingMessage ? 'Update' : 'Save') + ' scheduled message'"
             >
               <mat-icon>save</mat-icon>
               {{ editingMessage ? "Update" : "Save" }} Message
@@ -186,6 +187,7 @@
               mat-icon-button
               (click)="editMessage(message)"
               title="Edit"
+              [attr.aria-label]="'Edit message: ' + message.title"
             >
               <mat-icon>edit</mat-icon>
             </button>
@@ -194,6 +196,7 @@
               mat-icon-button
               (click)="toggleMessageStatus(message)"
               [title]="message.active ? 'Disable' : 'Enable'"
+              [attr.aria-label]="(message.active ? 'Disable' : 'Enable') + ' message: ' + message.title"
             >
               <mat-icon>{{
                 message.active ? "pause" : "play_arrow"
@@ -205,6 +208,7 @@
               (click)="testMessage(message)"
               title="Send test"
               color="accent"
+              [attr.aria-label]="'Send test message: ' + message.title"
             >
               <mat-icon>send</mat-icon>
             </button>
@@ -214,6 +218,7 @@
               (click)="deleteMessage(message)"
               title="Delete"
               color="warn"
+              [attr.aria-label]="'Delete message: ' + message.title"
             >
               <mat-icon>delete</mat-icon>
             </button>
@@ -229,6 +234,7 @@
           mat-raised-button
           color="primary"
           (click)="startCreatingMessage()"
+          [attr.aria-label]="'Create first scheduled message for ' + birthday?.name"
         >
           <mat-icon>add</mat-icon>
           Create First Message

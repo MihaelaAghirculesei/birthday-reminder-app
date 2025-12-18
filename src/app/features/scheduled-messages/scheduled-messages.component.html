@@ -2,7 +2,7 @@
   <div class="header">
     <h2>Messaggi Programmati</h2>
     <p class="subtitle">Tutti i messaggi programmati per i compleanni</p>
-    <button mat-fab extended color="primary" (click)="openScheduleDialog()" class="add-message-fab">
+    <button mat-fab extended color="primary" (click)="openScheduleDialog()" class="add-message-fab" aria-label="Create new scheduled message">
       <mat-icon>add</mat-icon>
       New Message
     </button>
@@ -58,6 +58,7 @@
                   color="primary"
                   (click)="openScheduleDialog(birthday)"
                   matTooltip="Edit messages"
+                  [attr.aria-label]="'Edit messages for ' + birthday.name"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -66,6 +67,7 @@
                   color="warn"
                   (click)="deleteMessage(birthday.id, message.id)"
                   matTooltip="Elimina messaggio"
+                  [attr.aria-label]="'Delete message: ' + message.title"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
