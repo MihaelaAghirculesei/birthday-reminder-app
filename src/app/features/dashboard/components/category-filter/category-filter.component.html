@@ -16,6 +16,7 @@
       class="clear-all-btn"
       (click)="clearFilter()"
       matTooltip="Clear all filters"
+      aria-label="Clear category filter"
     >
       <mat-icon>clear_all</mat-icon>
     </button>
@@ -27,6 +28,12 @@
       class="category-stat-card"
       [class.selected]="selectedCategory === categoryStats.id"
       (click)="selectCategory(categoryStats.id)"
+      role="button"
+      tabindex="0"
+      [attr.aria-label]="'Filter by ' + categoryStats.name + ' category, ' + categoryStats.count + ' ' + (categoryStats.count === 1 ? 'person' : 'people')"
+      [attr.aria-pressed]="selectedCategory === categoryStats.id"
+      (keydown.enter)="selectCategory(categoryStats.id)"
+      (keydown.space)="selectCategory(categoryStats.id)"
     >
       <div class="category-card-background"></div>
       <div class="category-stat-content">
@@ -57,6 +64,7 @@
             class="category-action-btn edit-btn"
             (click)="editCategory($event, categoryStats.id)"
             matTooltip="Edit category"
+            [attr.aria-label]="'Edit ' + categoryStats.name + ' category'"
           >
             <mat-icon>edit</mat-icon>
           </button>
@@ -65,6 +73,7 @@
             class="category-action-btn delete-btn"
             (click)="deleteCategory($event, categoryStats.id)"
             matTooltip="Delete category"
+            [attr.aria-label]="'Delete ' + categoryStats.name + ' category'"
           >
             <mat-icon>delete</mat-icon>
           </button>
@@ -75,6 +84,11 @@
     <div
       class="category-stat-card add-category-card"
       (click)="addNewCategory()"
+      role="button"
+      tabindex="0"
+      aria-label="Add new category"
+      (keydown.enter)="addNewCategory()"
+      (keydown.space)="addNewCategory()"
     >
       <div class="category-card-background add-category-background"></div>
       <div class="category-stat-content">
