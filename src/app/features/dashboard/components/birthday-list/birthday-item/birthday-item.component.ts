@@ -40,9 +40,9 @@ export class BirthdayItemComponent implements OnChanges {
   daysChipClass = 'green-safe';
 
   @Output() edit = new EventEmitter<Birthday>();
-  @Output() delete = new EventEmitter<Birthday>();
+  @Output() deleted = new EventEmitter<Birthday>();
   @Output() save = new EventEmitter<Birthday>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
   @Output() quickEdit = new EventEmitter<Birthday>();
   @Output() editInputChange = new EventEmitter<Birthday>();
   @Output() photoSelected = new EventEmitter<string>();
@@ -87,7 +87,7 @@ export class BirthdayItemComponent implements OnChanges {
   }
 
   onDelete(): void {
-    this.delete.emit(this.birthday);
+    this.deleted.emit(this.birthday);
   }
 
   onSave(): void {
@@ -95,7 +95,7 @@ export class BirthdayItemComponent implements OnChanges {
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.cancelled.emit();
   }
 
   onQuickEdit(): void {
