@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
@@ -22,6 +22,7 @@ import { GoogleCalendarService, GoogleCalendarItem, BirthdayFacadeService } from
     MatIconModule,
     MatButtonModule
 ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="sync-card">
       <mat-card-header>
@@ -397,7 +398,8 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   constructor(
     private googleCalendarService: GoogleCalendarService,
     private birthdayFacade: BirthdayFacadeService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {
     this.settingsForm = this.fb.group({
       enabled: [false],
@@ -419,12 +421,14 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
         if (isSignedIn) {
           this.loadCalendars();
         }
+        this.cdr.markForCheck();
       });
 
     this.googleCalendarService.settings$
       .pipe(takeUntil(this.destroy$))
       .subscribe(settings => {
         this.settingsForm.patchValue(settings);
+        this.cdr.markForCheck();
       });
 
     this.settingsForm.valueChanges
@@ -443,12 +447,14 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
 
   async signIn() {
     this.isConnecting = true;
+    this.cdr.markForCheck();
     try {
       await this.googleCalendarService.signIn();
     } catch {
       // Silent failure for sign in
     } finally {
       this.isConnecting = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -457,6 +463,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
       await this.googleCalendarService.signOut();
       this.calendars = [];
       this.lastSyncResult = null;
+      this.cdr.markForCheck();
     } catch {
       // Silent failure for sign out
     }
@@ -465,6 +472,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   async loadCalendars() {
     try {
       this.calendars = await this.googleCalendarService.getCalendars();
+      this.cdr.markForCheck();
     } catch {
       // Silent failure for loading calendars
     }
@@ -472,15 +480,18 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
 
   async syncAllBirthdays() {
     this.isSyncing = true;
+    this.cdr.markForCheck();
     try {
       const birthdays = await firstValueFrom(this.birthdayFacade.birthdays$);
       if (birthdays) {
         this.lastSyncResult = await this.googleCalendarService.syncAllBirthdays(birthdays);
+        this.cdr.markForCheck();
       }
     } catch {
       // Silent failure for sync
     } finally {
       this.isSyncing = false;
+      this.cdr.markForCheck();
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -30,7 +30,8 @@ interface MessageScheduleDialogData {
     MessageSchedulerComponent
   ],
   templateUrl: './message-schedule-dialog.component.html',
-  styleUrls: ['./message-schedule-dialog.component.scss']
+  styleUrls: ['./message-schedule-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -43,7 +44,8 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
   constructor(
     private dialogRef: MatDialogRef<MessageScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: MessageScheduleDialogData,
-    private birthdayFacade: BirthdayFacadeService
+    private birthdayFacade: BirthdayFacadeService,
+    private cdr: ChangeDetectorRef
   ) {
     this.allBirthdays$ = this.birthdayFacade.birthdays$;
   }
@@ -58,6 +60,7 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
           const found = birthdays.find(b => b.id === this.data.birthdayId);
           if (found) {
             this.selectedBirthday = found;
+            this.cdr.markForCheck();
           }
         });
     } else {
@@ -74,6 +77,7 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
           if (found) {
             this.selectedBirthday = found;
             this.showBirthdaySelector = false;
+            this.cdr.markForCheck();
           }
         });
     }

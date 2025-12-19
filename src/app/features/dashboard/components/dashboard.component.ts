@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable, Subject, map, combineLatest } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,7 +34,8 @@ import { getDaysUntilBirthday } from '../../../shared/utils/date.utils';
     NotificationPermissionBannerComponent
   ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnDestroy {
   private destroy$ = new Subject<void>();

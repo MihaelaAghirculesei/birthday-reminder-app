@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -42,6 +42,7 @@ import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('expandCollapse', [
       transition(':enter', [
@@ -73,7 +74,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private birthdayFacade: BirthdayFacadeService,
-    private categoryFacade: CategoryFacadeService
+    private categoryFacade: CategoryFacadeService,
+    private cdr: ChangeDetectorRef
   ) {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
@@ -125,6 +127,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.testDataTimer = setTimeout(() => {
       this.isAddingTestData = false;
       this.testDataTimer = null;
+      this.cdr.markForCheck();
     }, 1000);
   }
 

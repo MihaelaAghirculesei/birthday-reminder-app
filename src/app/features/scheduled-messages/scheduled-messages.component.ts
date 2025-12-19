@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, map } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,6 +22,7 @@ import { MessageScheduleDialogComponent } from './message-schedule-dialog/messag
   ],
   templateUrl: './scheduled-messages.component.html',
   styleUrls: ['./scheduled-messages.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduledMessagesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -29,7 +30,8 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
 
   constructor(
     private birthdayFacade: BirthdayFacadeService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -42,6 +44,7 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
       )
       .subscribe(filteredBirthdays => {
         this.birthdaysWithMessages = filteredBirthdays;
+        this.cdr.markForCheck();
       });
   }
 
