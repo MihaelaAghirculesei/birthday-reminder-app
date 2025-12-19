@@ -17,7 +17,7 @@ export class NotificationPermissionService {
             this.permissionStatus$.next(this.getCurrentPermission());
           };
         })
-        .catch(() => {});
+        .catch(() => void 0);
     }
   }
 
@@ -63,7 +63,7 @@ export class NotificationPermissionService {
       localStorage.setItem('notificationPermissionGranted', (permission === 'granted').toString());
 
       return permission === 'granted';
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -89,7 +89,8 @@ export class NotificationPermissionService {
           primaryKey: 'test'
         }
       } as NotificationOptions);
-    } catch (error) {
+    } catch {
+      void 0;
     }
   }
 

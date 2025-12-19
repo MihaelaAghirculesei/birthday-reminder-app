@@ -159,8 +159,8 @@ export class PushNotificationService implements OnDestroy {
   }
 
   private async setupNotificationListeners(): Promise<void> {
-    await LocalNotifications.addListener('localNotificationReceived', () => {});
-    await LocalNotifications.addListener('localNotificationActionPerformed', () => {});
+    await LocalNotifications.addListener('localNotificationReceived', () => void 0);
+    await LocalNotifications.addListener('localNotificationActionPerformed', () => void 0);
   }
 
   async hasPermission(): Promise<boolean> {

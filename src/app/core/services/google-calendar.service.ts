@@ -69,28 +69,24 @@ export class GoogleCalendarService {
       return;
     }
 
-    try {
-      await this.loadGapi();
-      await gapi.load('client:auth2', async () => {
-        await gapi.client.init({
-          apiKey: this.API_KEY,
-          clientId: this.CLIENT_ID,
-          discoveryDocs: [this.DISCOVERY_DOC],
-          scope: this.SCOPES
-        });
-
-        const authInstance = this.getAuthInstance();
-        this.isSignedInSubject.next(authInstance.isSignedIn.get());
-
-        authInstance.isSignedIn.listen((isSignedIn: boolean) => {
-          this.isSignedInSubject.next(isSignedIn);
-        });
-
-        this.isInitialized = true;
+    await this.loadGapi();
+    await gapi.load('client:auth2', async () => {
+      await gapi.client.init({
+        apiKey: this.API_KEY,
+        clientId: this.CLIENT_ID,
+        discoveryDocs: [this.DISCOVERY_DOC],
+        scope: this.SCOPES
       });
-    } catch (error) {
-      throw error;
-    }
+
+      const authInstance = this.getAuthInstance();
+      this.isSignedInSubject.next(authInstance.isSignedIn.get());
+
+      authInstance.isSignedIn.listen((isSignedIn: boolean) => {
+        this.isSignedInSubject.next(isSignedIn);
+      });
+
+      this.isInitialized = true;
+    });
   }
 
   private loadGapi(): Promise<void> {
@@ -156,8 +152,8 @@ export class GoogleCalendarService {
       if (expiresIn < this.TOKEN_REFRESH_THRESHOLD_SECONDS) {
         await user.reloadAuthResponse();
       }
-    } catch (error) {
-      // Silent fail - will retry on actual API call if needed
+    } catch {
+      void 0;
     }
   }
 
@@ -166,14 +162,14 @@ export class GoogleCalendarService {
 
     try {
       return await operation();
-    } catch (error: any) {
-      const status = error?.result?.error?.code || error?.status;
+    } catch (error: unknown) {
+      const status = (error as { result?: { error?: { code?: number } }; status?: number })?.result?.error?.code || (error as { status?: number })?.status;
 
       if (status === 401 || status === 403) {
         try {
           await this.getAuthInstance().currentUser.get().reloadAuthResponse();
           return await operation();
-        } catch (retryError) {
+        } catch {
           throw error;
         }
       }
