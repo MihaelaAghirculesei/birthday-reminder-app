@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -8,46 +8,56 @@ import { NotificationService } from '../../core/services/notification.service';
 @Component({
   selector: 'app-photo-upload',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [MatIconModule, MatButtonModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="photo-upload-container">
       <div class="photo-preview"
-           [class.has-photo]="currentPhoto"
-           (click)="triggerFileInput()">
-
-        <div *ngIf="currentPhoto" class="photo-display">
-          <img [src]="currentPhoto" alt="Contact photo" class="contact-photo">
-          <div class="photo-overlay">
-            <mat-icon>edit</mat-icon>
-            <span>Change Photo</span>
+        [class.has-photo]="currentPhoto"
+        (click)="triggerFileInput()"
+        (keydown.enter)="triggerFileInput()"
+        (keydown.space)="triggerFileInput()"
+        tabindex="0"
+        role="button">
+    
+        @if (currentPhoto) {
+          <div class="photo-display">
+            <img [src]="currentPhoto" alt="Contact photo" class="contact-photo">
+            <div class="photo-overlay">
+              <mat-icon>edit</mat-icon>
+              <span>Change Photo</span>
+            </div>
           </div>
-        </div>
-
-        <div *ngIf="!currentPhoto" class="photo-placeholder">
-          <mat-icon class="upload-icon">add_a_photo</mat-icon>
-          <span class="upload-text">Add Remember Photo</span>
-          <small class="upload-hint">Click to upload image</small>
-        </div>
-
+        }
+    
+        @if (!currentPhoto) {
+          <div class="photo-placeholder">
+            <mat-icon class="upload-icon">add_a_photo</mat-icon>
+            <span class="upload-text">Add Remember Photo</span>
+            <small class="upload-hint">Click to upload image</small>
+          </div>
+        }
+    
         <input
           #fileInput
           type="file"
           accept="image/*"
           (change)="onFileSelected($event)"
           style="display: none;">
+        </div>
+    
+        @if (currentPhoto) {
+          <button
+            mat-icon-button
+            color="warn"
+            class="delete-button-circle"
+            (click)="removePhoto($event)"
+            matTooltip="Remove photo">
+            <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
+          </button>
+        }
       </div>
-
-      <button *ngIf="currentPhoto"
-              mat-icon-button
-              color="warn"
-              class="delete-button-circle"
-              (click)="removePhoto($event)"
-              matTooltip="Remove photo">
-        <img src="assets/icons/delete-button.png" alt="Delete" class="delete-icon">
-      </button>
-    </div>
-  `,
+    `,
   styles: [`
     .photo-upload-container {
       display: flex;

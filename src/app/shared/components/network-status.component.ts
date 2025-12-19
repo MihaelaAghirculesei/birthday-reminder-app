@@ -9,7 +9,7 @@ import { NetworkService } from '../../core';
   imports: [CommonModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="network-status" [ngClass]="{'offline': !(networkService.online$ | async)}">
+    <div class="network-status" [ngClass]="{'offline': (networkService.online$ | async) === false}">
       <mat-icon>{{ (networkService.online$ | async) ? 'wifi' : 'wifi_off' }}</mat-icon>
       <span>{{ (networkService.online$ | async) ? 'Online' : 'Offline' }}</span>
     </div>
