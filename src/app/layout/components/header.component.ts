@@ -16,7 +16,10 @@ import { ThemeService } from '../../core';
     <div class="app-header">
       <div class="header-top">
         <h1 class="hero-title">
-          <img src="assets/icons/logo-reminder.png" alt="Birthday Reminder Logo" class="app-logo">
+          <picture>
+            <source srcset="assets/icons/logo-reminder.webp" type="image/webp">
+            <img src="assets/icons/logo-reminder.png" alt="Birthday Reminder Logo" class="app-logo">
+          </picture>
           Birthday Memories
         </h1>
         <div class="header-controls">

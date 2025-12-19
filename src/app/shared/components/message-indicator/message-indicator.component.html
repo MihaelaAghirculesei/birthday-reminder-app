@@ -5,19 +5,25 @@
   type="button"
   >
   @if (hasActiveMessages) {
-    <img
-      src="assets/icons/configured-message.png"
-      alt="Message configured"
-      class="configured-message-icon"
-      />
+    <picture>
+      <source srcset="assets/icons/configured-message.webp" type="image/webp">
+      <img
+        src="assets/icons/configured-message.png"
+        alt="Message configured"
+        class="configured-message-icon"
+        />
+    </picture>
   }
 
   @if (!hasActiveMessages) {
-    <img
-      src="assets/icons/not-configured-message.png"
-      alt="No message configured"
-      class="not-configured-message-icon"
-      />
+    <picture>
+      <source srcset="assets/icons/not-configured-message.webp" type="image/webp">
+      <img
+        src="assets/icons/not-configured-message.png"
+        alt="No message configured"
+        class="not-configured-message-icon"
+        />
+    </picture>
   }
 
   @if (hasActiveMessages && activeMessageCount > 1) {
