@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import {
   ReactiveFormsModule,
@@ -25,7 +25,6 @@ import { NotificationService, BirthdayFacadeService } from '../../../core';
   selector: 'app-message-scheduler',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatCardModule,
     MatExpansionModule,
@@ -36,8 +35,8 @@ import { NotificationService, BirthdayFacadeService } from '../../../core';
     MatSlideToggleModule,
     MatIconModule,
     MatButtonModule,
-    MatTooltipModule,
-  ],
+    MatTooltipModule
+],
   templateUrl: './message-scheduler.component.html',
   styleUrls: ['./message-scheduler.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

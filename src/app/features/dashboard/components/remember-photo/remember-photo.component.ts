@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-remember-photo',
   standalone: true,
-  imports: [CommonModule, MatTooltipModule],
+  imports: [MatTooltipModule],
   templateUrl: './remember-photo.component.html',
   styleUrls: ['./remember-photo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

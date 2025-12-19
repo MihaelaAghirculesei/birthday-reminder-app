@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subject, takeUntil } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,43 +9,45 @@ import { NotificationPermissionService } from '../../core/services/notification-
 @Component({
   selector: 'app-notification-permission-banner',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
+  imports: [MatCardModule, MatIconModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="notification-banner" *ngIf="shouldShow">
-      <mat-card class="permission-card">
-        <mat-card-content>
-          <div class="banner-content">
-            <div class="icon-section">
-              <mat-icon class="notification-icon">notifications_active</mat-icon>
+    @if (shouldShow) {
+      <div class="notification-banner">
+        <mat-card class="permission-card">
+          <mat-card-content>
+            <div class="banner-content">
+              <div class="icon-section">
+                <mat-icon class="notification-icon">notifications_active</mat-icon>
+              </div>
+              <div class="text-section">
+                <h3>Enable Birthday Notifications</h3>
+                <p>Get reminded when it's someone's birthday! We'll send you notifications at the scheduled time.</p>
+              </div>
+              <div class="action-section">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="requestPermission()"
+                  [disabled]="isRequesting"
+                  >
+                  <mat-icon>check</mat-icon>
+                  Enable Notifications
+                </button>
+                <button
+                  mat-button
+                  (click)="dismiss()"
+                  [disabled]="isRequesting"
+                  >
+                  Maybe Later
+                </button>
+              </div>
             </div>
-            <div class="text-section">
-              <h3>Enable Birthday Notifications</h3>
-              <p>Get reminded when it's someone's birthday! We'll send you notifications at the scheduled time.</p>
-            </div>
-            <div class="action-section">
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="requestPermission()"
-                [disabled]="isRequesting"
-              >
-                <mat-icon>check</mat-icon>
-                Enable Notifications
-              </button>
-              <button
-                mat-button
-                (click)="dismiss()"
-                [disabled]="isRequesting"
-              >
-                Maybe Later
-              </button>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+    `,
   styles: [`
     .notification-banner {
       margin: 16px 0;

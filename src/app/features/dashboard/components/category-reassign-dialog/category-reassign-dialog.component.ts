@@ -1,5 +1,5 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,14 +19,13 @@ export interface CategoryReassignDialogData {
   selector: 'app-category-reassign-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatDialogModule,
     MatIconModule,
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule
-  ],
+],
   templateUrl: './category-reassign-dialog.component.html',
   styleUrls: ['./category-reassign-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

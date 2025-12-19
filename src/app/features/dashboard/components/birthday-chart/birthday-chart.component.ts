@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ChartDataItem } from '../../services';
@@ -12,7 +12,7 @@ interface EnrichedChartDataItem extends ChartDataItem {
 @Component({
   selector: 'app-birthday-chart',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
+  imports: [MatCardModule, MatIconModule],
   templateUrl: './birthday-chart.component.html',
   styleUrls: ['./birthday-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

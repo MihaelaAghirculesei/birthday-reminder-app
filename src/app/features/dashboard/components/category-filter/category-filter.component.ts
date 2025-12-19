@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -16,7 +16,7 @@ export interface CategoryStats {
 @Component({
   selector: 'app-category-filter',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, CategoryIconComponent],
+  imports: [MatIconModule, MatButtonModule, MatTooltipModule, CategoryIconComponent],
   templateUrl: './category-filter.component.html',
   styleUrls: ['./category-filter.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

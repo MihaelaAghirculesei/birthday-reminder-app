@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
@@ -21,7 +21,6 @@ interface EnrichedBirthday extends Birthday {
   selector: 'app-birthday-list',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -30,7 +29,7 @@ interface EnrichedBirthday extends Birthday {
     MatButtonModule,
     MatTooltipModule,
     BirthdayItemComponent
-  ],
+],
   templateUrl: './birthday-list.component.html',
   styleUrls: ['./birthday-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
