@@ -10,52 +10,62 @@
   </div>
 
   <mat-dialog-content>
-    <div class="birthday-selector" *ngIf="showBirthdaySelector">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Select a Birthday</mat-label>
-        <mat-select [(ngModel)]="selectedBirthdayId" (selectionChange)="onBirthdaySelected()">
-          <mat-option *ngFor="let birthday of allBirthdays$ | async; trackBy: trackByBirthday" [value]="birthday.id">
-            <div class="birthday-option">
-              <span class="birthday-name">{{ birthday.name }}</span>
-              <span class="birthday-date">{{ birthday.birthDate | date: 'dd MMM yyyy' }}</span>
+    @if (showBirthdaySelector) {
+      <div class="birthday-selector">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select a Birthday</mat-label>
+          <mat-select [(ngModel)]="selectedBirthdayId" (selectionChange)="onBirthdaySelected()">
+            @for (birthday of allBirthdays$ | async; track birthday.id) {
+              <mat-option [value]="birthday.id">
+                <div class="birthday-option">
+                  <span class="birthday-name">{{ birthday.name }}</span>
+                  <span class="birthday-date">{{ birthday.birthDate | date: 'dd MMM yyyy' }}</span>
+                </div>
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>cake</mat-icon>
+          <mat-hint>Choose whose birthday to schedule messages for</mat-hint>
+        </mat-form-field>
+        @if (!selectedBirthdayId) {
+          <div class="selector-help">
+            <mat-icon>info</mat-icon>
+            <p>Select a person from the dropdown to create scheduled messages for their birthday</p>
+          </div>
+        }
+      </div>
+    }
+
+    @if (selectedBirthday && !showBirthdaySelector) {
+      <div class="selected-birthday-section">
+        <div class="selected-birthday-card">
+          @if (selectedBirthday.photo) {
+            <div class="birthday-avatar">
+              <img [src]="selectedBirthday.photo" [alt]="selectedBirthday.name" />
             </div>
-          </mat-option>
-        </mat-select>
-        <mat-icon matPrefix>cake</mat-icon>
-        <mat-hint>Choose whose birthday to schedule messages for</mat-hint>
-      </mat-form-field>
-
-      <div class="selector-help" *ngIf="!selectedBirthdayId">
-        <mat-icon>info</mat-icon>
-        <p>Select a person from the dropdown to create scheduled messages for their birthday</p>
-      </div>
-    </div>
-
-    <div class="selected-birthday-section" *ngIf="selectedBirthday && !showBirthdaySelector">
-      <div class="selected-birthday-card">
-        <div class="birthday-avatar" *ngIf="selectedBirthday.photo">
-          <img [src]="selectedBirthday.photo" [alt]="selectedBirthday.name" />
+          }
+          @if (!selectedBirthday.photo) {
+            <div class="birthday-avatar no-photo">
+              <mat-icon>person</mat-icon>
+            </div>
+          }
+          <div class="birthday-details">
+            <h3>{{ selectedBirthday.name }}</h3>
+            <p class="birth-date">
+              <mat-icon class="small-icon">cake</mat-icon>
+              {{ selectedBirthday.birthDate | date: 'EEEE, MMMM dd, yyyy' }}
+            </p>
+          </div>
+          <button mat-button color="primary" (click)="changeBirthday()" class="change-button" aria-label="Change selected birthday">
+            <mat-icon>swap_horiz</mat-icon>
+            Change
+          </button>
         </div>
-        <div class="birthday-avatar no-photo" *ngIf="!selectedBirthday.photo">
-          <mat-icon>person</mat-icon>
+        <div class="scheduler-container">
+          <app-message-scheduler [birthday]="selectedBirthday"></app-message-scheduler>
         </div>
-        <div class="birthday-details">
-          <h3>{{ selectedBirthday.name }}</h3>
-          <p class="birth-date">
-            <mat-icon class="small-icon">cake</mat-icon>
-            {{ selectedBirthday.birthDate | date: 'EEEE, MMMM dd, yyyy' }}
-          </p>
-        </div>
-        <button mat-button color="primary" (click)="changeBirthday()" class="change-button" aria-label="Change selected birthday">
-          <mat-icon>swap_horiz</mat-icon>
-          Change
-        </button>
       </div>
-
-      <div class="scheduler-container">
-        <app-message-scheduler [birthday]="selectedBirthday"></app-message-scheduler>
-      </div>
-    </div>
+    }
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">

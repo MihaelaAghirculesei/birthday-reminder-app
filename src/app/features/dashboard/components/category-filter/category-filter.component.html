@@ -1,105 +1,108 @@
-<div class="categories-section" *ngIf="categoriesStats.length > 0">
-  <div class="section-header">
-    <div class="section-title-wrapper">
-      <h3 class="section-title">
-        <div class="title-icon-wrapper">
-          <mat-icon>category</mat-icon>
-        </div>
-        Categories Overview
-      </h3>
-      <p class="section-subtitle">Click any category to filter your birthdays</p>
+@if (categoriesStats.length > 0) {
+  <div class="categories-section">
+    <div class="section-header">
+      <div class="section-title-wrapper">
+        <h3 class="section-title">
+          <div class="title-icon-wrapper">
+            <mat-icon>category</mat-icon>
+          </div>
+          Categories Overview
+        </h3>
+        <p class="section-subtitle">Click any category to filter your birthdays</p>
+      </div>
+      @if (selectedCategory) {
+        <button
+          mat-fab
+          color="primary"
+          class="clear-all-btn"
+          (click)="clearFilter()"
+          matTooltip="Clear all filters"
+          aria-label="Clear category filter"
+          >
+          <mat-icon>clear_all</mat-icon>
+        </button>
+      }
     </div>
-    <button
-      *ngIf="selectedCategory"
-      mat-fab
-      color="primary"
-      class="clear-all-btn"
-      (click)="clearFilter()"
-      matTooltip="Clear all filters"
-      aria-label="Clear category filter"
-    >
-      <mat-icon>clear_all</mat-icon>
-    </button>
-  </div>
-
-  <div class="categories-grid">
-    <div
-      *ngFor="let categoryStats of categoriesStats; trackBy: trackByCategoryStats"
-      class="category-stat-card"
-      [class.selected]="selectedCategory === categoryStats.id"
-      (click)="selectCategory(categoryStats.id)"
-      role="button"
-      tabindex="0"
-      [attr.aria-label]="'Filter by ' + categoryStats.name + ' category, ' + categoryStats.count + ' ' + (categoryStats.count === 1 ? 'person' : 'people')"
-      [attr.aria-pressed]="selectedCategory === categoryStats.id"
-      (keydown.enter)="selectCategory(categoryStats.id)"
-      (keydown.space)="selectCategory(categoryStats.id)"
-    >
-      <div class="category-card-background"></div>
-      <div class="category-stat-content">
-        <div class="category-icon-section">
-          <app-category-icon
-            [categoryId]="categoryStats.id"
-            [icon]="categoryStats.icon"
-            [color]="categoryStats.color"
-            cssClass="category-stat-icon"
-          ></app-category-icon>
-          <div
-            class="selection-indicator"
-            *ngIf="selectedCategory === categoryStats.id"
+    <div class="categories-grid">
+      @for (categoryStats of categoriesStats; track categoryStats.id) {
+        <div
+          class="category-stat-card"
+          [class.selected]="selectedCategory === categoryStats.id"
+          (click)="selectCategory(categoryStats.id)"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Filter by ' + categoryStats.name + ' category, ' + categoryStats.count + ' ' + (categoryStats.count === 1 ? 'person' : 'people')"
+          [attr.aria-pressed]="selectedCategory === categoryStats.id"
+          (keydown.enter)="selectCategory(categoryStats.id)"
+          (keydown.space)="selectCategory(categoryStats.id)"
           >
-            <mat-icon>check_circle</mat-icon>
+          <div class="category-card-background"></div>
+          <div class="category-stat-content">
+            <div class="category-icon-section">
+              <app-category-icon
+                [categoryId]="categoryStats.id"
+                [icon]="categoryStats.icon"
+                [color]="categoryStats.color"
+                cssClass="category-stat-icon"
+              ></app-category-icon>
+              @if (selectedCategory === categoryStats.id) {
+                <div
+                  class="selection-indicator"
+                  >
+                  <mat-icon>check_circle</mat-icon>
+                </div>
+              }
+            </div>
+            <div class="category-stat-info">
+              <div class="category-stat-name">{{ categoryStats.name }}</div>
+              <div class="category-stat-count">
+                {{ categoryStats.count }}
+                {{ categoryStats.count === 1 ? 'person' : 'people' }}
+              </div>
+            </div>
+            <div class="category-actions">
+              <button
+                mat-icon-button
+                class="category-action-btn edit-btn"
+                (click)="editCategory($event, categoryStats.id)"
+                matTooltip="Edit category"
+                [attr.aria-label]="'Edit ' + categoryStats.name + ' category'"
+                >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="category-action-btn delete-btn"
+                (click)="deleteCategory($event, categoryStats.id)"
+                matTooltip="Delete category"
+                [attr.aria-label]="'Delete ' + categoryStats.name + ' category'"
+                >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
-        <div class="category-stat-info">
-          <div class="category-stat-name">{{ categoryStats.name }}</div>
-          <div class="category-stat-count">
-            {{ categoryStats.count }}
-            {{ categoryStats.count === 1 ? 'person' : 'people' }}
+      }
+      <div
+        class="category-stat-card add-category-card"
+        (click)="addNewCategory()"
+        role="button"
+        tabindex="0"
+        aria-label="Add new category"
+        (keydown.enter)="addNewCategory()"
+        (keydown.space)="addNewCategory()"
+        >
+        <div class="category-card-background add-category-background"></div>
+        <div class="category-stat-content">
+          <div class="category-icon-section">
+            <mat-icon class="add-category-icon">add_circle</mat-icon>
           </div>
-        </div>
-        <div class="category-actions">
-          <button
-            mat-icon-button
-            class="category-action-btn edit-btn"
-            (click)="editCategory($event, categoryStats.id)"
-            matTooltip="Edit category"
-            [attr.aria-label]="'Edit ' + categoryStats.name + ' category'"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            class="category-action-btn delete-btn"
-            (click)="deleteCategory($event, categoryStats.id)"
-            matTooltip="Delete category"
-            [attr.aria-label]="'Delete ' + categoryStats.name + ' category'"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
+          <div class="category-stat-info">
+            <div class="category-stat-name">New Category</div>
+            <div class="category-stat-count">Click to add</div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div
-      class="category-stat-card add-category-card"
-      (click)="addNewCategory()"
-      role="button"
-      tabindex="0"
-      aria-label="Add new category"
-      (keydown.enter)="addNewCategory()"
-      (keydown.space)="addNewCategory()"
-    >
-      <div class="category-card-background add-category-background"></div>
-      <div class="category-stat-content">
-        <div class="category-icon-section">
-          <mat-icon class="add-category-icon">add_circle</mat-icon>
-        </div>
-        <div class="category-stat-info">
-          <div class="category-stat-name">New Category</div>
-          <div class="category-stat-count">Click to add</div>
-        </div>
-      </div>
-    </div>
   </div>
-</div>
+}

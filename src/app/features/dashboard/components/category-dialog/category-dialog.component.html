@@ -6,56 +6,64 @@
       <mat-label>Category Name</mat-label>
       <input matInput formControlName="name" placeholder="e.g. Sports, Music, Gaming">
       <mat-icon matSuffix>label</mat-icon>
-      <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
-        Name is required
-      </mat-error>
-      <mat-error *ngIf="categoryForm.get('name')?.hasError('minlength')">
-        Name must be at least 2 characters
-      </mat-error>
+      @if (categoryForm.get('name')?.hasError('required')) {
+        <mat-error>
+          Name is required
+        </mat-error>
+      }
+      @if (categoryForm.get('name')?.hasError('minlength')) {
+        <mat-error>
+          Name must be at least 2 characters
+        </mat-error>
+      }
     </mat-form-field>
 
     <div class="icon-section">
-      <label class="section-label">Choose Icon</label>
+      <div class="section-label">Choose Icon</div>
       <div class="icon-grid">
-        <button
-          *ngFor="let icon of availableIcons; trackBy: trackByIndex"
-          type="button"
-          mat-icon-button
-          class="icon-option"
-          [class.selected]="categoryForm.get('icon')?.value === icon"
-          (click)="categoryForm.patchValue({ icon: icon })"
-          [style.color]="categoryForm.get('icon')?.value === icon ? categoryForm.get('color')?.value : ''"
-          [attr.aria-label]="'Select ' + icon + ' icon'"
-          [attr.aria-pressed]="categoryForm.get('icon')?.value === icon"
-        >
-          <mat-icon>{{ icon }}</mat-icon>
-        </button>
+        @for (icon of availableIcons; track $index) {
+          <button
+            type="button"
+            mat-icon-button
+            class="icon-option"
+            [class.selected]="categoryForm.get('icon')?.value === icon"
+            (click)="categoryForm.patchValue({ icon: icon })"
+            [style.color]="categoryForm.get('icon')?.value === icon ? categoryForm.get('color')?.value : ''"
+            [attr.aria-label]="'Select ' + icon + ' icon'"
+            [attr.aria-pressed]="categoryForm.get('icon')?.value === icon"
+            >
+            <mat-icon>{{ icon }}</mat-icon>
+          </button>
+        }
       </div>
     </div>
 
     <div class="color-section">
-      <label class="section-label">Choose Color</label>
+      <div class="section-label">Choose Color</div>
       <div class="color-grid">
-        <button
-          *ngFor="let colorOption of availableColors; trackBy: trackByColorValue"
-          type="button"
-          class="color-option"
-          [class.selected]="categoryForm.get('color')?.value === colorOption.value"
-          [style.background-color]="colorOption.value"
-          (click)="categoryForm.patchValue({ color: colorOption.value })"
-          [matTooltip]="colorOption.name"
-          [attr.aria-label]="'Select ' + colorOption.name + ' color'"
-          [attr.aria-pressed]="categoryForm.get('color')?.value === colorOption.value"
-        >
-          <mat-icon *ngIf="categoryForm.get('color')?.value === colorOption.value" class="check-icon">
-            check_circle
-          </mat-icon>
-        </button>
+        @for (colorOption of availableColors; track colorOption.value) {
+          <button
+            type="button"
+            class="color-option"
+            [class.selected]="categoryForm.get('color')?.value === colorOption.value"
+            [style.background-color]="colorOption.value"
+            (click)="categoryForm.patchValue({ color: colorOption.value })"
+            [matTooltip]="colorOption.name"
+            [attr.aria-label]="'Select ' + colorOption.name + ' color'"
+            [attr.aria-pressed]="categoryForm.get('color')?.value === colorOption.value"
+            >
+            @if (categoryForm.get('color')?.value === colorOption.value) {
+              <mat-icon class="check-icon">
+                check_circle
+              </mat-icon>
+            }
+          </button>
+        }
       </div>
     </div>
 
     <div class="preview-section">
-      <label class="section-label">Preview</label>
+      <div class="section-label">Preview</div>
       <div class="category-preview">
         <mat-icon [style.color]="categoryForm.get('color')?.value">
           {{ categoryForm.get('icon')?.value }}
@@ -74,7 +82,7 @@
     (click)="onSubmit()"
     [disabled]="categoryForm.invalid"
     [attr.aria-label]="data.mode === 'add' ? 'Add new category' : 'Save category changes'"
-  >
+    >
     {{ data.mode === 'add' ? 'Add Category' : 'Save Changes' }}
   </button>
 </mat-dialog-actions>

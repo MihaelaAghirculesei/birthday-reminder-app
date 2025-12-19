@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
@@ -8,13 +8,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, BirthdayFacadeService } from '../../core';
+import { GoogleCalendarService, GoogleCalendarItem, BirthdayFacadeService } from '../../core';
 
 @Component({
   selector: 'app-google-calendar-sync',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -22,13 +21,13 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
     MatSlideToggleModule,
     MatIconModule,
     MatButtonModule
-  ],
+],
   template: `
     <mat-card class="sync-card">
       <mat-card-header>
         <mat-card-title>📅 Google Calendar Sync</mat-card-title>
       </mat-card-header>
-
+    
       <mat-card-content>
         <div class="sync-status" [class.connected]="isSignedIn">
           <mat-icon [color]="isSignedIn ? 'primary' : 'warn'">
@@ -38,112 +37,115 @@ import { GoogleCalendarService, GoogleCalendarSettings, GoogleCalendarItem, Birt
             {{ isSignedIn ? 'Connected to Google Calendar' : 'Not connected' }}
           </span>
         </div>
-
-        <div class="auth-section" *ngIf="!isSignedIn">
-          <p class="auth-description">
-            Connect your Google account to automatically sync birthdays to your calendar.
-            Each birthday will be added as an annual recurring event.
-          </p>
-          <button mat-raised-button
-                  color="primary"
-                  (click)="signIn()"
-                  [disabled]="isConnecting"
-                  class="submit-button">
-            <mat-icon>login</mat-icon>
-            {{ isConnecting ? 'Connecting...' : 'Connect Google Calendar' }}
-          </button>
-        </div>
-
-        <div class="settings-section" *ngIf="isSignedIn">
-          <form [formGroup]="settingsForm" class="settings-form">
-            <mat-slide-toggle
-              formControlName="enabled"
+    
+        @if (!isSignedIn) {
+          <div class="auth-section">
+            <p class="auth-description">
+              Connect your Google account to automatically sync birthdays to your calendar.
+              Each birthday will be added as an annual recurring event.
+            </p>
+            <button mat-raised-button
               color="primary"
-              class="sync-toggle">
-              Enable automatic sync
-            </mat-slide-toggle>
-
-            <div class="settings-content" *ngIf="settingsForm.get('enabled')?.value">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Target Calendar</mat-label>
-                <mat-select formControlName="calendarId">
-                  <mat-option value="primary">Primary Calendar</mat-option>
-                  <mat-option *ngFor="let calendar of calendars; trackBy: trackByCalendar" [value]="calendar.id">
-                    {{ calendar.summary }}
-                  </mat-option>
-                </mat-select>
-                <mat-icon matSuffix>calendar_today</mat-icon>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Sync Mode</mat-label>
-                <mat-select formControlName="syncMode">
-                  <mat-option value="one-way">One-way (App → Calendar)</mat-option>
-                  <mat-option value="two-way">Two-way (Bidirectional)</mat-option>
-                </mat-select>
-                <mat-hint>
-                  One-way: Only sync from app to calendar.
-                  Two-way: Sync changes in both directions.
-                </mat-hint>
-                <mat-icon matSuffix>sync</mat-icon>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Reminder Time</mat-label>
-                <mat-select formControlName="reminderMinutes">
-                  <mat-option [value]="60">1 hour before</mat-option>
-                  <mat-option [value]="360">6 hours before</mat-option>
-                  <mat-option [value]="1440">1 day before</mat-option>
-                  <mat-option [value]="2880">2 days before</mat-option>
-                  <mat-option [value]="10080">1 week before</mat-option>
-                </mat-select>
-                <mat-icon matSuffix>notifications</mat-icon>
-              </mat-form-field>
-
-              <div class="sync-actions">
-                <button mat-raised-button
-                        color="primary"
-                        (click)="syncAllBirthdays()"
-                        [disabled]="isSyncing"
-                        class="sync-button">
-                  <mat-icon>sync</mat-icon>
-                  {{ isSyncing ? 'Syncing...' : 'Sync All Birthdays' }}
-                </button>
-
-                <button mat-stroked-button
-                        (click)="saveSettings()"
-                        [disabled]="settingsForm.pristine"
-                        class="save-button">
-                  <mat-icon>save</mat-icon>
-                  Save Settings
-                </button>
-              </div>
-
-              <div class="sync-info" *ngIf="lastSyncResult">
-                <mat-icon [color]="lastSyncResult.failed > 0 ? 'warn' : 'primary'">
-                  {{ lastSyncResult.failed > 0 ? 'warning' : 'check_circle' }}
-                </mat-icon>
-                <span>
-                  Last sync: {{ lastSyncResult.success }} successful,
-                  {{ lastSyncResult.failed }} failed
-                </span>
-              </div>
-            </div>
-          </form>
-
-          <div class="disconnect-section">
-            <button mat-stroked-button
-                    color="warn"
-                    (click)="signOut()"
-                    class="disconnect-button">
-              <mat-icon>logout</mat-icon>
-              Disconnect Google Calendar
+              (click)="signIn()"
+              [disabled]="isConnecting"
+              class="submit-button">
+              <mat-icon>login</mat-icon>
+              {{ isConnecting ? 'Connecting...' : 'Connect Google Calendar' }}
             </button>
           </div>
-        </div>
+        }
+    
+        @if (isSignedIn) {
+          <div class="settings-section">
+            <form [formGroup]="settingsForm" class="settings-form">
+              <mat-slide-toggle
+                formControlName="enabled"
+                color="primary"
+                class="sync-toggle">
+                Enable automatic sync
+              </mat-slide-toggle>
+              @if (settingsForm.get('enabled')?.value) {
+                <div class="settings-content">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Target Calendar</mat-label>
+                    <mat-select formControlName="calendarId">
+                      <mat-option value="primary">Primary Calendar</mat-option>
+                      @for (calendar of calendars; track calendar.id) {
+                        <mat-option [value]="calendar.id">
+                          {{ calendar.summary }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-icon matSuffix>calendar_today</mat-icon>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Sync Mode</mat-label>
+                    <mat-select formControlName="syncMode">
+                      <mat-option value="one-way">One-way (App → Calendar)</mat-option>
+                      <mat-option value="two-way">Two-way (Bidirectional)</mat-option>
+                    </mat-select>
+                    <mat-hint>
+                      One-way: Only sync from app to calendar.
+                      Two-way: Sync changes in both directions.
+                    </mat-hint>
+                    <mat-icon matSuffix>sync</mat-icon>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Reminder Time</mat-label>
+                    <mat-select formControlName="reminderMinutes">
+                      <mat-option [value]="60">1 hour before</mat-option>
+                      <mat-option [value]="360">6 hours before</mat-option>
+                      <mat-option [value]="1440">1 day before</mat-option>
+                      <mat-option [value]="2880">2 days before</mat-option>
+                      <mat-option [value]="10080">1 week before</mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>notifications</mat-icon>
+                  </mat-form-field>
+                  <div class="sync-actions">
+                    <button mat-raised-button
+                      color="primary"
+                      (click)="syncAllBirthdays()"
+                      [disabled]="isSyncing"
+                      class="sync-button">
+                      <mat-icon>sync</mat-icon>
+                      {{ isSyncing ? 'Syncing...' : 'Sync All Birthdays' }}
+                    </button>
+                    <button mat-stroked-button
+                      (click)="saveSettings()"
+                      [disabled]="settingsForm.pristine"
+                      class="save-button">
+                      <mat-icon>save</mat-icon>
+                      Save Settings
+                    </button>
+                  </div>
+                  @if (lastSyncResult) {
+                    <div class="sync-info">
+                      <mat-icon [color]="lastSyncResult.failed > 0 ? 'warn' : 'primary'">
+                        {{ lastSyncResult.failed > 0 ? 'warning' : 'check_circle' }}
+                      </mat-icon>
+                      <span>
+                        Last sync: {{ lastSyncResult.success }} successful,
+                        {{ lastSyncResult.failed }} failed
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </form>
+            <div class="disconnect-section">
+              <button mat-stroked-button
+                color="warn"
+                (click)="signOut()"
+                class="disconnect-button">
+                <mat-icon>logout</mat-icon>
+                Disconnect Google Calendar
+              </button>
+            </div>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
-  `,
+    `,
   styles: [`
     .sync-card {
       max-width: 600px;
@@ -443,7 +445,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     this.isConnecting = true;
     try {
       await this.googleCalendarService.signIn();
-    } catch (error) {
+    } catch {
       // Silent failure for sign in
     } finally {
       this.isConnecting = false;
@@ -455,7 +457,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
       await this.googleCalendarService.signOut();
       this.calendars = [];
       this.lastSyncResult = null;
-    } catch (error) {
+    } catch {
       // Silent failure for sign out
     }
   }
@@ -463,7 +465,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
   async loadCalendars() {
     try {
       this.calendars = await this.googleCalendarService.getCalendars();
-    } catch (error) {
+    } catch {
       // Silent failure for loading calendars
     }
   }
@@ -475,7 +477,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
       if (birthdays) {
         this.lastSyncResult = await this.googleCalendarService.syncAllBirthdays(birthdays);
       }
-    } catch (error) {
+    } catch {
       // Silent failure for sync
     } finally {
       this.isSyncing = false;

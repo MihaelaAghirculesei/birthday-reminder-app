@@ -7,22 +7,28 @@
   </mat-card-header>
   <mat-card-content>
     <div class="chart-container">
-      <div *ngFor="let monthData of enrichedChartData; trackBy: trackByMonth" class="chart-bar">
-        <div class="bar-container">
-          <div
-            class="bar"
-            [style.height.%]="monthData.heightPercent"
-            [class.current-month]="monthData.isCurrentMonth"
-          ></div>
-          <div class="bar-value" *ngIf="monthData.count > 0">
-            {{ monthData.count }}
+      @for (monthData of enrichedChartData; track monthData.month) {
+        <div class="chart-bar">
+          <div class="bar-container">
+            <div
+              class="bar"
+              [style.height.%]="monthData.heightPercent"
+              [class.current-month]="monthData.isCurrentMonth"
+            ></div>
+            @if (monthData.count > 0) {
+              <div class="bar-value">
+                {{ monthData.count }}
+              </div>
+            }
           </div>
+          <div class="bar-label">{{ monthData.month }}</div>
         </div>
-        <div class="bar-label">{{ monthData.month }}</div>
+      }
+    </div>
+    @if (totalBirthdays === 0) {
+      <div class="chart-legend">
+        <p class="no-data-text">Add some birthdays to see the chart!</p>
       </div>
-    </div>
-    <div class="chart-legend" *ngIf="totalBirthdays === 0">
-      <p class="no-data-text">Add some birthdays to see the chart!</p>
-    </div>
+    }
   </mat-card-content>
 </mat-card>

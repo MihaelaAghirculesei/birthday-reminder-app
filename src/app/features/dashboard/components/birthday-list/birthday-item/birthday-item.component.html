@@ -1,215 +1,238 @@
 <div class="dashboard-birthday-item" tabindex="0" role="article" [attr.aria-label]="'Birthday card for ' + birthday.name">
-  <div class="dashboard-avatar" *ngIf="birthday.photo">
-    <img
-      [src]="birthday.photo"
-      [alt]="birthday.name"
-      class="dashboard-photo"
-    />
-  </div>
-  <div class="dashboard-avatar" *ngIf="!birthday.photo">
-    <mat-icon class="dashboard-default-icon">person</mat-icon>
-  </div>
+  @if (birthday.photo) {
+    <div class="dashboard-avatar">
+      <img
+        [src]="birthday.photo"
+        [alt]="birthday.name"
+        class="dashboard-photo"
+        />
+    </div>
+  }
+  @if (!birthday.photo) {
+    <div class="dashboard-avatar">
+      <mat-icon class="dashboard-default-icon">person</mat-icon>
+    </div>
+  }
 
   <div class="dashboard-birthday-content">
     <div class="dashboard-birthday-info">
-      <div
-        class="dashboard-name"
-        *ngIf="!isEditing"
-        (dblclick)="onQuickEdit()"
-        title="Double-click to edit"
-      >
-        {{ birthday.name }}
-      </div>
-      <input
-        *ngIf="isEditing"
-        type="text"
-        [(ngModel)]="editingData!.name"
-        (input)="onEditInputChange()"
-        class="edit-name-input"
-        placeholder="Name"
-        aria-label="Birthday person name"
-      />
+      @if (!isEditing) {
+        <div
+          class="dashboard-name"
+          (dblclick)="onQuickEdit()"
+          title="Double-click to edit"
+          >
+          {{ birthday.name }}
+        </div>
+      }
+      @if (isEditing) {
+        <input
+          type="text"
+          [(ngModel)]="editingData!.name"
+          (input)="onEditInputChange()"
+          class="edit-name-input"
+          placeholder="Name"
+          aria-label="Birthday person name"
+          />
+      }
       <div class="dashboard-age">
         {{ getAge(birthday.birthDate) }} years old
       </div>
     </div>
 
     <div class="dashboard-birthday-details">
-      <div class="dashboard-birth-date" *ngIf="!isEditing">
-        <mat-icon class="small-icon">cake</mat-icon>
-        {{ birthday.birthDate | date : 'EEEE, MMMM dd, yyyy' }}
-      </div>
-      <div class="dashboard-birth-date-edit" *ngIf="isEditing">
-        <mat-icon class="small-icon">cake</mat-icon>
-        <input
-          type="date"
-          [(ngModel)]="editingData!.birthDate"
-          (input)="onEditInputChange()"
-          class="edit-date-input"
-          placeholder="Birth Date"
-          aria-label="Birth date"
-        />
-      </div>
-      <div
-        class="dashboard-notes"
-        *ngIf="birthday.notes && !isEditing"
-      >
-        <mat-icon class="small-icon">note</mat-icon>
-        {{ birthday.notes }}
-      </div>
-      <div class="dashboard-notes-edit" *ngIf="isEditing">
-        <mat-icon class="small-icon">note</mat-icon>
-        <input
-          type="text"
-          [(ngModel)]="editingData!.notes"
-          (input)="onEditInputChange()"
-          class="edit-notes-input"
-          placeholder="Notes"
-          aria-label="Birthday notes"
-        />
-      </div>
-    </div>
-
-    <div class="dashboard-icons" *ngIf="!isEditing">
-      <div class="dashboard-icons-left">
-        <app-category-icon
-          [categoryId]="birthday.category || defaultCategory"
-          cssClass="dashboard-category-inline"
-        ></app-category-icon>
-        <app-zodiac-icon
-          [zodiacSign]="birthday.zodiacSign"
-          *ngIf="birthday.zodiacSign"
-          cssClass="dashboard-zodiac-inline"
-        ></app-zodiac-icon>
-        <app-message-indicator
-          [birthday]="birthday"
-        ></app-message-indicator>
-        <app-remember-photo
-          [photoUrl]="birthday.rememberPhoto"
-          [birthdayName]="birthday.name"
-          (share)="onShareRememberPhoto()"
-          (download)="onDownloadRememberPhoto()"
-        ></app-remember-photo>
-      </div>
-      <div class="dashboard-icons-right">
-        <ng-container *ngIf="!isEditing">
-          <button
-            mat-icon-button
-            color="primary"
-            (click)="onEdit()"
-            class="edit-button-circle"
-            matTooltip="Edit birthday"
-            [attr.aria-label]="'Edit ' + birthday.name + ' birthday'"
-          >
-            <mat-icon class="edit-icon">edit</mat-icon>
-          </button>
-
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="onDelete()"
-            class="delete-button-circle"
-            matTooltip="Delete birthday"
-            [attr.aria-label]="'Delete ' + birthday.name + ' birthday'"
-          >
-            <img
-              src="assets/icons/delete-button.png"
-              alt="Delete"
-              class="delete-icon"
+      @if (!isEditing) {
+        <div class="dashboard-birth-date">
+          <mat-icon class="small-icon">cake</mat-icon>
+          {{ birthday.birthDate | date : 'EEEE, MMMM dd, yyyy' }}
+        </div>
+      }
+      @if (isEditing) {
+        <div class="dashboard-birth-date-edit">
+          <mat-icon class="small-icon">cake</mat-icon>
+          <input
+            type="date"
+            [(ngModel)]="editingData!.birthDate"
+            (input)="onEditInputChange()"
+            class="edit-date-input"
+            placeholder="Birth Date"
+            aria-label="Birth date"
             />
-          </button>
-        </ng-container>
-
-        <ng-container *ngIf="isEditing">
-          <button
-            mat-icon-button
-            color="primary"
-            (click)="onSave()"
-            class="save-button-circle"
-            matTooltip="Save changes"
-            [attr.aria-label]="'Save changes to ' + birthday.name + ' birthday'"
+        </div>
+      }
+      @if (birthday.notes && !isEditing) {
+        <div
+          class="dashboard-notes"
           >
-            <mat-icon class="save-icon">check</mat-icon>
-          </button>
+          <mat-icon class="small-icon">note</mat-icon>
+          {{ birthday.notes }}
+        </div>
+      }
+      @if (isEditing) {
+        <div class="dashboard-notes-edit">
+          <mat-icon class="small-icon">note</mat-icon>
+          <input
+            type="text"
+            [(ngModel)]="editingData!.notes"
+            (input)="onEditInputChange()"
+            class="edit-notes-input"
+            placeholder="Notes"
+            aria-label="Birthday notes"
+            />
+        </div>
+      }
+    </div>
 
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="onCancel()"
-            class="cancel-button-circle"
-            matTooltip="Cancel"
-            aria-label="Cancel editing"
+    @if (!isEditing) {
+      <div class="dashboard-icons">
+        <div class="dashboard-icons-left">
+          <app-category-icon
+            [categoryId]="birthday.category || defaultCategory"
+            cssClass="dashboard-category-inline"
+          ></app-category-icon>
+          @if (birthday.zodiacSign) {
+            <app-zodiac-icon
+              [zodiacSign]="birthday.zodiacSign"
+              cssClass="dashboard-zodiac-inline"
+            ></app-zodiac-icon>
+          }
+          <app-message-indicator
+            [birthday]="birthday"
+          ></app-message-indicator>
+          <app-remember-photo
+            [photoUrl]="birthday.rememberPhoto"
+            [birthdayName]="birthday.name"
+            (share)="onShareRememberPhoto()"
+            (download)="onDownloadRememberPhoto()"
+          ></app-remember-photo>
+        </div>
+        <div class="dashboard-icons-right">
+          @if (!isEditing) {
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="onEdit()"
+              class="edit-button-circle"
+              matTooltip="Edit birthday"
+              [attr.aria-label]="'Edit ' + birthday.name + ' birthday'"
+              >
+              <mat-icon class="edit-icon">edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="onDelete()"
+              class="delete-button-circle"
+              matTooltip="Delete birthday"
+              [attr.aria-label]="'Delete ' + birthday.name + ' birthday'"
+              >
+              <img
+                src="assets/icons/delete-button.png"
+                alt="Delete"
+                class="delete-icon"
+                />
+            </button>
+          }
+          @if (isEditing) {
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="onSave()"
+              class="save-button-circle"
+              matTooltip="Save changes"
+              [attr.aria-label]="'Save changes to ' + birthday.name + ' birthday'"
+              >
+              <mat-icon class="save-icon">check</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="onCancel()"
+              class="cancel-button-circle"
+              matTooltip="Cancel"
+              aria-label="Cancel editing"
+              >
+              <mat-icon class="cancel-icon">close</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (isEditing) {
+      <div class="dashboard-category-edit">
+        <mat-icon class="small-icon">category</mat-icon>
+        <select
+          [(ngModel)]="editingData!.category"
+          (change)="onEditInputChange()"
+          class="edit-category-select"
+          aria-label="Birthday category"
           >
-            <mat-icon class="cancel-icon">close</mat-icon>
-          </button>
-        </ng-container>
+          @for (category of categories; track category.id) {
+            <option
+              [value]="category.id"
+              >
+              {{ category.name }}
+            </option>
+          }
+        </select>
       </div>
-    </div>
+    }
 
-    <div class="dashboard-category-edit" *ngIf="isEditing">
-      <mat-icon class="small-icon">category</mat-icon>
-      <select
-        [(ngModel)]="editingData!.category"
-        (change)="onEditInputChange()"
-        class="edit-category-select"
-        aria-label="Birthday category"
-      >
-        <option
-          *ngFor="let category of categories; trackBy: trackByCategory"
-          [value]="category.id"
-        >
-          {{ category.name }}
-        </option>
-      </select>
-    </div>
-
-    <div class="dashboard-photo-edit" *ngIf="isEditing">
-      <div class="photo-section-title">
-        <mat-icon class="small-icon">photo_camera</mat-icon>
-        <span>Profile Photo</span>
+    @if (isEditing) {
+      <div class="dashboard-photo-edit">
+        <div class="photo-section-title">
+          <mat-icon class="small-icon">photo_camera</mat-icon>
+          <span>Profile Photo</span>
+        </div>
+        <app-photo-upload
+          [currentPhoto]="editingData!.photo"
+          (photoSelected)="onPhotoSelected($event)"
+          (photoRemoved)="onPhotoRemoved()"
+          >
+        </app-photo-upload>
       </div>
-      <app-photo-upload
-        [currentPhoto]="editingData!.photo"
-        (photoSelected)="onPhotoSelected($event)"
-        (photoRemoved)="onPhotoRemoved()"
-      >
-      </app-photo-upload>
-    </div>
+    }
 
-    <div class="dashboard-photo-edit" *ngIf="isEditing">
-      <div class="photo-section-title">
-        <mat-icon class="small-icon">photo_library</mat-icon>
-        <span>Remember Photo</span>
-        <small>(For social sharing/messages)</small>
+    @if (isEditing) {
+      <div class="dashboard-photo-edit">
+        <div class="photo-section-title">
+          <mat-icon class="small-icon">photo_library</mat-icon>
+          <span>Remember Photo</span>
+          <small>(For social sharing/messages)</small>
+        </div>
+        <app-photo-upload
+          [currentPhoto]="editingData!.rememberPhoto"
+          (photoSelected)="onRememberPhotoSelected($event)"
+          (photoRemoved)="onRememberPhotoRemoved()"
+          >
+        </app-photo-upload>
       </div>
-      <app-photo-upload
-        [currentPhoto]="editingData!.rememberPhoto"
-        (photoSelected)="onRememberPhotoSelected($event)"
-        (photoRemoved)="onRememberPhotoRemoved()"
-      >
-      </app-photo-upload>
-    </div>
+    }
 
-    <div class="message-scheduler-section" *ngIf="isEditing">
-      <div class="photo-section-title">
-        <mat-icon class="small-icon">schedule_send</mat-icon>
-        <span>Scheduled Messages</span>
+    @if (isEditing) {
+      <div class="message-scheduler-section">
+        <div class="photo-section-title">
+          <mat-icon class="small-icon">schedule_send</mat-icon>
+          <span>Scheduled Messages</span>
+        </div>
+        <app-message-scheduler [birthday]="birthday"></app-message-scheduler>
       </div>
-      <app-message-scheduler [birthday]="birthday"></app-message-scheduler>
-    </div>
+    }
   </div>
 
   <div class="dashboard-actions">
-    <div
-      class="birthday-days-circle"
-      [class]="daysChipClass"
-      *ngIf="!isEditing"
-    >
-      <div class="days-circle-content">
-        <div class="days-number">
-          {{ daysText }}
+    @if (!isEditing) {
+      <div
+        class="birthday-days-circle"
+        [class]="daysChipClass"
+        >
+        <div class="days-circle-content">
+          <div class="days-number">
+            {{ daysText }}
+          </div>
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>

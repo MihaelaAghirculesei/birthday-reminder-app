@@ -1,15 +1,19 @@
-<div
-  class="remember-photo-icon"
-  *ngIf="photoUrl"
-  [matTooltip]="tooltipText"
-  matTooltipPosition="below"
-  (click)="onDownload()"
-  (dblclick)="onShare()"
-  tabindex="0"
->
-  <img
-    [src]="photoUrl"
-    [alt]="birthdayName + ' remember photo'"
-    class="remember-photo-mini"
-  />
-</div>
+@if (photoUrl) {
+  <div
+    class="remember-photo-icon"
+    [matTooltip]="tooltipText"
+    matTooltipPosition="below"
+    (click)="onDownload()"
+    (dblclick)="onShare()"
+    (keydown.enter)="onDownload()"
+    (keydown.space)="onDownload()"
+    tabindex="0"
+    role="button"
+    >
+    <img
+      [src]="photoUrl"
+      [alt]="birthdayName + ' remember photo'"
+      class="remember-photo-mini"
+      />
+  </div>
+}

@@ -8,82 +8,88 @@
     </button>
   </div>
 
-  <div
-    class="messages-list"
-    *ngIf="birthdaysWithMessages.length > 0; else noMessages"
-  >
-    <mat-card *ngFor="let birthday of birthdaysWithMessages; trackBy: trackByBirthday" class="birthday-message-card">
-      <mat-card-header>
-        <div class="birthday-header">
-          <div class="birthday-avatar" *ngIf="birthday.photo">
-            <img [src]="birthday.photo" [alt]="birthday.name" />
-          </div>
-          <div class="birthday-avatar" *ngIf="!birthday.photo">
-            <mat-icon>person</mat-icon>
-          </div>
-          <div class="birthday-info">
-            <mat-card-title>{{ birthday.name }}</mat-card-title>
-            <mat-card-subtitle>
-              {{ birthday.birthDate | date : "dd MMMM yyyy" }}
-            </mat-card-subtitle>
-          </div>
-        </div>
-      </mat-card-header>
-
-      <mat-card-content>
-        <div class="messages-for-birthday">
-          <div
-            *ngFor="let message of birthday.scheduledMessages; trackBy: trackByMessage"
-            class="message-item"
-            [class.inactive]="!message.active"
-          >
-            <div class="message-header">
-              <span class="message-title">{{ message.title }}</span>
-              <span class="message-time">
-                <mat-icon class="small-icon">schedule</mat-icon>
-                {{ message.scheduledTime }}
-              </span>
-            </div>
-            <div class="message-content">{{ message.message }}</div>
-            <div class="message-footer">
-              <span class="priority" [class]="'priority-' + message.priority">
-                {{ getPriorityLabel(message.priority) }}
-              </span>
-              <span class="status" [class.active]="message.active">
-                {{ message.active ? "Attivo" : "Disattivo" }}
-              </span>
-              <div class="message-actions">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="openScheduleDialog(birthday)"
-                  matTooltip="Edit messages"
-                  [attr.aria-label]="'Edit messages for ' + birthday.name"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="deleteMessage(birthday.id, message.id)"
-                  matTooltip="Elimina messaggio"
-                  [attr.aria-label]="'Delete message: ' + message.title"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
+  @if (birthdaysWithMessages.length > 0) {
+    <div
+      class="messages-list"
+      >
+      @for (birthday of birthdaysWithMessages; track birthday.id) {
+        <mat-card class="birthday-message-card">
+          <mat-card-header>
+            <div class="birthday-header">
+              @if (birthday.photo) {
+                <div class="birthday-avatar">
+                  <img [src]="birthday.photo" [alt]="birthday.name" />
+                </div>
+              }
+              @if (!birthday.photo) {
+                <div class="birthday-avatar">
+                  <mat-icon>person</mat-icon>
+                </div>
+              }
+              <div class="birthday-info">
+                <mat-card-title>{{ birthday.name }}</mat-card-title>
+                <mat-card-subtitle>
+                  {{ birthday.birthDate | date : "dd MMMM yyyy" }}
+                </mat-card-subtitle>
               </div>
             </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <ng-template #noMessages>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="messages-for-birthday">
+              @for (message of birthday.scheduledMessages; track message.id) {
+                <div
+                  class="message-item"
+                  [class.inactive]="!message.active"
+                  >
+                  <div class="message-header">
+                    <span class="message-title">{{ message.title }}</span>
+                    <span class="message-time">
+                      <mat-icon class="small-icon">schedule</mat-icon>
+                      {{ message.scheduledTime }}
+                    </span>
+                  </div>
+                  <div class="message-content">{{ message.message }}</div>
+                  <div class="message-footer">
+                    <span class="priority" [class]="'priority-' + message.priority">
+                      {{ getPriorityLabel(message.priority) }}
+                    </span>
+                    <span class="status" [class.active]="message.active">
+                      {{ message.active ? "Attivo" : "Disattivo" }}
+                    </span>
+                    <div class="message-actions">
+                      <button
+                        mat-icon-button
+                        color="primary"
+                        (click)="openScheduleDialog(birthday)"
+                        matTooltip="Edit messages"
+                        [attr.aria-label]="'Edit messages for ' + birthday.name"
+                        >
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="deleteMessage(birthday.id, message.id)"
+                        matTooltip="Elimina messaggio"
+                        [attr.aria-label]="'Delete message: ' + message.title"
+                        >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  } @else {
     <div class="no-messages">
       <mat-icon class="large-icon">schedule</mat-icon>
       <h3>Nessun messaggio programmato</h3>
       <p>Vai alla dashboard e modifica un compleanno per aggiungere messaggi programmati</p>
     </div>
-  </ng-template>
+  }
+
 </div>

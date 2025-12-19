@@ -20,46 +20,51 @@
       <h3>Choose a new category</h3>
       <mat-form-field appearance="outline" class="category-select">
         <mat-select [(ngModel)]="selectedCategoryId">
-          <mat-option *ngFor="let category of availableCategories; trackBy: trackByCategory" [value]="category.id">
-            <div class="category-option">
-              <mat-icon [style.background-color]="category.color">{{ category.icon }}</mat-icon>
-              <span>{{ category.name }}</span>
-            </div>
-          </mat-option>
+          @for (category of availableCategories; track category.id) {
+            <mat-option [value]="category.id">
+              <div class="category-option">
+                <mat-icon [style.background-color]="category.color">{{ category.icon }}</mat-icon>
+                <span>{{ category.name }}</span>
+              </div>
+            </mat-option>
+          }
         </mat-select>
         <mat-hint>All affected birthdays will be moved to this category</mat-hint>
       </mat-form-field>
     </div>
 
-    <div class="alternative-section" *ngIf="!isReassignOnly">
-      <p class="alternative-text">
-        Or you can delete the category and leave birthdays without a category
-        (they will use the default "Friends" category).
-      </p>
-    </div>
+    @if (!isReassignOnly) {
+      <div class="alternative-section">
+        <p class="alternative-text">
+          Or you can delete the category and leave birthdays without a category
+          (they will use the default "Friends" category).
+        </p>
+      </div>
+    }
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" aria-label="Cancel category reassignment">
       Cancel
     </button>
-    <button
-      *ngIf="!isReassignOnly"
-      mat-stroked-button
-      color="warn"
-      (click)="onDeleteWithoutReassign()"
-      [attr.aria-label]="'Delete ' + data.categoryToDelete.name + ' category without reassigning birthdays'"
-    >
-      <mat-icon>delete</mat-icon>
-      Delete Without Reassigning
-    </button>
+    @if (!isReassignOnly) {
+      <button
+        mat-stroked-button
+        color="warn"
+        (click)="onDeleteWithoutReassign()"
+        [attr.aria-label]="'Delete ' + data.categoryToDelete.name + ' category without reassigning birthdays'"
+        >
+        <mat-icon>delete</mat-icon>
+        Delete Without Reassigning
+      </button>
+    }
     <button
       mat-raised-button
       color="primary"
       (click)="onConfirm()"
       [disabled]="!selectedCategoryId"
       [attr.aria-label]="isReassignOnly ? 'Reassign birthdays to selected category' : 'Reassign birthdays and delete category'"
-    >
+      >
       <mat-icon>move_to_inbox</mat-icon>
       {{ isReassignOnly ? 'Reassign Birthdays' : 'Reassign & Delete' }}
     </button>
