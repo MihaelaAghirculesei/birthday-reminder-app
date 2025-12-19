@@ -7,23 +7,6 @@ interface ErrorContext {
   technicalMessage: string;
 }
 
-interface IndexedDBError extends Error {
-  name: 'QuotaExceededError' | 'InvalidStateError' | string;
-}
-
-interface GoogleAPIError {
-  result?: {
-    error?: {
-      code?: number | string;
-    };
-  };
-  message?: string;
-}
-
-interface NetworkError extends Error {
-  message: string;
-}
-
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   constructor(private injector: Injector) {}

@@ -1,7 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { BirthdayState } from './birthday.state';
 import { birthdayAdapter } from './birthday.reducer';
-import { Birthday } from '../../../shared/models/birthday.model';
 import { calculateAge, DEFAULT_CATEGORY } from '../../../shared';
 import { getNextBirthdayDate, getDaysUntilBirthday } from '../../../shared/utils/date.utils';
 
@@ -95,10 +94,11 @@ export const selectFilteredBirthdays = createSelector(
           return a.name.localeCompare(b.name);
         case 'age':
           return calculateAge(b.birthDate) - calculateAge(a.birthDate);
-        case 'nextBirthday':
+        case 'nextBirthday': {
           const nextA = getNextBirthdayDate(a.birthDate);
           const nextB = getNextBirthdayDate(b.birthDate);
           return nextA.getTime() - nextB.getTime();
+        }
         default:
           return 0;
       }

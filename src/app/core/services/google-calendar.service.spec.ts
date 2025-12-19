@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { GoogleCalendarService } from './google-calendar.service';
-import type { GapiUser, GapiAuthInstance, Gapi } from './google-api.types';
+import type { GapiUser, GapiAuthInstance } from './google-api.types';
 
 describe('GoogleCalendarService', () => {
   let service: GoogleCalendarService;

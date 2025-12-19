@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import { trigger, style, transition, animate } from '@angular/animations';
 import { Observable } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,19 +13,25 @@ import { NotificationService, NotificationMessage } from '../../core/services/no
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="notification-container">
-      <div *ngFor="let notification of notifications$ | async; trackBy: trackByNotification"
-           class="notification"
-           [class]="'notification-' + notification.type"
-           [@slideIn]
-           (click)="close(notification.id)">
-        <mat-icon class="notification-icon">{{ getIcon(notification.type) }}</mat-icon>
-        <span class="notification-message">{{ notification.message }}</span>
-        <button mat-icon-button class="close-btn" (click)="close(notification.id)">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
+      @for (notification of notifications$ | async; track notification.id) {
+        <div
+          class="notification"
+          [class]="'notification-' + notification.type"
+          [@slideIn]
+          (click)="close(notification.id)"
+          (keydown.enter)="close(notification.id)"
+          (keydown.space)="close(notification.id)"
+          tabindex="0"
+          role="button">
+          <mat-icon class="notification-icon">{{ getIcon(notification.type) }}</mat-icon>
+          <span class="notification-message">{{ notification.message }}</span>
+          <button mat-icon-button class="close-btn" (click)="close(notification.id)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
     </div>
-  `,
+    `,
   styles: [`
     .notification-container {
       position: fixed;
@@ -123,14 +129,12 @@ import { NotificationService, NotificationMessage } from '../../core/services/no
     ])
   ]
 })
-export class NotificationComponent implements OnInit {
+export class NotificationComponent {
   notifications$: Observable<NotificationMessage[]>;
 
   constructor(private notificationService: NotificationService) {
     this.notifications$ = this.notificationService.notifications;
   }
-
-  ngOnInit() {}
 
   getIcon(type: string): string {
     switch (type) {

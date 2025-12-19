@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, Observable, fromEvent, merge, of, Subscription } from 'rxjs';
+import { BehaviorSubject, fromEvent, merge, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable({

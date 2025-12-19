@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, combineLatest, take } from 'rxjs';
+import { combineLatest, take } from 'rxjs';
 import { Birthday, BirthdayCategory } from '../../../shared';
 import { BirthdayFacadeService, CategoryFacadeService } from '../../../core';
 import { CategoryDialogComponent } from '../components/category-dialog/category-dialog.component';

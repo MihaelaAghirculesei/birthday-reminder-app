@@ -1,11 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ZODIAC_SIGNS } from '../utils/date/zodiac.util';
 
 @Component({
   selector: 'app-zodiac-icon',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button class="zodiac-button"
