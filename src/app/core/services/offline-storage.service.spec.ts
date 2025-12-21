@@ -19,6 +19,10 @@ describe('IndexedDBStorageService', () => {
     service = TestBed.inject(IndexedDBStorageService);
   });
 
+  afterEach(async () => {
+    await service.clear();
+  });
+
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
