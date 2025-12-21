@@ -250,22 +250,36 @@
   margin-top: 16px;
 }
 
+:host {
+  display: contents;
+}
+
+.data-management-sections {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  margin-top: 32px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: stretch;
+  }
+}
+
 .test-data-section,
 .clear-data-section,
 .backup-section {
-  margin-top: 32px;
   display: flex;
   justify-content: center;
+  align-items: stretch;
 }
 
 .test-data-card,
 .clear-data-card,
 .backup-card {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--secondary) 100%
-  ) !important;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #8b9af7 0%, #b89dd9 50%, #f5b3fc 100%) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow-elevated) !important;
   border: none !important;
@@ -274,11 +288,18 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible !important;
 
+  :host-context(body.dark-theme) & {
+    background: linear-gradient(135deg, #4a5568 0%, #5a5a7a 50%, #6b5b7b 100%) !important;
+  }
+
   &:hover {
     transform: translateY(-4px) scale(1.02);
   }
 
   .mat-mdc-card-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
     padding: 32px !important;
     overflow: visible !important;
   }
@@ -426,26 +447,31 @@
 
 @media (max-width: 768px) {
   .birthday-list-card,
-  .chart-card {
+  .chart-card,
+  .test-data-card,
+  .clear-data-card,
+  .backup-card {
     .mat-mdc-card-content {
       padding: 16px !important;
+    }
+  }
+
+  .birthday-list-card,
+  .chart-card {
+    .mat-mdc-card-content {
       min-height: 280px !important;
     }
+  }
+
+  .data-management-sections {
+    margin-top: 24px;
+    gap: 24px;
   }
 
   .test-data-section,
   .clear-data-section,
   .backup-section {
-    margin-top: 24px;
     padding: 0 8px;
-  }
-
-  .test-data-card,
-  .clear-data-card,
-  .backup-card {
-    .mat-mdc-card-content {
-      padding: 24px !important;
-    }
   }
 
   .test-data-content,
