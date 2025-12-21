@@ -69,25 +69,32 @@
         font-size: 2rem;
         width: 2rem;
         height: 2rem;
-        background: rgba(255, 255, 255, 0.2);
+        color: #1e293b !important;
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 1);
         backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         margin-left: 16px;
         flex-shrink: 0;
         pointer-events: none;
 
-        &:hover {
-          background: rgba(255, 255, 255, 0.3);
-          transform: scale(1.1);
+        :host-context(body.dark-theme) & {
+          color: #ffffff !important;
+          background: rgba(255, 255, 255, 0.2);
+          border: 2px solid rgba(255, 255, 255, 0.4);
         }
 
-        &.expanded {
-          &:hover {
-            transform: scale(1.1);
+        &:hover {
+          background: rgba(255, 255, 255, 1);
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+          :host-context(body.dark-theme) & {
+            background: rgba(255, 255, 255, 0.3);
           }
         }
       }
