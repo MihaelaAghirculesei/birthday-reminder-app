@@ -1,0 +1,103 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>
+    <mat-icon>edit</mat-icon>
+    Edit Birthday - {{ data.birthday.name }}
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="edit-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input
+          matInput
+          [(ngModel)]="editingData.name"
+          placeholder="Enter name"
+          required
+          />
+        <mat-icon matPrefix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Birth Date</mat-label>
+        <input
+          matInput
+          type="date"
+          [(ngModel)]="editingData.birthDate"
+          required
+          />
+        <mat-icon matPrefix>cake</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width notes-field">
+        <mat-label>Notes</mat-label>
+        <textarea
+          matInput
+          [(ngModel)]="editingData.notes"
+          placeholder="What they love, hobbies, gift ideas..."
+          rows="2"
+        ></textarea>
+        <mat-icon matPrefix>note</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Category</mat-label>
+        <mat-select [(ngModel)]="editingData.category">
+          @for (category of data.categories; track category.id) {
+            <mat-option [value]="category.id">
+              {{ category.name }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>category</mat-icon>
+      </mat-form-field>
+
+      <div class="photo-sections-container">
+        <div class="photo-section">
+          <div class="photo-section-title">
+            <mat-icon>photo_camera</mat-icon>
+            <span>Profile Photo</span>
+          </div>
+          <app-photo-upload
+            [currentPhoto]="editingData.photo"
+            (photoSelected)="onPhotoSelected($event)"
+            (photoRemoved)="onPhotoRemoved()"
+          ></app-photo-upload>
+        </div>
+
+        <div class="photo-section">
+          <div class="photo-section-title">
+            <mat-icon>photo_library</mat-icon>
+            <div class="title-text">
+              <span>Remember Photo</span>
+              <small>(For social sharing/messages)</small>
+            </div>
+          </div>
+          <app-photo-upload
+            [currentPhoto]="editingData.rememberPhoto"
+            (photoSelected)="onRememberPhotoSelected($event)"
+            (photoRemoved)="onRememberPhotoRemoved()"
+          ></app-photo-upload>
+        </div>
+      </div>
+
+      <div class="scheduler-section">
+        <div class="photo-section-title">
+          <mat-icon>schedule_send</mat-icon>
+          <span>Scheduled Messages</span>
+        </div>
+        <app-message-scheduler [birthday]="data.birthday"></app-message-scheduler>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="onCancel()" color="warn">
+      <mat-icon>close</mat-icon>
+      Cancel
+    </button>
+    <button mat-raised-button (click)="onSave()" color="primary">
+      <mat-icon>check</mat-icon>
+      Save Changes
+    </button>
+  </mat-dialog-actions>
+</div>
