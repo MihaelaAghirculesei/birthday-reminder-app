@@ -9,7 +9,7 @@
       background: var(--scheduler-header) !important;
       color: white !important;
       margin: -24px -24px 24px -24px;
-      padding: 24px;
+      padding: 24px 24px 24px 32px;
 
       .mat-mdc-card-title {
         display: flex;
@@ -55,8 +55,15 @@
       color: var(--scheduler-text) !important;
 
       mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
         color: var(--scheduler-accent) !important;
       }
+    }
+
+    .mat-mdc-button-touch-target {
+      display: none !important;
     }
 
     .mat-expansion-panel-content {
@@ -287,12 +294,20 @@
     padding: 40px;
     color: var(--scheduler-muted);
 
-    mat-icon {
+    > mat-icon {
       font-size: 64px;
       width: 64px;
       height: 64px;
       margin-bottom: 16px;
       color: var(--border-light);
+    }
+
+    button mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-bottom: 0;
+      margin-right: 8px;
     }
 
     h3 {

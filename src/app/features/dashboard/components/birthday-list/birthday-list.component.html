@@ -37,20 +37,9 @@
         @for (birthday of enrichedBirthdays; track birthday.id) {
           <app-birthday-item
             [birthday]="birthday"
-            [categories]="categories"
-            [isEditing]="isEditing(birthday.id)"
-            [editingData]="editService.currentEditingData"
             [daysUntilBirthday]="birthday.daysUntilBirthday"
             (edit)="editBirthday($event)"
             (deleted)="deleteBirthday($event)"
-            (save)="saveBirthday($event)"
-            (cancelled)="cancelEdit()"
-            (quickEdit)="quickEditName($event)"
-            (editInputChange)="onEditInputChange($event)"
-            (photoSelected)="onPhotoSelected($event)"
-            (photoRemoved)="onPhotoRemoved()"
-            (rememberPhotoSelected)="onRememberPhotoSelected($event)"
-            (rememberPhotoRemoved)="onRememberPhotoRemoved()"
           ></app-birthday-item>
         }
       </div>
