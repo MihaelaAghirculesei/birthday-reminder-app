@@ -1,4 +1,4 @@
-import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -69,6 +69,11 @@ export class BirthdayEditDialogComponent {
       photo: data.birthday.photo || null,
       rememberPhoto: data.birthday.rememberPhoto || null,
     };
+  }
+
+  @HostListener('window:keydown.escape')
+  handleEscapeKey(): void {
+    this.onCancel();
   }
 
   private formatDateForInput(date: Date): string {
