@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
@@ -8,10 +7,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { Birthday, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
 import { BirthdayFacadeService, BackupService, NotificationService } from '../../../../core';
-import { BirthdayEditService } from '../../services/birthday-edit.service';
+import { BirthdayEditDialogComponent, BirthdayEditDialogData, BirthdayEditDialogResult } from '../birthday-edit-dialog/birthday-edit-dialog.component';
 
 interface EnrichedBirthday extends Birthday {
   daysUntilBirthday: number;
@@ -56,9 +56,9 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
 
   constructor(
     public birthdayFacade: BirthdayFacadeService,
-    public editService: BirthdayEditService,
     private backupService: BackupService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -186,116 +186,40 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
   }
 
   editBirthday(birthday: Birthday): void {
-    this.editService.startEdit(
+    const dialogData: BirthdayEditDialogData = {
       birthday,
-      this.formatDateForInput.bind(this),
-      'default'
-    );
+      categories: this.categories
+    };
+
+    const dialogRef = this.dialog.open(BirthdayEditDialogComponent, {
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: dialogData,
+      disableClose: false,
+      autoFocus: 'first-tabbable',
+      restoreFocus: true,
+      ariaModal: true
+    });
+
+    dialogRef.afterClosed().subscribe((result: BirthdayEditDialogResult | undefined) => {
+      if (result) {
+        const updatedBirthday: Birthday = {
+          ...result.birthday,
+          name: result.editedData.name.trim() || result.birthday.name,
+          notes: result.editedData.notes.trim(),
+          birthDate: new Date(result.editedData.birthDate),
+          category: result.editedData.category,
+          photo: result.editedData.photo || undefined,
+          rememberPhoto: result.editedData.rememberPhoto || undefined
+        };
+        this.birthdayFacade.updateBirthday(updatedBirthday);
+      }
+    });
   }
 
   deleteBirthday(birthday: Birthday): void {
     this.birthdayFacade.deleteBirthday(birthday.id);
-  }
-
-  saveBirthday(birthday: Birthday): void {
-    const editingData = this.editService.currentEditingData;
-    if (!editingData) return;
-
-    const updatedBirthday = {
-      ...birthday,
-      name: editingData.name.trim() || birthday.name,
-      notes: editingData.notes.trim(),
-      birthDate: new Date(editingData.birthDate),
-      category: editingData.category,
-    };
-
-    this.birthdayFacade.updateBirthday(updatedBirthday);
-    this.editService.cancelEdit();
-  }
-
-  cancelEdit(): void {
-    this.editService.cancelEdit();
-  }
-
-  quickEditName(birthday: Birthday): void {
-    this.editBirthday(birthday);
-    setTimeout(() => {
-      const nameInput = document.querySelector('.edit-name-input') as HTMLInputElement;
-      if (nameInput) {
-        nameInput.focus();
-        nameInput.select();
-      }
-    }, 100);
-  }
-
-  onEditInputChange(birthday: Birthday): void {
-    this.editService.scheduleAutoSave(() => {
-      this.saveBirthday(birthday);
-    });
-  }
-
-  onPhotoSelected(photoDataUrl: string): void {
-    const editingData = this.editService.currentEditingData;
-    if (editingData) {
-      this.editService.updateEditingData({ photo: photoDataUrl });
-      this.autoSavePhotoChange();
-    }
-  }
-
-  onPhotoRemoved(): void {
-    const editingData = this.editService.currentEditingData;
-    if (editingData) {
-      this.editService.updateEditingData({ photo: null });
-      this.autoSavePhotoChange();
-    }
-  }
-
-  onRememberPhotoSelected(photoDataUrl: string): void {
-    const editingData = this.editService.currentEditingData;
-    if (editingData) {
-      this.editService.updateEditingData({ rememberPhoto: photoDataUrl });
-      this.autoSaveRememberPhotoChange();
-    }
-  }
-
-  onRememberPhotoRemoved(): void {
-    const editingData = this.editService.currentEditingData;
-    if (editingData) {
-      this.editService.updateEditingData({ rememberPhoto: null });
-      this.autoSaveRememberPhotoChange();
-    }
-  }
-
-  private autoSavePhotoChange(): void {
-    this.editService.scheduleAutoSave(() => {
-      const editingId = this.editService.currentEditingId;
-      const birthday = this.birthdays.find(b => b.id === editingId);
-      if (birthday) {
-        this.saveBirthday(birthday);
-      }
-    }, 1000);
-  }
-
-  private autoSaveRememberPhotoChange(): void {
-    this.editService.scheduleAutoSave(() => {
-      const editingId = this.editService.currentEditingId;
-      const birthday = this.birthdays.find(b => b.id === editingId);
-      if (birthday) {
-        this.saveBirthday(birthday);
-      }
-    }, 1000);
-  }
-
-  private formatDateForInput(date: Date): string {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  isEditing(birthdayId: string): boolean {
-    return this.editService.isEditing(birthdayId);
   }
 
   private calculateDaysUntilBirthday(birthDate: Date): number {
