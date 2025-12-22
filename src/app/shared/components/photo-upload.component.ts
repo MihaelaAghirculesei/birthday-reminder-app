@@ -160,14 +160,15 @@ import { NotificationService } from '../../core/services/notification.service';
         font-weight: 600;
         color: var(--text-primary);
         font-size: 0.9rem;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
         display: block;
+        line-height: 1.1;
       }
 
       .upload-hint {
         color: var(--text-muted);
         font-size: 0.75rem;
-        line-height: 1.2;
+        line-height: 1.1;
       }
     }
 
@@ -214,6 +215,26 @@ import { NotificationService } from '../../core/services/notification.service';
       .photo-preview {
         width: 100px;
         height: 100px;
+      }
+
+      .photo-placeholder {
+        padding: 12px;
+
+        .upload-icon {
+          font-size: 2rem;
+          width: 2rem;
+          height: 2rem;
+          margin-bottom: 6px;
+        }
+
+        .upload-text {
+          font-size: 0.75rem;
+          margin-bottom: 2px;
+        }
+
+        .upload-hint {
+          font-size: 0.65rem;
+        }
       }
     }
   `]
