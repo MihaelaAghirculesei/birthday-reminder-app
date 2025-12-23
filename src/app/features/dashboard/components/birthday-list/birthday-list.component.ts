@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy, isDevMode } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { take } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,7 @@ import { Birthday, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
 import { BirthdayFacadeService, BackupService, NotificationService } from '../../../../core';
 import { BirthdayEditDialogComponent, BirthdayEditDialogData, BirthdayEditDialogResult } from '../birthday-edit-dialog/birthday-edit-dialog.component';
+import { getDaysUntilBirthday } from '../../../../shared/utils/date.utils';
 
 interface EnrichedBirthday extends Birthday {
   daysUntilBirthday: number;
@@ -65,7 +66,7 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
     if (changes['birthdays']) {
       this.enrichedBirthdays = this.birthdays.map(birthday => ({
         ...birthday,
-        daysUntilBirthday: this.calculateDaysUntilBirthday(birthday.birthDate)
+        daysUntilBirthday: getDaysUntilBirthday(birthday.birthDate)
       }));
     }
   }
@@ -135,7 +136,10 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
       }
 
       this.notificationService.show(`Imported ${birthdays.length} birthdays`, 'success');
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Import failed:', error);
+      }
       this.notificationService.show('Invalid backup file', 'error');
     }
 
@@ -220,27 +224,5 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
 
   deleteBirthday(birthday: Birthday): void {
     this.birthdayFacade.deleteBirthday(birthday.id);
-  }
-
-  private calculateDaysUntilBirthday(birthDate: Date): number {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const nextBirthday = this.getNextBirthdayDate(birthDate);
-    nextBirthday.setHours(0, 0, 0, 0);
-    const diffTime = nextBirthday.getTime() - today.getTime();
-    return Math.round(diffTime / (1000 * 60 * 60 * 24));
-  }
-
-  private getNextBirthdayDate(birthDate: Date): Date {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const currentYear = today.getFullYear();
-    const nextBirthday = new Date(birthDate);
-    nextBirthday.setFullYear(currentYear);
-    nextBirthday.setHours(0, 0, 0, 0);
-    if (nextBirthday < today) {
-      nextBirthday.setFullYear(currentYear + 1);
-    }
-    return nextBirthday;
   }
 }

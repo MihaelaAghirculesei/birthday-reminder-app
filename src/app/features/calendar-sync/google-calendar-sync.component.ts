@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, isDevMode } from '@angular/core';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil, firstValueFrom } from 'rxjs';
@@ -450,8 +450,10 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     try {
       await this.googleCalendarService.signIn();
-    } catch {
-      // Silent failure for sign in
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Google Calendar sign in failed:', error);
+      }
     } finally {
       this.isConnecting = false;
       this.cdr.markForCheck();
@@ -464,8 +466,10 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
       this.calendars = [];
       this.lastSyncResult = null;
       this.cdr.markForCheck();
-    } catch {
-      // Silent failure for sign out
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Google Calendar sign out failed:', error);
+      }
     }
   }
 
@@ -473,8 +477,10 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     try {
       this.calendars = await this.googleCalendarService.getCalendars();
       this.cdr.markForCheck();
-    } catch {
-      // Silent failure for loading calendars
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Loading calendars failed:', error);
+      }
     }
   }
 
@@ -487,8 +493,10 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
         this.lastSyncResult = await this.googleCalendarService.syncAllBirthdays(birthdays);
         this.cdr.markForCheck();
       }
-    } catch {
-      // Silent failure for sync
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Syncing birthdays failed:', error);
+      }
     } finally {
       this.isSyncing = false;
       this.cdr.markForCheck();
