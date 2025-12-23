@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { BirthdayCategory } from '../../shared';
@@ -16,6 +17,13 @@ export class CategoryFacadeService {
   loaded$ = this.store.select(CategorySelectors.selectCategoriesLoaded);
   loading$ = this.store.select(CategorySelectors.selectCategoriesLoading);
   error$ = this.store.select(CategorySelectors.selectCategoriesError);
+
+  categories: Signal<BirthdayCategory[]> = toSignal(this.categories$, { initialValue: [] });
+  defaultCategories: Signal<BirthdayCategory[]> = toSignal(this.defaultCategories$, { initialValue: [] });
+  customCategories: Signal<BirthdayCategory[]> = toSignal(this.customCategories$, { initialValue: [] });
+  loaded: Signal<boolean> = toSignal(this.loaded$, { initialValue: false });
+  loading: Signal<boolean> = toSignal(this.loading$, { initialValue: false });
+  error: Signal<string | null> = toSignal(this.error$, { initialValue: null });
 
   constructor(private store: Store<AppState>) {}
 

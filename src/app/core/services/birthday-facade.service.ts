@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { Birthday, ScheduledMessage } from '../../shared/models/birthday.model';
@@ -26,6 +27,22 @@ export class BirthdayFacadeService {
   birthdaysByMonth$ = this.store.select(BirthdaySelectors.selectBirthdaysByMonth);
   birthdaysThisMonth$ = this.store.select(BirthdaySelectors.selectBirthdaysThisMonth);
   next5Birthdays$ = this.store.select(BirthdaySelectors.selectNext5Birthdays);
+
+  birthdays: Signal<Birthday[]> = toSignal(this.birthdays$, { initialValue: [] });
+  filteredBirthdays: Signal<Birthday[]> = toSignal(this.filteredBirthdays$, { initialValue: [] });
+  selectedBirthday = toSignal(this.selectedBirthday$);
+  loading: Signal<boolean> = toSignal(this.loading$, { initialValue: false });
+  error = toSignal(this.error$);
+
+  searchTerm: Signal<string> = toSignal(this.searchTerm$, { initialValue: '' });
+  selectedMonth = toSignal(this.selectedMonth$);
+  selectedCategory = toSignal(this.selectedCategory$);
+  sortOrder: Signal<'name' | 'age' | 'nextBirthday'> = toSignal(this.sortOrder$, { initialValue: 'nextBirthday' });
+
+  averageAge: Signal<number> = toSignal(this.averageAge$, { initialValue: 0 });
+  birthdaysByMonth = toSignal(this.birthdaysByMonth$, { initialValue: [] });
+  birthdaysThisMonth = toSignal(this.birthdaysThisMonth$);
+  next5Birthdays: Signal<Birthday[]> = toSignal(this.next5Birthdays$, { initialValue: [] });
 
   constructor(private store: Store<AppState>) {
     this.loadBirthdays();
