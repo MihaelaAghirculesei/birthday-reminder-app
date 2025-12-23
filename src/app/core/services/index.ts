@@ -1,5 +1,6 @@
 export { BirthdayFacadeService } from './birthday-facade.service';
 export { CategoryFacadeService } from './category-facade.service';
+export { CategoryStorageService } from './category-storage.service';
 export { NotificationService, NotificationMessage } from './notification.service';
 export { NotificationPermissionService, NotificationPermissionStatus } from './notification-permission.service';
 export { PushNotificationService, BirthdayNotificationData } from './push-notification.service';

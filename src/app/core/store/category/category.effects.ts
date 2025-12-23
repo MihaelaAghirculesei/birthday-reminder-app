@@ -1,30 +1,26 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import * as CategoryActions from './category.actions';
 import { BIRTHDAY_CATEGORIES, BirthdayCategory } from '../../../shared';
+import { CategoryStorageService } from '../../services/category-storage.service';
 
 @Injectable()
 export class CategoryEffects {
-  constructor(private actions$: Actions) {}
+  constructor(
+    private actions$: Actions,
+    private categoryStorage: CategoryStorageService
+  ) {}
 
   loadCategories$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CategoryActions.loadCategories),
       map(() => {
         try {
-          const customCategoriesStr = localStorage.getItem('customCategories');
-          const modifiedCategoriesStr = localStorage.getItem('modifiedCategories');
-          const deletedIdsStr = localStorage.getItem('deletedCategoryIds');
-
-          const customCategories = customCategoriesStr
-            ? JSON.parse(customCategoriesStr)
-            : [];
-          const modifiedCategories = modifiedCategoriesStr
-            ? JSON.parse(modifiedCategoriesStr)
-            : [];
-          const deletedIds = deletedIdsStr ? JSON.parse(deletedIdsStr) : [];
+          const customCategories = this.categoryStorage.getCustomCategories();
+          const modifiedCategories = this.categoryStorage.getModifiedCategories();
+          const deletedIds = this.categoryStorage.getDeletedIds();
 
           const modifiedMap = new Map(
             modifiedCategories.map((cat: BirthdayCategory) => [cat.id, cat])
@@ -65,20 +61,7 @@ export class CategoryEffects {
   addCategory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CategoryActions.addCategory),
-      tap(({ category }) => {
-        try {
-          const customCategoriesStr = localStorage.getItem('customCategories');
-          const customCategories = customCategoriesStr
-            ? JSON.parse(customCategoriesStr)
-            : [];
-          customCategories.push(category);
-          localStorage.setItem('customCategories', JSON.stringify(customCategories));
-        } catch (error) {
-          if (isDevMode()) {
-            console.error('Failed to save custom category to localStorage:', error);
-          }
-        }
-      }),
+      tap(({ category }) => this.categoryStorage.addCustomCategory(category)),
       map(({ category }) => CategoryActions.addCategorySuccess({ category }))
     )
   );
@@ -86,33 +69,7 @@ export class CategoryEffects {
   updateCategory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CategoryActions.updateCategory),
-      tap(({ category }) => {
-        try {
-          const modifiedCategoriesStr = localStorage.getItem('modifiedCategories');
-          const modifiedCategories = modifiedCategoriesStr
-            ? JSON.parse(modifiedCategoriesStr)
-            : [];
-
-          const index = modifiedCategories.findIndex(
-            (c: BirthdayCategory) => c.id === category.id
-          );
-
-          if (index !== -1) {
-            modifiedCategories[index] = category;
-          } else {
-            modifiedCategories.push(category);
-          }
-
-          localStorage.setItem(
-            'modifiedCategories',
-            JSON.stringify(modifiedCategories)
-          );
-        } catch (error) {
-          if (isDevMode()) {
-            console.error('Failed to update category in localStorage:', error);
-          }
-        }
-      }),
+      tap(({ category }) => this.categoryStorage.updateCategory(category)),
       map(({ category }) => CategoryActions.updateCategorySuccess({ category }))
     )
   );
@@ -120,21 +77,7 @@ export class CategoryEffects {
   deleteCategory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CategoryActions.deleteCategory),
-      tap(({ categoryId }) => {
-        try {
-          const deletedIdsStr = localStorage.getItem('deletedCategoryIds');
-          const deletedIds = deletedIdsStr ? JSON.parse(deletedIdsStr) : [];
-
-          if (!deletedIds.includes(categoryId)) {
-            deletedIds.push(categoryId);
-            localStorage.setItem('deletedCategoryIds', JSON.stringify(deletedIds));
-          }
-        } catch (error) {
-          if (isDevMode()) {
-            console.error('Failed to delete category in localStorage:', error);
-          }
-        }
-      }),
+      tap(({ categoryId }) => this.categoryStorage.deleteCategory(categoryId)),
       map(({ categoryId }) =>
         CategoryActions.deleteCategorySuccess({ categoryId })
       )
@@ -144,19 +87,7 @@ export class CategoryEffects {
   restoreCategory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CategoryActions.restoreCategory),
-      tap(({ categoryId }) => {
-        try {
-          const deletedIdsStr = localStorage.getItem('deletedCategoryIds');
-          const deletedIds = deletedIdsStr ? JSON.parse(deletedIdsStr) : [];
-
-          const updatedIds = deletedIds.filter((id: string) => id !== categoryId);
-          localStorage.setItem('deletedCategoryIds', JSON.stringify(updatedIds));
-        } catch (error) {
-          if (isDevMode()) {
-            console.error('Failed to restore category in localStorage:', error);
-          }
-        }
-      }),
+      tap(({ categoryId }) => this.categoryStorage.restoreCategory(categoryId)),
       map(({ categoryId }) =>
         CategoryActions.restoreCategorySuccess({ categoryId })
       )
