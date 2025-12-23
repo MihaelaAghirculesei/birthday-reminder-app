@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NotificationService } from './notification.service';
+import { NotificationService, NotificationMessage } from './notification.service';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -59,7 +59,7 @@ describe('NotificationService', () => {
   });
 
   it('should auto-remove notification after duration', fakeAsync(() => {
-    let notifications: any[] = [];
+    let notifications: NotificationMessage[] = [];
     service.notifications.subscribe(n => notifications = n);
 
     service.show('test', 'info', 1000);
@@ -70,7 +70,7 @@ describe('NotificationService', () => {
   }));
 
   it('should not auto-remove when duration is 0', fakeAsync(() => {
-    let notifications: any[] = [];
+    let notifications: NotificationMessage[] = [];
     service.notifications.subscribe(n => notifications = n);
 
     service.show('test', 'info', 0);
