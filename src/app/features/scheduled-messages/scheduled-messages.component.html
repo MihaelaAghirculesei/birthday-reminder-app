@@ -1,7 +1,7 @@
 <div class="scheduled-messages-container">
   <div class="header">
-    <h2>Messaggi Programmati</h2>
-    <p class="subtitle">Tutti i messaggi programmati per i compleanni</p>
+    <h2>Scheduled Messages</h2>
+    <p class="subtitle">All scheduled messages for birthdays</p>
     <button mat-fab extended color="primary" (click)="openScheduleDialog()" class="add-message-fab" aria-label="Create new scheduled message">
       <mat-icon>add</mat-icon>
       New Message
@@ -54,7 +54,7 @@
                       {{ getPriorityLabel(message.priority) }}
                     </span>
                     <span class="status" [class.active]="message.active">
-                      {{ message.active ? "Attivo" : "Disattivo" }}
+                      {{ message.active ? "Active" : "Inactive" }}
                     </span>
                     <div class="message-actions">
                       <button
@@ -70,7 +70,7 @@
                         mat-icon-button
                         color="warn"
                         (click)="deleteMessage(birthday.id, message.id)"
-                        matTooltip="Elimina messaggio"
+                        matTooltip="Delete message"
                         [attr.aria-label]="'Delete message: ' + message.title"
                         >
                         <mat-icon>delete</mat-icon>
@@ -87,8 +87,8 @@
   } @else {
     <div class="no-messages">
       <mat-icon class="large-icon">schedule</mat-icon>
-      <h3>Nessun messaggio programmato</h3>
-      <p>Vai alla dashboard e modifica un compleanno per aggiungere messaggi programmati</p>
+      <h3>No Scheduled Messages</h3>
+      <p>Go to the dashboard and edit a birthday to add scheduled messages</p>
     </div>
   }
 
