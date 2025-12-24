@@ -1,4 +1,5 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable, isDevMode, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BirthdayCategory } from '../../shared';
 
 @Injectable({
@@ -9,7 +10,13 @@ export class CategoryStorageService {
   private readonly MODIFIED_CATEGORIES_KEY = 'modifiedCategories';
   private readonly DELETED_IDS_KEY = 'deletedCategoryIds';
 
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
+
   getCustomCategories(): BirthdayCategory[] {
+    if (!isPlatformBrowser(this.platformId)) {
+      return [];
+    }
+
     try {
       const data = localStorage.getItem(this.CUSTOM_CATEGORIES_KEY);
       return data ? JSON.parse(data) : [];
@@ -22,6 +29,10 @@ export class CategoryStorageService {
   }
 
   getModifiedCategories(): BirthdayCategory[] {
+    if (!isPlatformBrowser(this.platformId)) {
+      return [];
+    }
+
     try {
       const data = localStorage.getItem(this.MODIFIED_CATEGORIES_KEY);
       return data ? JSON.parse(data) : [];
@@ -34,6 +45,10 @@ export class CategoryStorageService {
   }
 
   getDeletedIds(): string[] {
+    if (!isPlatformBrowser(this.platformId)) {
+      return [];
+    }
+
     try {
       const data = localStorage.getItem(this.DELETED_IDS_KEY);
       return data ? JSON.parse(data) : [];
@@ -46,6 +61,10 @@ export class CategoryStorageService {
   }
 
   addCustomCategory(category: BirthdayCategory): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     try {
       const categories = this.getCustomCategories();
       categories.push(category);
@@ -58,6 +77,10 @@ export class CategoryStorageService {
   }
 
   updateCategory(category: BirthdayCategory): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     try {
       const categories = this.getModifiedCategories();
       const index = categories.findIndex(c => c.id === category.id);
@@ -77,6 +100,10 @@ export class CategoryStorageService {
   }
 
   deleteCategory(categoryId: string): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     try {
       const deletedIds = this.getDeletedIds();
 
@@ -92,6 +119,10 @@ export class CategoryStorageService {
   }
 
   restoreCategory(categoryId: string): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     try {
       const deletedIds = this.getDeletedIds();
       const updatedIds = deletedIds.filter(id => id !== categoryId);

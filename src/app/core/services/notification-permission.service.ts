@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export type NotificationPermissionStatus = 'default' | 'granted' | 'denied';
@@ -9,7 +10,7 @@ export type NotificationPermissionStatus = 'default' | 'granted' | 'denied';
 export class NotificationPermissionService {
   private permissionStatus$ = new BehaviorSubject<NotificationPermissionStatus>(this.getCurrentPermission());
 
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     if ('permissions' in navigator) {
       navigator.permissions.query({ name: 'notifications' as PermissionName })
         .then(permissionStatus => {
@@ -59,8 +60,10 @@ export class NotificationPermissionService {
       const permission = await Notification.requestPermission();
       this.permissionStatus$.next(permission as NotificationPermissionStatus);
 
-      localStorage.setItem('notificationPermissionRequested', 'true');
-      localStorage.setItem('notificationPermissionGranted', (permission === 'granted').toString());
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('notificationPermissionRequested', 'true');
+        localStorage.setItem('notificationPermissionGranted', (permission === 'granted').toString());
+      }
 
       return permission === 'granted';
     } catch {
@@ -69,6 +72,9 @@ export class NotificationPermissionService {
   }
 
   hasBeenAsked(): boolean {
+    if (!isPlatformBrowser(this.platformId)) {
+      return false;
+    }
     return localStorage.getItem('notificationPermissionRequested') === 'true';
   }
 
