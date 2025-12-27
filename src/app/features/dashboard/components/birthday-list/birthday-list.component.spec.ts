@@ -55,6 +55,7 @@ describe('BirthdayListComponent', () => {
     const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
 
     birthdayFacadeSpyObj.birthdays$ = of(mockBirthdays);
+    birthdayFacadeSpyObj.birthdays = jasmine.createSpy('birthdays').and.returnValue(mockBirthdays);
     backupServiceSpyObj.exportToJSON.and.returnValue(undefined);
     backupServiceSpyObj.exportToCSV.and.returnValue(undefined);
     backupServiceSpyObj.importFromFile.and.returnValue(Promise.resolve(mockBirthdays));
