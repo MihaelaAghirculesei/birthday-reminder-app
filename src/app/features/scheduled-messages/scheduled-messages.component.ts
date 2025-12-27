@@ -1,6 +1,5 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil, map } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,29 +23,17 @@ import { MessageScheduleDialogComponent } from './message-schedule-dialog/messag
   styleUrls: ['./scheduled-messages.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ScheduledMessagesComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-  birthdaysWithMessages: Birthday[] = [];
+export class ScheduledMessagesComponent {
+  birthdaysWithMessages: Signal<Birthday[]> = computed(() =>
+    this.birthdayFacade.birthdays().filter(
+      b => b.scheduledMessages && b.scheduledMessages.length > 0
+    )
+  );
 
   constructor(
     private birthdayFacade: BirthdayFacadeService,
-    private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private dialog: MatDialog
   ) {}
-
-  ngOnInit(): void {
-    this.birthdayFacade.birthdays$
-      .pipe(
-        takeUntil(this.destroy$),
-        map(birthdays => birthdays.filter(
-          b => b.scheduledMessages && b.scheduledMessages.length > 0
-        ))
-      )
-      .subscribe(filteredBirthdays => {
-        this.birthdaysWithMessages = filteredBirthdays;
-        this.cdr.markForCheck();
-      });
-  }
 
   openScheduleDialog(birthday?: Birthday): void {
     this.dialog.open(MessageScheduleDialogComponent, {
@@ -84,10 +71,5 @@ export class ScheduledMessagesComponent implements OnInit, OnDestroy {
 
   trackByMessage(_index: number, message: ScheduledMessage): string {
     return message.id;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

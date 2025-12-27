@@ -8,11 +8,11 @@
     </button>
   </div>
 
-  @if (birthdaysWithMessages.length > 0) {
+  @if (birthdaysWithMessages().length > 0) {
     <div
       class="messages-list"
       >
-      @for (birthday of birthdaysWithMessages; track birthday.id) {
+      @for (birthday of birthdaysWithMessages(); track birthday.id) {
         <mat-card class="birthday-message-card">
           <mat-card-header>
             <div class="birthday-header">

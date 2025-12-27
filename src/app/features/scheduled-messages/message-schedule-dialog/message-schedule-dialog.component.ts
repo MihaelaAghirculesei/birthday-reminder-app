@@ -1,7 +1,6 @@
-import { Component, Inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectionStrategy, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { Observable, Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -33,36 +32,26 @@ interface MessageScheduleDialogData {
   styleUrls: ['./message-schedule-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-
+export class MessageScheduleDialogComponent implements OnInit {
   selectedBirthday: Birthday | null = null;
-  allBirthdays$: Observable<Birthday[]>;
+  allBirthdays: Signal<Birthday[]> = this.birthdayFacade.birthdays;
   selectedBirthdayId = '';
   showBirthdaySelector = false;
 
   constructor(
     private dialogRef: MatDialogRef<MessageScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: MessageScheduleDialogData,
-    private birthdayFacade: BirthdayFacadeService,
-    private cdr: ChangeDetectorRef
-  ) {
-    this.allBirthdays$ = this.birthdayFacade.birthdays$;
-  }
+    private birthdayFacade: BirthdayFacadeService
+  ) {}
 
   ngOnInit(): void {
     if (this.data?.birthday) {
       this.selectedBirthday = this.data.birthday;
     } else if (this.data?.birthdayId) {
-      this.allBirthdays$
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(birthdays => {
-          const found = birthdays.find(b => b.id === this.data.birthdayId);
-          if (found) {
-            this.selectedBirthday = found;
-            this.cdr.markForCheck();
-          }
-        });
+      const found = this.allBirthdays().find(b => b.id === this.data.birthdayId);
+      if (found) {
+        this.selectedBirthday = found;
+      }
     } else {
       this.showBirthdaySelector = true;
     }
@@ -70,16 +59,11 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
 
   onBirthdaySelected(): void {
     if (this.selectedBirthdayId) {
-      this.allBirthdays$
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(birthdays => {
-          const found = birthdays.find(b => b.id === this.selectedBirthdayId);
-          if (found) {
-            this.selectedBirthday = found;
-            this.showBirthdaySelector = false;
-            this.cdr.markForCheck();
-          }
-        });
+      const found = this.allBirthdays().find(b => b.id === this.selectedBirthdayId);
+      if (found) {
+        this.selectedBirthday = found;
+        this.showBirthdaySelector = false;
+      }
     }
   }
 
@@ -94,10 +78,5 @@ export class MessageScheduleDialogComponent implements OnInit, OnDestroy {
 
   trackByBirthday(_index: number, birthday: Birthday): string {
     return birthday.id;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
