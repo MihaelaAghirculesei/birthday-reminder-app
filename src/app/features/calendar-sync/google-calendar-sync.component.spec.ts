@@ -65,7 +65,8 @@ describe('GoogleCalendarSyncComponent', () => {
     }));
 
     const birthdayFacadeSpyObj = jasmine.createSpyObj('BirthdayFacadeService', [], {
-      birthdays$: of(mockBirthdays)
+      birthdays$: of(mockBirthdays),
+      birthdays: jasmine.createSpy('birthdays').and.returnValue(mockBirthdays)
     });
 
     await TestBed.configureTestingModule({

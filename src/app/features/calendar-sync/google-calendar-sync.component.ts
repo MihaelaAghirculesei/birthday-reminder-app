@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, isDevMode } from '@angular/core';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { Subject, takeUntil, firstValueFrom } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -488,7 +488,7 @@ export class GoogleCalendarSyncComponent implements OnInit, OnDestroy {
     this.isSyncing = true;
     this.cdr.markForCheck();
     try {
-      const birthdays = await firstValueFrom(this.birthdayFacade.birthdays$);
+      const birthdays = this.birthdayFacade.birthdays();
       if (birthdays) {
         this.lastSyncResult = await this.googleCalendarService.syncAllBirthdays(birthdays);
         this.cdr.markForCheck();
