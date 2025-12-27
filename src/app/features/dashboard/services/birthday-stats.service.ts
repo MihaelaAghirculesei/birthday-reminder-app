@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Birthday } from '../../../shared';
+import { getDaysUntilBirthday } from '../../../shared/utils/date.utils';
 
 export interface DashboardStats {
   total: number;
@@ -46,7 +47,7 @@ export class BirthdayStatsService {
     const averageAge = birthdays.length > 0 ? Math.round(totalAge / birthdays.length) : 0;
 
     const nextBirthday = this.getNextBirthday(birthdays);
-    const nextBirthdayDays = nextBirthday ? this.calculateDaysUntil(nextBirthday.birthDate) : 0;
+    const nextBirthdayDays = nextBirthday ? getDaysUntilBirthday(nextBirthday.birthDate) : 0;
     const nextBirthdayText = nextBirthday ? nextBirthday.name : 'No upcoming birthdays';
 
     return {
@@ -62,28 +63,12 @@ export class BirthdayStatsService {
     if (birthdays.length === 0) return null;
 
     const sorted = [...birthdays].sort((a, b) => {
-      const daysA = this.calculateDaysUntil(a.birthDate);
-      const daysB = this.calculateDaysUntil(b.birthDate);
+      const daysA = getDaysUntilBirthday(a.birthDate);
+      const daysB = getDaysUntilBirthday(b.birthDate);
       return daysA - daysB;
     });
 
     return sorted[0];
-  }
-
-  private calculateDaysUntil(birthDate: Date): number {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const birth = new Date(birthDate);
-    const nextBirthday = new Date(birth);
-    nextBirthday.setFullYear(today.getFullYear());
-    nextBirthday.setHours(0, 0, 0, 0);
-
-    if (nextBirthday < today) {
-      nextBirthday.setFullYear(today.getFullYear() + 1);
-    }
-
-    const diffTime = nextBirthday.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   getChartData(birthdays: Birthday[]): ChartDataItem[] {
