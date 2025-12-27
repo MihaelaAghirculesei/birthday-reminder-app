@@ -1,0 +1,295 @@
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { BirthdayEditService } from './birthday-edit.service';
+import { Birthday } from '../../../shared';
+
+describe('BirthdayEditService', () => {
+  let service: BirthdayEditService;
+
+  const mockBirthday: Birthday = {
+    id: '1',
+    name: 'John Doe',
+    birthDate: new Date(1990, 0, 15),
+    category: 'friends',
+    zodiacSign: 'Capricorn',
+    reminderDays: 7,
+    notes: 'Test notes',
+    photo: 'photo.jpg',
+    rememberPhoto: 'remember.jpg',
+    scheduledMessages: []
+  };
+
+  const formatDateForInput = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(BirthdayEditService);
+  });
+
+  afterEach(() => {
+    service.ngOnDestroy();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('Observables', () => {
+    it('should have editingBirthdayId$ observable', (done) => {
+      service.editingBirthdayId$.subscribe(id => {
+        expect(id).toBeNull();
+        done();
+      });
+    });
+
+    it('should have editingBirthdayData$ observable', (done) => {
+      service.editingBirthdayData$.subscribe(data => {
+        expect(data).toBeNull();
+        done();
+      });
+    });
+  });
+
+  describe('currentEditingId', () => {
+    it('should return null initially', () => {
+      expect(service.currentEditingId).toBeNull();
+    });
+
+    it('should return current editing ID after startEdit', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      expect(service.currentEditingId).toBe('1');
+    });
+  });
+
+  describe('currentEditingData', () => {
+    it('should return null initially', () => {
+      expect(service.currentEditingData).toBeNull();
+    });
+
+    it('should return current editing data after startEdit', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      const data = service.currentEditingData;
+      expect(data).toBeTruthy();
+      expect(data?.name).toBe('John Doe');
+      expect(data?.notes).toBe('Test notes');
+    });
+  });
+
+  describe('startEdit', () => {
+    it('should set editing birthday ID', (done) => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+
+      service.editingBirthdayId$.subscribe(id => {
+        expect(id).toBe('1');
+        done();
+      });
+    });
+
+    it('should set editing birthday data with correct values', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+
+      const data = service.currentEditingData;
+      expect(data?.name).toBe('John Doe');
+      expect(data?.notes).toBe('Test notes');
+      expect(data?.category).toBe('friends');
+      expect(data?.photo).toBe('photo.jpg');
+      expect(data?.rememberPhoto).toBe('remember.jpg');
+    });
+
+    it('should format birthDate correctly', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+
+      const data = service.currentEditingData;
+      const expectedDate = formatDateForInput(mockBirthday.birthDate);
+      expect(data?.birthDate).toBe(expectedDate);
+    });
+
+    it('should use empty string for missing notes', () => {
+      const birthdayWithoutNotes = { ...mockBirthday, notes: undefined };
+      service.startEdit(birthdayWithoutNotes, formatDateForInput, 'friends');
+
+      const data = service.currentEditingData;
+      expect(data?.notes).toBe('');
+    });
+
+    it('should use default category when birthday has no category', () => {
+      const birthdayWithoutCategory = { ...mockBirthday, category: undefined };
+      service.startEdit(birthdayWithoutCategory, formatDateForInput, 'family');
+
+      const data = service.currentEditingData;
+      expect(data?.category).toBe('family');
+    });
+
+    it('should cancel previous edit when starting new edit', () => {
+      const birthday2 = { ...mockBirthday, id: '2', name: 'Jane Doe' };
+
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      expect(service.currentEditingId).toBe('1');
+
+      service.startEdit(birthday2, formatDateForInput, 'friends');
+      expect(service.currentEditingId).toBe('2');
+      expect(service.currentEditingData?.name).toBe('Jane Doe');
+    });
+
+    it('should not cancel edit when starting same birthday', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      expect(service.currentEditingId).toBe('1');
+    });
+  });
+
+  describe('updateEditingData', () => {
+    beforeEach(() => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+    });
+
+    it('should update name', () => {
+      service.updateEditingData({ name: 'Updated Name' });
+      expect(service.currentEditingData?.name).toBe('Updated Name');
+    });
+
+    it('should update notes', () => {
+      service.updateEditingData({ notes: 'Updated notes' });
+      expect(service.currentEditingData?.notes).toBe('Updated notes');
+    });
+
+    it('should update category', () => {
+      service.updateEditingData({ category: 'family' });
+      expect(service.currentEditingData?.category).toBe('family');
+    });
+
+    it('should update multiple fields at once', () => {
+      service.updateEditingData({
+        name: 'New Name',
+        notes: 'New notes',
+        category: 'work'
+      });
+
+      const data = service.currentEditingData;
+      expect(data?.name).toBe('New Name');
+      expect(data?.notes).toBe('New notes');
+      expect(data?.category).toBe('work');
+    });
+
+    it('should not update if no data is being edited', () => {
+      service.cancelEdit();
+      service.updateEditingData({ name: 'Should not update' });
+      expect(service.currentEditingData).toBeNull();
+    });
+
+    it('should preserve unmodified fields', () => {
+      service.updateEditingData({ name: 'Updated Name' });
+      const data = service.currentEditingData;
+      expect(data?.notes).toBe('Test notes'); // Should remain unchanged
+      expect(data?.category).toBe('friends'); // Should remain unchanged
+    });
+  });
+
+  describe('cancelEdit', () => {
+    beforeEach(() => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+    });
+
+    it('should clear editing birthday ID', () => {
+      service.cancelEdit();
+      expect(service.currentEditingId).toBeNull();
+    });
+
+    it('should clear editing birthday data', () => {
+      service.cancelEdit();
+      expect(service.currentEditingData).toBeNull();
+    });
+
+    it('should emit null for observables', (done) => {
+      service.cancelEdit();
+
+      service.editingBirthdayId$.subscribe(id => {
+        expect(id).toBeNull();
+      });
+
+      service.editingBirthdayData$.subscribe(data => {
+        expect(data).toBeNull();
+        done();
+      });
+    });
+
+    it('should clear auto-save timer', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+      service.scheduleAutoSave(callback, 1000);
+      service.cancelEdit();
+      tick(1000);
+      expect(callback).not.toHaveBeenCalled();
+    }));
+  });
+
+  describe('isEditing', () => {
+    it('should return false when nothing is being edited', () => {
+      expect(service.isEditing('1')).toBe(false);
+    });
+
+    it('should return true for currently editing birthday', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      expect(service.isEditing('1')).toBe(true);
+    });
+
+    it('should return false for different birthday ID', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      expect(service.isEditing('2')).toBe(false);
+    });
+
+    it('should return false after cancel', () => {
+      service.startEdit(mockBirthday, formatDateForInput, 'friends');
+      service.cancelEdit();
+      expect(service.isEditing('1')).toBe(false);
+    });
+  });
+
+  describe('scheduleAutoSave', () => {
+    it('should call callback after delay', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+      service.scheduleAutoSave(callback, 1000);
+      tick(999);
+      expect(callback).not.toHaveBeenCalled();
+      tick(1);
+      expect(callback).toHaveBeenCalledTimes(1);
+    }));
+
+    it('should use default delay of 2000ms', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+      service.scheduleAutoSave(callback);
+      tick(1999);
+      expect(callback).not.toHaveBeenCalled();
+      tick(1);
+      expect(callback).toHaveBeenCalledTimes(1);
+    }));
+
+    it('should clear previous timer when scheduling new save', fakeAsync(() => {
+      const callback1 = jasmine.createSpy('callback1');
+      const callback2 = jasmine.createSpy('callback2');
+
+      service.scheduleAutoSave(callback1, 1000);
+      tick(500);
+      service.scheduleAutoSave(callback2, 1000);
+      tick(1000);
+
+      expect(callback1).not.toHaveBeenCalled();
+      expect(callback2).toHaveBeenCalledTimes(1);
+    }));
+  });
+
+  describe('ngOnDestroy', () => {
+    it('should clear auto-save timer on destroy', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+      service.scheduleAutoSave(callback, 1000);
+      service.ngOnDestroy();
+      tick(1000);
+      expect(callback).not.toHaveBeenCalled();
+    }));
+
+    it('should not throw when no timer is active', () => {
+      expect(() => service.ngOnDestroy()).not.toThrow();
+    });
+  });
+});
