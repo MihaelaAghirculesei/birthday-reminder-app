@@ -1,4 +1,4 @@
-@if ((birthdays$ | async)?.length === 0) {
+@if (birthdays().length === 0) {
   <div class="test-data-section">
     <mat-card class="test-data-card">
       <mat-card-content>
@@ -66,7 +66,7 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Category</mat-label>
             <mat-select formControlName="category">
-              @for (category of (categories$ | async); track category.id) {
+              @for (category of categories(); track category.id) {
                 <mat-option [value]="category.id">
                   <div class="category-option">
                     <mat-icon [style.color]="category.color">{{ category.icon }}</mat-icon>
@@ -105,6 +105,6 @@
   </mat-card>
 </div>
 
-@if ((birthdays$ | async)?.length) {
+@if (birthdays().length) {
   <app-dashboard></app-dashboard>
 }

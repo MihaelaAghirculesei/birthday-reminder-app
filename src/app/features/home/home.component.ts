@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -8,7 +8,6 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { Observable } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -64,8 +63,8 @@ import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   birthdayForm!: FormGroup;
-  birthdays$!: Observable<Birthday[]>;
-  categories$!: Observable<BirthdayCategory[]>;
+  birthdays: Signal<Birthday[]> = this.birthdayFacade.birthdays;
+  categories: Signal<BirthdayCategory[]> = this.categoryFacade.categories;
   selectedPhoto: string | null = null;
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
@@ -85,9 +84,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       reminderDays: [7, [Validators.min(1), Validators.max(365)]],
       photo: [null],
     });
-
-    this.birthdays$ = this.birthdayFacade.birthdays$;
-    this.categories$ = this.categoryFacade.categories$;
   }
 
   ngOnInit(): void {
