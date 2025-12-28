@@ -20,17 +20,17 @@
   </div>
 
   <app-dashboard-stats
-    [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
-    [birthdaysThisMonth]="(birthdaysThisMonth$ | async) ?? 0"
-    [averageAge]="(averageAge$ | async) ?? 0"
-    [nextBirthdayDays]="(nextBirthdayDays$ | async) ?? 0"
-    [nextBirthdayText]="(nextBirthdayText$ | async) ?? ''"
+    [totalBirthdays]="totalBirthdays()"
+    [birthdaysThisMonth]="birthdaysThisMonth()"
+    [averageAge]="averageAge()"
+    [nextBirthdayDays]="nextBirthdayDays()"
+    [nextBirthdayText]="nextBirthdayText()"
   ></app-dashboard-stats>
 
   <app-notification-permission-banner></app-notification-permission-banner>
 
   <app-category-filter
-    [categoriesStats]="(categoriesStats$ | async) ?? []"
+    [categoriesStats]="categoriesStats()"
     [selectedCategory]="selectedCategory"
     (categorySelected)="selectCategory($event)"
     (filterCleared)="clearCategoryFilter()"
@@ -40,11 +40,11 @@
   ></app-category-filter>
 
   <app-birthday-list
-    [birthdays]="(allBirthdays$ | async) ?? []"
-    [categories]="(categories$ | async) ?? []"
+    [birthdays]="allBirthdays()"
+    [categories]="categories()"
     [searchTerm]="dashboardSearchTerm"
     [lastAction]="lastAction"
-    [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
+    [totalBirthdays]="totalBirthdays()"
     (searchTermChange)="onSearchTermChange($event)"
     (clearSearch)="onClearSearch()"
     (undoAction)="undoLastAction()"
@@ -66,10 +66,10 @@
 
   <div class="full-width-section">
     <app-birthday-chart
-      [chartData]="(chartData$ | async) ?? []"
-      [maxCount]="(maxCount$ | async) ?? 0"
+      [chartData]="chartData()"
+      [maxCount]="maxCount()"
       [currentMonth]="currentMonth"
-      [totalBirthdays]="(totalBirthdays$ | async) ?? 0"
+      [totalBirthdays]="totalBirthdays()"
     ></app-birthday-chart>
   </div>
 

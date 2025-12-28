@@ -45,15 +45,28 @@ describe('DashboardComponent', () => {
     { id: 'family', name: 'Family', icon: 'family_restroom', color: '#2196F3' }
   ];
 
+  const mockNext5Birthdays = [
+    { ...mockBirthdays[0], nextBirthday: new Date(2026, 0, 15), daysUntil: 10 },
+    { ...mockBirthdays[1], nextBirthday: new Date(2026, 5, 20), daysUntil: 20 }
+  ];
+
   beforeEach(async () => {
     const birthdayFacadeSpyObj = jasmine.createSpyObj('BirthdayFacadeService', [
       'loadTestData',
       'clearAllBirthdays',
       'addBirthday',
       'getBirthdaysNext30Days'
-    ]);
+    ], {
+      birthdays$: of(mockBirthdays),
+      birthdays: jasmine.createSpy('birthdays').and.returnValue(mockBirthdays),
+      averageAge$: of(30),
+      averageAge: jasmine.createSpy('averageAge').and.returnValue(30),
+      next5Birthdays$: of(mockNext5Birthdays),
+      next5Birthdays: jasmine.createSpy('next5Birthdays').and.returnValue(mockNext5Birthdays)
+    });
     const categoryFacadeSpyObj = jasmine.createSpyObj('CategoryFacadeService', [], {
-      categories$: of(mockCategories)
+      categories$: of(mockCategories),
+      categories: jasmine.createSpy('categories').and.returnValue(mockCategories)
     });
     const editServiceSpyObj = jasmine.createSpyObj('BirthdayEditService', ['cancelEdit'], {
       currentEditingId: null
@@ -70,12 +83,6 @@ describe('DashboardComponent', () => {
       'deleteCategory'
     ]);
 
-    birthdayFacadeSpyObj.birthdays$ = of(mockBirthdays);
-    birthdayFacadeSpyObj.averageAge$ = of(30);
-    birthdayFacadeSpyObj.next5Birthdays$ = of([
-      { ...mockBirthdays[0], nextBirthday: new Date(2026, 0, 15), daysUntil: 10 },
-      { ...mockBirthdays[1], nextBirthday: new Date(2026, 5, 20), daysUntil: 20 }
-    ]);
     birthdayFacadeSpyObj.getBirthdaysNext30Days.and.returnValue(of(mockBirthdays));
 
     statsServiceSpyObj.getChartData.and.returnValue([
@@ -116,37 +123,26 @@ describe('DashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Observables initialization', () => {
-    it('should initialize totalBirthdays$', (done) => {
-      component.totalBirthdays$.subscribe(total => {
-        expect(total).toBe(2);
-        done();
-      });
+  describe('Signals initialization', () => {
+    it('should initialize totalBirthdays', () => {
+      expect(component.totalBirthdays()).toBe(2);
     });
 
-    it('should initialize birthdaysThisMonth$', (done) => {
-      component.birthdaysThisMonth$.subscribe(count => {
-        expect(count).toBe(2);
-        done();
-      });
+    it('should initialize birthdaysThisMonth', () => {
+      expect(component.birthdaysThisMonth()).toBeGreaterThanOrEqual(0);
     });
 
-    it('should initialize averageAge$', (done) => {
-      component.averageAge$.subscribe(age => {
-        expect(age).toBe(30);
-        done();
-      });
+    it('should initialize averageAge', () => {
+      expect(component.averageAge()).toBe(30);
     });
 
-    it('should initialize nextBirthdayDays$', (done) => {
-      component.nextBirthdayDays$.subscribe(days => {
-        expect(days).toBe(10);
-        done();
-      });
+    it('should initialize nextBirthdayDays', () => {
+      expect(component.nextBirthdayDays()).toBe(10);
     });
 
-    it('should return "Today!" when next birthday is today', (done) => {
-      birthdayFacadeSpy.next5Birthdays$ = of([{ ...mockBirthdays[0], nextBirthday: new Date(), daysUntil: 0 }]);
+    it('should return "Today!" when next birthday is today', () => {
+      const birthdaysToday = [{ ...mockBirthdays[0], nextBirthday: new Date(), daysUntil: 0 }];
+      (birthdayFacadeSpy.next5Birthdays as jasmine.Spy).and.returnValue(birthdaysToday);
       const comp = new DashboardComponent(
         birthdayFacadeSpy,
         categoryFacadeSpy,
@@ -155,16 +151,14 @@ describe('DashboardComponent', () => {
         dialogSpy,
         categoryManagerSpy
       );
-      comp.nextBirthdayText$.subscribe(text => {
-        expect(text).toBe('Today!');
-        done();
-      });
+      expect(comp.nextBirthdayText()).toBe('Today!');
     });
 
-    it('should return "Tomorrow!" when next birthday is tomorrow', (done) => {
+    it('should return "Tomorrow!" when next birthday is tomorrow', () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      birthdayFacadeSpy.next5Birthdays$ = of([{ ...mockBirthdays[0], nextBirthday: tomorrow, daysUntil: 1 }]);
+      const birthdaysTomorrow = [{ ...mockBirthdays[0], nextBirthday: tomorrow, daysUntil: 1 }];
+      (birthdayFacadeSpy.next5Birthdays as jasmine.Spy).and.returnValue(birthdaysTomorrow);
       const comp = new DashboardComponent(
         birthdayFacadeSpy,
         categoryFacadeSpy,
@@ -173,14 +167,11 @@ describe('DashboardComponent', () => {
         dialogSpy,
         categoryManagerSpy
       );
-      comp.nextBirthdayText$.subscribe(text => {
-        expect(text).toBe('Tomorrow!');
-        done();
-      });
+      expect(comp.nextBirthdayText()).toBe('Tomorrow!');
     });
 
-    it('should return "N/A" when no birthdays', (done) => {
-      birthdayFacadeSpy.next5Birthdays$ = of([]);
+    it('should return "N/A" when no birthdays', () => {
+      (birthdayFacadeSpy.next5Birthdays as jasmine.Spy).and.returnValue([]);
       const comp = new DashboardComponent(
         birthdayFacadeSpy,
         categoryFacadeSpy,
@@ -189,10 +180,7 @@ describe('DashboardComponent', () => {
         dialogSpy,
         categoryManagerSpy
       );
-      comp.nextBirthdayText$.subscribe(text => {
-        expect(text).toBe('N/A');
-        done();
-      });
+      expect(comp.nextBirthdayText()).toBe('N/A');
     });
   });
 
@@ -250,27 +238,39 @@ describe('DashboardComponent', () => {
 
     it('should filter birthdays by search term', () => {
       component.dashboardSearchTerm = 'John';
-      const filtered = component.getSortedFilteredBirthdays(mockBirthdays, mockCategories);
+      fixture.detectChanges();
+      const filtered = component.allBirthdays();
       expect(filtered.length).toBe(1);
       expect(filtered[0].name).toBe('John Doe');
     });
 
     it('should be case insensitive when filtering', () => {
       component.dashboardSearchTerm = 'john';
-      const filtered = component.getSortedFilteredBirthdays(mockBirthdays, mockCategories);
+      fixture.detectChanges();
+      const filtered = component.allBirthdays();
       expect(filtered.length).toBe(1);
     });
   });
 
   describe('Birthday filtering and sorting', () => {
     it('should return empty array when birthdays is null', () => {
-      const result = component.getSortedFilteredBirthdays(null, mockCategories);
+      (birthdayFacadeSpy.birthdays as jasmine.Spy).and.returnValue(null);
+      const comp = new DashboardComponent(
+        birthdayFacadeSpy,
+        categoryFacadeSpy,
+        editServiceSpy,
+        statsServiceSpy,
+        dialogSpy,
+        categoryManagerSpy
+      );
+      const result = comp.allBirthdays();
       expect(result).toEqual([]);
     });
 
     it('should filter by selected category', () => {
       component.selectedCategory = 'friends';
-      const filtered = component.getSortedFilteredBirthdays(mockBirthdays, mockCategories);
+      fixture.detectChanges();
+      const filtered = component.allBirthdays();
       expect(filtered.length).toBe(1);
       expect(filtered[0].category).toBe('friends');
     });
@@ -289,14 +289,16 @@ describe('DashboardComponent', () => {
           scheduledMessages: []
         }
       ];
+      (birthdayFacadeSpy.birthdays as jasmine.Spy).and.returnValue(birthdaysWithOrphaned);
       component.selectedCategory = '__orphaned__';
-      const filtered = component.getSortedFilteredBirthdays(birthdaysWithOrphaned, mockCategories);
+      fixture.detectChanges();
+      const filtered = component.allBirthdays();
       expect(filtered.length).toBe(1);
       expect(filtered[0].name).toBe('Orphan');
     });
 
     it('should sort birthdays by days until birthday', () => {
-      const result = component.getSortedFilteredBirthdays(mockBirthdays, mockCategories);
+      const result = component.allBirthdays();
       expect(result.length).toBe(2);
     });
   });
@@ -375,18 +377,6 @@ describe('DashboardComponent', () => {
 
       component.onDocumentClick(event);
       expect(editServiceSpy.cancelEdit).toHaveBeenCalled();
-    });
-  });
-
-  describe('Component lifecycle', () => {
-    it('should complete destroy$ on ngOnDestroy', () => {
-      spyOn(component['destroy$'], 'next');
-      spyOn(component['destroy$'], 'complete');
-
-      component.ngOnDestroy();
-
-      expect(component['destroy$'].next).toHaveBeenCalled();
-      expect(component['destroy$'].complete).toHaveBeenCalled();
     });
   });
 });

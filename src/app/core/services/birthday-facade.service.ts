@@ -7,6 +7,11 @@ import { AppState } from '../store/app.state';
 import * as BirthdayActions from '../store/birthday/birthday.actions';
 import * as BirthdaySelectors from '../store/birthday/birthday.selectors';
 
+export interface BirthdayWithDays extends Birthday {
+  nextBirthday: Date;
+  daysUntil: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +47,7 @@ export class BirthdayFacadeService {
   averageAge: Signal<number> = toSignal(this.averageAge$, { initialValue: 0 });
   birthdaysByMonth = toSignal(this.birthdaysByMonth$, { initialValue: [] });
   birthdaysThisMonth = toSignal(this.birthdaysThisMonth$);
-  next5Birthdays: Signal<Birthday[]> = toSignal(this.next5Birthdays$, { initialValue: [] });
+  next5Birthdays: Signal<BirthdayWithDays[]> = toSignal(this.next5Birthdays$, { initialValue: [] });
 
   constructor(private store: Store<AppState>) {
     this.loadBirthdays();
