@@ -43,14 +43,16 @@ describe('CategoryManagerService', () => {
   beforeEach(() => {
     const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
     const birthdayFacadeSpyObj = jasmine.createSpyObj('BirthdayFacadeService', ['updateBirthday'], {
-      birthdays$: of(mockBirthdays)
+      birthdays$: of(mockBirthdays),
+      birthdays: jasmine.createSpy('birthdays').and.returnValue(mockBirthdays)
     });
     const categoryFacadeSpyObj = jasmine.createSpyObj('CategoryFacadeService', [
       'addCategory',
       'updateCategory',
       'deleteCategory'
     ], {
-      categories$: of(mockCategories)
+      categories$: of(mockCategories),
+      categories: jasmine.createSpy('categories').and.returnValue(mockCategories)
     });
 
     TestBed.configureTestingModule({
