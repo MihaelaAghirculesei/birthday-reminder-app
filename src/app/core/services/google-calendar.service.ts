@@ -152,8 +152,10 @@ export class GoogleCalendarService {
       if (expiresIn < this.TOKEN_REFRESH_THRESHOLD_SECONDS) {
         await user.reloadAuthResponse();
       }
-    } catch {
-      void 0;
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to refresh auth token:', error);
+      }
     }
   }
 
@@ -169,7 +171,10 @@ export class GoogleCalendarService {
         try {
           await this.getAuthInstance().currentUser.get().reloadAuthResponse();
           return await operation();
-        } catch {
+        } catch (retryError) {
+          if (isDevMode()) {
+            console.error('Failed to retry operation after token refresh:', retryError);
+          }
           throw error;
         }
       }

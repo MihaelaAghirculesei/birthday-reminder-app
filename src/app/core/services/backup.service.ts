@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Birthday } from '../../shared';
 
 export interface BackupData {
@@ -49,7 +49,10 @@ export class BackupService {
     let backup: BackupData;
     try {
       backup = JSON.parse(text);
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to parse JSON backup file:', error);
+      }
       throw new Error('Invalid JSON file. Please select a valid backup file.');
     }
 

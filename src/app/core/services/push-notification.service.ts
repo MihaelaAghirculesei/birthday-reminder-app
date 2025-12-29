@@ -169,7 +169,10 @@ export class PushNotificationService implements OnDestroy {
     try {
       const status = await LocalNotifications.checkPermissions();
       return status.display === 'granted';
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to check notification permissions:', error);
+      }
       return false;
     }
   }
@@ -180,7 +183,10 @@ export class PushNotificationService implements OnDestroy {
     try {
       const status = await LocalNotifications.requestPermissions();
       return status.display === 'granted';
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to request notification permissions:', error);
+      }
       return false;
     }
   }
@@ -372,7 +378,10 @@ export class PushNotificationService implements OnDestroy {
           }
         }
         return count;
-      } catch {
+      } catch (error) {
+        if (isDevMode()) {
+          console.error('Failed to get scheduled notifications count (browser):', error);
+        }
         return 0;
       }
     }
@@ -380,7 +389,10 @@ export class PushNotificationService implements OnDestroy {
     try {
       const pending = await LocalNotifications.getPending();
       return pending.notifications.length;
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to get scheduled notifications count (native):', error);
+      }
       return 0;
     }
   }
@@ -420,7 +432,10 @@ export class PushNotificationService implements OnDestroy {
           }
         }
         return notifications.sort((a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime());
-      } catch {
+      } catch (error) {
+        if (isDevMode()) {
+          console.error('Failed to get pending notifications (browser):', error);
+        }
         return [];
       }
     }
@@ -434,7 +449,10 @@ export class PushNotificationService implements OnDestroy {
         scheduledAt: n.schedule?.at ? new Date(n.schedule.at) : new Date(),
         birthdayId: n.extra?.birthdayId
       }));
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to get pending notifications (native):', error);
+      }
       return [];
     }
   }

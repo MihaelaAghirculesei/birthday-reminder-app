@@ -1,3 +1,5 @@
+import { isDevMode } from '@angular/core';
+
 export interface BirthdayCategory {
   id: string;
   name: string;
@@ -57,7 +59,10 @@ export function getCustomCategories(): BirthdayCategory[] {
   try {
     const stored = localStorage.getItem('customCategories');
     return stored ? JSON.parse(stored) : [];
-  } catch {
+  } catch (error) {
+    if (isDevMode()) {
+      console.error('Failed to load custom categories:', error);
+    }
     return [];
   }
 }
@@ -67,7 +72,10 @@ function getModifiedCategories(): BirthdayCategory[] {
   try {
     const stored = localStorage.getItem('modifiedCategories');
     return stored ? JSON.parse(stored) : [];
-  } catch {
+  } catch (error) {
+    if (isDevMode()) {
+      console.error('Failed to load modified categories:', error);
+    }
     return [];
   }
 }
@@ -77,7 +85,10 @@ function getDeletedCategoryIds(): string[] {
   try {
     const stored = localStorage.getItem('deletedCategoryIds');
     return stored ? JSON.parse(stored) : [];
-  } catch {
+  } catch (error) {
+    if (isDevMode()) {
+      console.error('Failed to load deleted category IDs:', error);
+    }
     return [];
   }
 }

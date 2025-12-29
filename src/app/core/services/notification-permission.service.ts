@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject, isDevMode } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -66,7 +66,10 @@ export class NotificationPermissionService {
       }
 
       return permission === 'granted';
-    } catch {
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to request notification permission:', error);
+      }
       return false;
     }
   }
@@ -95,8 +98,10 @@ export class NotificationPermissionService {
           primaryKey: 'test'
         }
       } as NotificationOptions);
-    } catch {
-      void 0;
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Failed to show test notification:', error);
+      }
     }
   }
 
