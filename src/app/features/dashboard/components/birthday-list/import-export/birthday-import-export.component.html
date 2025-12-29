@@ -1,0 +1,88 @@
+@if (totalBirthdays > 0) {
+  <div class="backup-section">
+    <mat-card class="backup-card">
+      <mat-card-content>
+        <div class="backup-content">
+          <mat-icon class="backup-icon">backup</mat-icon>
+          <div class="backup-info">
+            <h3>Backup & Restore</h3>
+            <p>Export or import your birthday data</p>
+          </div>
+          <div class="backup-actions">
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="onExportJSON()"
+              [disabled]="isImporting()"
+              matTooltip="Export all birthdays to JSON file"
+              aria-label="Export birthdays to JSON">
+              <mat-icon>download</mat-icon>
+              JSON
+            </button>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="onExportCSV()"
+              [disabled]="isImporting()"
+              matTooltip="Export all birthdays to CSV file"
+              aria-label="Export birthdays to CSV">
+              <mat-icon>download</mat-icon>
+              CSV
+            </button>
+            <button
+              mat-stroked-button
+              color="accent"
+              (click)="jsonInput.click()"
+              [disabled]="isImporting()"
+              matTooltip="Import birthdays from JSON file"
+              aria-label="Import birthdays from JSON">
+              <mat-icon>upload</mat-icon>
+              {{ isImporting() ? 'Importing...' : 'Import JSON' }}
+            </button>
+            <button
+              mat-stroked-button
+              color="accent"
+              (click)="csvInput.click()"
+              [disabled]="isImporting()"
+              matTooltip="Import birthdays from CSV file"
+              aria-label="Import birthdays from CSV">
+              <mat-icon>upload</mat-icon>
+              {{ isImporting() ? 'Importing...' : 'Import CSV' }}
+            </button>
+            <button
+              mat-stroked-button
+              color="accent"
+              (click)="vcardInput.click()"
+              [disabled]="isImporting()"
+              matTooltip="Import birthdays from vCard file"
+              aria-label="Import birthdays from vCard">
+              <mat-icon>upload</mat-icon>
+              {{ isImporting() ? 'Importing...' : 'Import vCard' }}
+            </button>
+            <input
+              #jsonInput
+              type="file"
+              accept=".json"
+              (change)="onImportBackup($event)"
+              hidden
+              aria-label="JSON file input" />
+            <input
+              #csvInput
+              type="file"
+              accept=".csv"
+              (change)="onImportCSV($event)"
+              hidden
+              aria-label="CSV file input" />
+            <input
+              #vcardInput
+              type="file"
+              accept=".vcf"
+              (change)="onImportVCard($event)"
+              hidden
+              aria-label="vCard file input" />
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
