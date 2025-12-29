@@ -68,10 +68,7 @@ describe('BirthdayFacadeService', () => {
     expect(store.dispatch).toHaveBeenCalledWith(BirthdayActions.clearFilters());
   });
 
-  it('should expose birthdays$ observable', (done) => {
-    service.birthdays$.subscribe(birthdays => {
-      expect(birthdays).toEqual([]);
-      done();
-    });
+  it('should expose birthdays signal', () => {
+    expect(service.birthdays()).toEqual([]);
   });
 });
