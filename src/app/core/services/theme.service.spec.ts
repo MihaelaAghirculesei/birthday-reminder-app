@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs';
@@ -60,35 +60,40 @@ describe('ThemeService', () => {
       );
     });
 
-    it('should apply dark theme class to body when enabled', () => {
+    it('should apply dark theme class to body when enabled', fakeAsync(() => {
       service = TestBed.inject(ThemeService);
       darkModeSubject.next(true);
+      tick();
 
       expect(document.body.classList.contains('dark-theme')).toBe(true);
-    });
+    }));
 
-    it('should remove dark theme class from body when disabled', () => {
+    it('should remove dark theme class from body when disabled', fakeAsync(() => {
       document.body.classList.add('dark-theme');
       service = TestBed.inject(ThemeService);
       darkModeSubject.next(false);
+      tick();
 
       expect(document.body.classList.contains('dark-theme')).toBe(false);
-    });
+    }));
 
-    it('should save theme preference to localStorage', () => {
+    it('should save theme preference to localStorage', fakeAsync(() => {
       service = TestBed.inject(ThemeService);
       darkModeSubject.next(true);
+      tick();
 
       expect(localStorage.setItem).toHaveBeenCalledWith('birthday-app-dark-mode', 'true');
-    });
+    }));
 
-    it('should update localStorage when theme changes', () => {
+    it('should update localStorage when theme changes', fakeAsync(() => {
       service = TestBed.inject(ThemeService);
       darkModeSubject.next(true);
+      tick();
       darkModeSubject.next(false);
+      tick();
 
       expect(localStorage.setItem).toHaveBeenCalledWith('birthday-app-dark-mode', 'false');
-    });
+    }));
   });
 
   describe('Server-side rendering', () => {
@@ -131,47 +136,23 @@ describe('ThemeService', () => {
     });
   });
 
-  describe('darkMode$ observable', () => {
+  describe('darkMode Signal', () => {
     beforeEach(() => {
       service = TestBed.inject(ThemeService);
     });
 
-    it('should expose darkMode$ observable', (done) => {
-      service.darkMode$.subscribe(enabled => {
-        expect(typeof enabled).toBe('boolean');
-        done();
-      });
+    it('should expose darkMode signal', () => {
+      expect(typeof service.darkMode()).toBe('boolean');
     });
 
-    it('should emit dark mode changes', (done) => {
-      let emissionCount = 0;
-      service.darkMode$.subscribe(enabled => {
-        emissionCount++;
-        if (emissionCount === 2) {
-          expect(enabled).toBe(true);
-          done();
-        }
-      });
+    it('should reflect dark mode changes', () => {
+      expect(service.darkMode()).toBe(false);
 
       darkModeSubject.next(true);
-    });
-  });
+      expect(service.darkMode()).toBe(true);
 
-  describe('ngOnDestroy', () => {
-    beforeEach(() => {
-      service = TestBed.inject(ThemeService);
-    });
-
-    it('should unsubscribe from darkMode$ on destroy', () => {
-      spyOn(darkModeSubject, 'unsubscribe');
-      service.ngOnDestroy();
-
-      expect(service['subscription']).toBeDefined();
-    });
-
-    it('should not throw if subscription is undefined', () => {
-      service['subscription'] = undefined;
-      expect(() => service.ngOnDestroy()).not.toThrow();
+      darkModeSubject.next(false);
+      expect(service.darkMode()).toBe(false);
     });
   });
 });

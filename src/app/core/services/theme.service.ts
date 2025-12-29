@@ -1,24 +1,32 @@
-import { Injectable, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, effect, Signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/app.state';
 import { selectDarkMode } from '../store/ui/ui.selectors';
 import * as UIActions from '../store/ui/ui.actions';
-import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ThemeService implements OnDestroy {
+export class ThemeService {
   private readonly STORAGE_KEY = 'birthday-app-dark-mode';
-  private subscription?: Subscription;
-  darkMode$ = this.store.select(selectDarkMode);
+
+  darkMode: Signal<boolean> = toSignal(this.store.select(selectDarkMode), { initialValue: false });
 
   constructor(
     private store: Store<AppState>,
     @Inject(PLATFORM_ID) private platformId: object
   ) {
     this.initializeTheme();
+
+    effect(() => {
+      const enabled = this.darkMode();
+      if (isPlatformBrowser(this.platformId)) {
+        this.applyTheme(enabled);
+        localStorage.setItem(this.STORAGE_KEY, String(enabled));
+      }
+    });
   }
 
   private initializeTheme(): void {
@@ -28,11 +36,6 @@ export class ThemeService implements OnDestroy {
     const isDark = savedPreference === 'true';
 
     this.store.dispatch(UIActions.setDarkMode({ enabled: isDark }));
-
-    this.subscription = this.darkMode$.subscribe(enabled => {
-      this.applyTheme(enabled);
-      localStorage.setItem(this.STORAGE_KEY, String(enabled));
-    });
   }
 
   private applyTheme(isDark: boolean): void {
@@ -47,9 +50,5 @@ export class ThemeService implements OnDestroy {
 
   toggleDarkMode(): void {
     this.store.dispatch(UIActions.toggleDarkMode());
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 }
