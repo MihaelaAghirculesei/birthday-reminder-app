@@ -242,6 +242,13 @@ export class DashboardComponent {
     this.lastAction = null;
   }
 
+  async onBirthdaysImported(birthdays: Birthday[]): Promise<void> {
+    for (const birthday of birthdays) {
+      this.birthdayFacade.addBirthday(birthday);
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+  }
+
   undoLastAction(): void {
     if (this.lastAction && this.lastAction.type === 'delete') {
       this.birthdayFacade.addBirthday(this.lastAction.data as Birthday);

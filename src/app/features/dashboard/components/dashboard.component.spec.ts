@@ -336,6 +336,14 @@ describe('DashboardComponent', () => {
         data: mockBirthdays[0]
       });
     });
+
+    it('should add imported birthdays with 50ms delay', async () => {
+      const birthdays = [mockBirthdays[0], mockBirthdays[1]];
+      await component.onBirthdaysImported(birthdays);
+      expect(birthdayFacadeSpy.addBirthday).toHaveBeenCalledTimes(2);
+      expect(birthdayFacadeSpy.addBirthday).toHaveBeenCalledWith(mockBirthdays[0]);
+      expect(birthdayFacadeSpy.addBirthday).toHaveBeenCalledWith(mockBirthdays[1]);
+    });
   });
 
   describe('Message dialog', () => {
