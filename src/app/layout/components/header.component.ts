@@ -24,11 +24,11 @@ import { ThemeService } from '../../core';
         </h1>
         <div class="header-controls">
           <mat-slide-toggle
-            [checked]="(themeService.darkMode$ | async) ?? false"
+            [checked]="themeService.darkMode()"
             (change)="themeService.toggleDarkMode()"
             class="theme-toggle"
             color="primary">
-            <mat-icon>{{ (themeService.darkMode$ | async) ? 'dark_mode' : 'light_mode' }}</mat-icon>
+            <mat-icon>{{ themeService.darkMode() ? 'dark_mode' : 'light_mode' }}</mat-icon>
           </mat-slide-toggle>
           <app-network-status></app-network-status>
         </div>
