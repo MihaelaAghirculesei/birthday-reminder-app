@@ -267,16 +267,14 @@
 }
 
 .test-data-section,
-.clear-data-section,
-.backup-section {
+.clear-data-section {
   display: flex;
   justify-content: center;
   align-items: stretch;
 }
 
 .test-data-card,
-.clear-data-card,
-.backup-card {
+.clear-data-card {
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #8b9af7 0%, #b89dd9 50%, #f5b3fc 100%) !important;
@@ -306,16 +304,14 @@
 }
 
 .test-data-content,
-.clear-data-content,
-.backup-content {
+.clear-data-content {
   display: flex;
   align-items: center;
   gap: 24px;
   color: var(--text-inverse);
 
   .test-icon,
-  .clear-icon,
-  .backup-icon {
+  .clear-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
@@ -332,8 +328,7 @@
   }
 
   .test-info,
-  .clear-info,
-  .backup-info {
+  .clear-info {
     flex: 1;
 
     h3 {
@@ -398,40 +393,6 @@
       height: 20px;
     }
   }
-
-  .backup-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    button {
-      background: rgba(255, 255, 255, 0.9) !important;
-      color: var(--primary) !important;
-      font-weight: 600 !important;
-      border-radius: var(--radius) !important;
-
-      :host-context(body.dark-theme) & {
-        background: rgba(59, 130, 246, 0.9) !important;
-        color: white !important;
-      }
-
-      &:hover {
-        background: var(--text-inverse) !important;
-        transform: translateY(-2px);
-
-        :host-context(body.dark-theme) & {
-          background: rgba(37, 99, 235, 0.9) !important;
-        }
-      }
-
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        margin-right: 4px;
-      }
-    }
-  }
 }
 
 @keyframes fadeInUp {
@@ -449,8 +410,7 @@
   .birthday-list-card,
   .chart-card,
   .test-data-card,
-  .clear-data-card,
-  .backup-card {
+  .clear-data-card {
     .mat-mdc-card-content {
       padding: 16px !important;
     }
@@ -469,21 +429,18 @@
   }
 
   .test-data-section,
-  .clear-data-section,
-  .backup-section {
+  .clear-data-section {
     padding: 0 8px;
   }
 
   .test-data-content,
-  .clear-data-content,
-  .backup-content {
+  .clear-data-content {
     flex-direction: column;
     text-align: center;
     gap: 16px;
 
     .test-icon,
-    .clear-icon,
-    .backup-icon {
+    .clear-icon {
       min-width: 64px;
       min-height: 64px;
       font-size: 40px;
@@ -493,8 +450,7 @@
     }
 
     .test-info,
-    .clear-info,
-    .backup-info {
+    .clear-info {
       h3 {
         font-size: 1.3rem;
       }
@@ -507,11 +463,6 @@
     .add-test-btn {
       min-width: 160px;
       height: 44px;
-    }
-
-    .backup-actions {
-      flex-wrap: wrap;
-      justify-content: center;
     }
   }
 

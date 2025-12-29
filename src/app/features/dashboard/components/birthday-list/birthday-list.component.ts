@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy, isDevMode } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,7 +9,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { Birthday, BirthdayCategory } from '../../../../shared';
 import { BirthdayItemComponent } from './birthday-item/birthday-item.component';
-import { BirthdayFacadeService, BackupService, NotificationService } from '../../../../core';
+import { BirthdayImportExportComponent } from './import-export/birthday-import-export.component';
+import { BirthdayFacadeService } from '../../../../core';
 import { BirthdayEditDialogComponent, BirthdayEditDialogData, BirthdayEditDialogResult } from '../birthday-edit-dialog/birthday-edit-dialog.component';
 import { getDaysUntilBirthday } from '../../../../shared/utils/date.utils';
 
@@ -28,7 +29,8 @@ interface EnrichedBirthday extends Birthday {
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    BirthdayItemComponent
+    BirthdayItemComponent,
+    BirthdayImportExportComponent
 ],
   templateUrl: './birthday-list.component.html',
   styleUrls: ['./birthday-list.component.scss'],
@@ -48,6 +50,7 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
   @Output() undoAction = new EventEmitter<void>();
   @Output() addTestData = new EventEmitter<void>();
   @Output() clearAllData = new EventEmitter<void>();
+  @Output() birthdaysImported = new EventEmitter<Birthday[]>();
 
   isAddingTestData = false;
   isClearingData = false;
@@ -56,8 +59,6 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
 
   constructor(
     public birthdayFacade: BirthdayFacadeService,
-    private backupService: BackupService,
-    private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
 
@@ -98,84 +99,13 @@ export class BirthdayListComponent implements OnChanges, OnDestroy {
     }, 2000);
   }
 
+  onBirthdaysImported(birthdays: Birthday[]): void {
+    this.birthdaysImported.emit(birthdays);
+  }
+
   ngOnDestroy(): void {
     if (this.testDataTimer) clearTimeout(this.testDataTimer);
     if (this.clearDataTimer) clearTimeout(this.clearDataTimer);
-  }
-
-  onExportJSON(): void {
-    const allBirthdays = this.birthdayFacade.birthdays();
-    this.backupService.exportToJSON(allBirthdays);
-    this.notificationService.show(`Exported ${allBirthdays.length} birthdays to JSON`, 'success');
-  }
-
-  onExportCSV(): void {
-    const allBirthdays = this.birthdayFacade.birthdays();
-    this.backupService.exportToCSV(allBirthdays);
-    this.notificationService.show(`Exported ${allBirthdays.length} birthdays to CSV`, 'success');
-  }
-
-  async onImportBackup(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    try {
-      const birthdays = await this.backupService.importFromFile(file);
-
-      for (const birthday of birthdays) {
-        this.birthdayFacade.addBirthday(birthday);
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-
-      this.notificationService.show(`Imported ${birthdays.length} birthdays`, 'success');
-    } catch (error) {
-      if (isDevMode()) {
-        console.error('Import failed:', error);
-      }
-      this.notificationService.show('Invalid backup file', 'error');
-    }
-
-    input.value = '';
-  }
-
-  async onImportCSV(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    try {
-      const birthdays = await this.backupService.importFromCSV(file);
-
-      for (const birthday of birthdays) {
-        this.birthdayFacade.addBirthday(birthday);
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-
-      this.notificationService.show(`Imported ${birthdays.length} birthdays from CSV`, 'success');
-    } catch {
-      this.notificationService.show('Invalid CSV file', 'error');
-    }
-
-    input.value = '';
-  }
-
-  async onImportVCard(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    try {
-      const birthdays = await this.backupService.importFromVCard(file);
-      for (const birthday of birthdays) {
-        this.birthdayFacade.addBirthday(birthday);
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-      this.notificationService.show(`Imported ${birthdays.length} birthdays from vCard`, 'success');
-    } catch {
-      this.notificationService.show('Invalid vCard file', 'error');
-    }
-    input.value = '';
   }
 
   trackByBirthday(_index: number, birthday: Birthday): string {

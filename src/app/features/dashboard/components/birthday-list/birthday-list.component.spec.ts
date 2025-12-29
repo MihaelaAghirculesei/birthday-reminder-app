@@ -3,15 +3,13 @@ import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { BirthdayListComponent } from './birthday-list.component';
-import { BirthdayFacadeService, BackupService, NotificationService } from '../../../../core';
+import { BirthdayFacadeService } from '../../../../core';
 import { Birthday, BirthdayCategory } from '../../../../shared';
 
 describe('BirthdayListComponent', () => {
   let component: BirthdayListComponent;
   let fixture: ComponentFixture<BirthdayListComponent>;
   let birthdayFacadeSpy: jasmine.SpyObj<BirthdayFacadeService>;
-  let backupServiceSpy: jasmine.SpyObj<BackupService>;
-  let notificationServiceSpy: jasmine.SpyObj<NotificationService>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockBirthdays: Birthday[] = [
@@ -44,37 +42,20 @@ describe('BirthdayListComponent', () => {
 
   beforeEach(async () => {
     const birthdayFacadeSpyObj = jasmine.createSpyObj('BirthdayFacadeService', ['addBirthday', 'updateBirthday', 'deleteBirthday']);
-    const backupServiceSpyObj = jasmine.createSpyObj('BackupService', [
-      'exportToJSON',
-      'exportToCSV',
-      'importFromFile',
-      'importFromCSV',
-      'importFromVCard'
-    ]);
-    const notificationServiceSpyObj = jasmine.createSpyObj('NotificationService', ['show']);
     const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
 
     birthdayFacadeSpyObj.birthdays$ = of(mockBirthdays);
     birthdayFacadeSpyObj.birthdays = jasmine.createSpy('birthdays').and.returnValue(mockBirthdays);
-    backupServiceSpyObj.exportToJSON.and.returnValue(undefined);
-    backupServiceSpyObj.exportToCSV.and.returnValue(undefined);
-    backupServiceSpyObj.importFromFile.and.returnValue(Promise.resolve(mockBirthdays));
-    backupServiceSpyObj.importFromCSV.and.returnValue(Promise.resolve(mockBirthdays));
-    backupServiceSpyObj.importFromVCard.and.returnValue(Promise.resolve(mockBirthdays));
 
     await TestBed.configureTestingModule({
       imports: [BirthdayListComponent, NoopAnimationsModule],
       providers: [
         { provide: BirthdayFacadeService, useValue: birthdayFacadeSpyObj },
-        { provide: BackupService, useValue: backupServiceSpyObj },
-        { provide: NotificationService, useValue: notificationServiceSpyObj },
         { provide: MatDialog, useValue: dialogSpyObj }
       ]
     }).compileComponents();
 
     birthdayFacadeSpy = TestBed.inject(BirthdayFacadeService) as jasmine.SpyObj<BirthdayFacadeService>;
-    backupServiceSpy = TestBed.inject(BackupService) as jasmine.SpyObj<BackupService>;
-    notificationServiceSpy = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
     dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
     fixture = TestBed.createComponent(BirthdayListComponent);
@@ -172,158 +153,12 @@ describe('BirthdayListComponent', () => {
     }));
   });
 
-  describe('Export functionality', () => {
-    it('should export to JSON', (done) => {
-      component.onExportJSON();
+  describe('Birthdays imported', () => {
+    it('should emit birthdaysImported when birthdays are imported', () => {
+      spyOn(component.birthdaysImported, 'emit');
+      component.onBirthdaysImported(mockBirthdays);
 
-      setTimeout(() => {
-        expect(backupServiceSpy.exportToJSON).toHaveBeenCalledWith(mockBirthdays);
-        expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-          'Exported 2 birthdays to JSON',
-          'success'
-        );
-        done();
-      }, 10);
-    });
-
-    it('should export to CSV', (done) => {
-      component.onExportCSV();
-
-      setTimeout(() => {
-        expect(backupServiceSpy.exportToCSV).toHaveBeenCalledWith(mockBirthdays);
-        expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-          'Exported 2 birthdays to CSV',
-          'success'
-        );
-        done();
-      }, 10);
-    });
-  });
-
-  describe('Import functionality', () => {
-    let fileInput: HTMLInputElement;
-    let mockFile: File;
-
-    beforeEach(() => {
-      fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      mockFile = new File(['test'], 'test.json', { type: 'application/json' });
-    });
-
-    it('should import from JSON backup file', async () => {
-      Object.defineProperty(fileInput, 'files', {
-        value: [mockFile],
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportBackup(event);
-
-      expect(backupServiceSpy.importFromFile).toHaveBeenCalledWith(mockFile);
-      expect(birthdayFacadeSpy.addBirthday).toHaveBeenCalledTimes(2);
-      expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-        'Imported 2 birthdays',
-        'success'
-      );
-      expect(fileInput.value).toBe('');
-    });
-
-    it('should handle import error gracefully', async () => {
-      backupServiceSpy.importFromFile.and.returnValue(Promise.reject('Error'));
-      Object.defineProperty(fileInput, 'files', {
-        value: [mockFile],
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportBackup(event);
-
-      expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-        'Invalid backup file',
-        'error'
-      );
-    });
-
-    it('should not import if no file selected', async () => {
-      Object.defineProperty(fileInput, 'files', {
-        value: null,
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportBackup(event);
-
-      expect(backupServiceSpy.importFromFile).not.toHaveBeenCalled();
-    });
-
-    it('should import from CSV file', async () => {
-      const csvFile = new File(['test'], 'test.csv', { type: 'text/csv' });
-      Object.defineProperty(fileInput, 'files', {
-        value: [csvFile],
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportCSV(event);
-
-      expect(backupServiceSpy.importFromCSV).toHaveBeenCalledWith(csvFile);
-      expect(birthdayFacadeSpy.addBirthday).toHaveBeenCalledTimes(2);
-      expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-        'Imported 2 birthdays from CSV',
-        'success'
-      );
-    });
-
-    it('should handle CSV import error', async () => {
-      backupServiceSpy.importFromCSV.and.returnValue(Promise.reject('Error'));
-      const csvFile = new File(['test'], 'test.csv', { type: 'text/csv' });
-      Object.defineProperty(fileInput, 'files', {
-        value: [csvFile],
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportCSV(event);
-
-      expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-        'Invalid CSV file',
-        'error'
-      );
-    });
-
-    it('should import from vCard file', async () => {
-      const vcfFile = new File(['test'], 'test.vcf', { type: 'text/vcard' });
-      Object.defineProperty(fileInput, 'files', {
-        value: [vcfFile],
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportVCard(event);
-
-      expect(backupServiceSpy.importFromVCard).toHaveBeenCalledWith(vcfFile);
-      expect(birthdayFacadeSpy.addBirthday).toHaveBeenCalledTimes(2);
-      expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-        'Imported 2 birthdays from vCard',
-        'success'
-      );
-    });
-
-    it('should handle vCard import error', async () => {
-      backupServiceSpy.importFromVCard.and.returnValue(Promise.reject('Error'));
-      const vcfFile = new File(['test'], 'test.vcf', { type: 'text/vcard' });
-      Object.defineProperty(fileInput, 'files', {
-        value: [vcfFile],
-        writable: false
-      });
-
-      const event = { target: fileInput } as unknown as Event;
-      await component.onImportVCard(event);
-
-      expect(notificationServiceSpy.show).toHaveBeenCalledWith(
-        'Invalid vCard file',
-        'error'
-      );
+      expect(component.birthdaysImported.emit).toHaveBeenCalledWith(mockBirthdays);
     });
   });
 
