@@ -7,6 +7,16 @@ interface ErrorContext {
   technicalMessage: string;
 }
 
+interface GoogleAPIError {
+  result?: {
+    error?: {
+      code?: number;
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   constructor(private injector: Injector) {}
@@ -68,14 +78,28 @@ export class GlobalErrorHandler implements ErrorHandler {
             (error.message.includes('IndexedDB') || error.message.includes('IDB')));
   }
 
-  private isGoogleAPIError(error: unknown): boolean {
+  private isGoogleAPIError(error: unknown): error is GoogleAPIError {
     if (!this.isObject(error)) return false;
-    const hasResultError = this.isObject(error['result']) &&
-                          this.isObject(error['result']['error']) &&
-                          error['result']['error']['code'] !== undefined;
-    const hasGoogleMessage = typeof error['message'] === 'string' &&
-                            (error['message'].includes('gapi') || error['message'].includes('Google'));
+
+    const hasResultError = this.hasGoogleResultError(error);
+    const hasGoogleMessage = this.hasGoogleMessage(error);
+
     return hasResultError || hasGoogleMessage;
+  }
+
+  private hasGoogleResultError(error: Record<string, unknown>): boolean {
+    return typeof error['result'] === 'object' &&
+           error['result'] !== null &&
+           'error' in error['result'] &&
+           typeof error['result']['error'] === 'object' &&
+           error['result']['error'] !== null &&
+           'code' in error['result']['error'] &&
+           typeof (error['result']['error'] as Record<string, unknown>)['code'] === 'number';
+  }
+
+  private hasGoogleMessage(error: Record<string, unknown>): boolean {
+    return typeof error['message'] === 'string' &&
+           (error['message'].includes('gapi') || error['message'].includes('Google'));
   }
 
   private isNetworkError(error: unknown): boolean {
@@ -108,7 +132,7 @@ export class GlobalErrorHandler implements ErrorHandler {
     if (error instanceof Error) {
       return error.message;
     }
-    if (this.isObject(error) && typeof error['message'] === 'string') {
+    if (this.isObject(error) && 'message' in error && typeof error['message'] === 'string') {
       return error['message'];
     }
     if (typeof error === 'string') {

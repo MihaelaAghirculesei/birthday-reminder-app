@@ -32,6 +32,16 @@ export interface CalendarEvent {
   };
 }
 
+interface GoogleAPIError {
+  result?: {
+    error?: {
+      code?: number;
+      message?: string;
+    };
+  };
+  status?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -165,7 +175,7 @@ export class GoogleCalendarService {
     try {
       return await operation();
     } catch (error: unknown) {
-      const status = (error as { result?: { error?: { code?: number } }; status?: number })?.result?.error?.code || (error as { status?: number })?.status;
+      const status = this.extractErrorStatus(error);
 
       if (status === 401 || status === 403) {
         try {
@@ -181,6 +191,20 @@ export class GoogleCalendarService {
 
       throw error;
     }
+  }
+
+  private extractErrorStatus(error: unknown): number | undefined {
+    if (!this.isGoogleAPIError(error)) {
+      return undefined;
+    }
+
+    return error.result?.error?.code || error.status;
+  }
+
+  private isGoogleAPIError(error: unknown): error is GoogleAPIError {
+    return typeof error === 'object' &&
+           error !== null &&
+           ('result' in error || 'status' in error);
   }
 
   async getCalendars(): Promise<GoogleCalendarItem[]> {
