@@ -8,7 +8,11 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
-        provideMockStore({ initialState: {} }),
+        provideMockStore({
+          initialState: {
+            ui: { darkMode: false }
+          }
+        }),
         provideRouter([])
       ]
     }).compileComponents();
