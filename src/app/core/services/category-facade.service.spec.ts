@@ -65,49 +65,6 @@ describe('CategoryFacadeService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('Selectors', () => {
-    it('should select all categories', (done) => {
-      service.categories$.subscribe(categories => {
-        expect(categories).toEqual(mockCategories);
-        done();
-      });
-    });
-
-    it('should select default categories', (done) => {
-      service.defaultCategories$.subscribe(categories => {
-        expect(categories).toEqual(mockDefaultCategories);
-        done();
-      });
-    });
-
-    it('should select custom categories', (done) => {
-      service.customCategories$.subscribe(categories => {
-        expect(categories).toEqual(mockCustomCategories);
-        done();
-      });
-    });
-
-    it('should select loaded state', (done) => {
-      service.loaded$.subscribe(loaded => {
-        expect(loaded).toBe(true);
-        done();
-      });
-    });
-
-    it('should select loading state', (done) => {
-      service.loading$.subscribe(loading => {
-        expect(loading).toBe(false);
-        done();
-      });
-    });
-
-    it('should select error state', (done) => {
-      service.error$.subscribe(error => {
-        expect(error).toBeNull();
-        done();
-      });
-    });
-  });
 
   describe('Signals', () => {
     it('should have categories signal with initial value', () => {

@@ -11,19 +11,12 @@ import * as CategorySelectors from '../store/category/category.selectors';
   providedIn: 'root',
 })
 export class CategoryFacadeService {
-  categories$ = this.store.select(CategorySelectors.selectAllCategories);
-  defaultCategories$ = this.store.select(CategorySelectors.selectDefaultCategories);
-  customCategories$ = this.store.select(CategorySelectors.selectCustomCategories);
-  loaded$ = this.store.select(CategorySelectors.selectCategoriesLoaded);
-  loading$ = this.store.select(CategorySelectors.selectCategoriesLoading);
-  error$ = this.store.select(CategorySelectors.selectCategoriesError);
-
-  categories: Signal<BirthdayCategory[]> = toSignal(this.categories$, { initialValue: [] });
-  defaultCategories: Signal<BirthdayCategory[]> = toSignal(this.defaultCategories$, { initialValue: [] });
-  customCategories: Signal<BirthdayCategory[]> = toSignal(this.customCategories$, { initialValue: [] });
-  loaded: Signal<boolean> = toSignal(this.loaded$, { initialValue: false });
-  loading: Signal<boolean> = toSignal(this.loading$, { initialValue: false });
-  error: Signal<string | null> = toSignal(this.error$, { initialValue: null });
+  categories: Signal<BirthdayCategory[]> = toSignal(this.store.select(CategorySelectors.selectAllCategories), { initialValue: [] });
+  defaultCategories: Signal<BirthdayCategory[]> = toSignal(this.store.select(CategorySelectors.selectDefaultCategories), { initialValue: [] });
+  customCategories: Signal<BirthdayCategory[]> = toSignal(this.store.select(CategorySelectors.selectCustomCategories), { initialValue: [] });
+  loaded: Signal<boolean> = toSignal(this.store.select(CategorySelectors.selectCategoriesLoaded), { initialValue: false });
+  loading: Signal<boolean> = toSignal(this.store.select(CategorySelectors.selectCategoriesLoading), { initialValue: false });
+  error: Signal<string | null> = toSignal(this.store.select(CategorySelectors.selectCategoriesError), { initialValue: null });
 
   constructor(private store: Store<AppState>) {}
 
