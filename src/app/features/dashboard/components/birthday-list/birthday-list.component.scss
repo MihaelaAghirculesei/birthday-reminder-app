@@ -1,3 +1,5 @@
+@import '../../../../../styles/shared';
+
 .birthday-list-card {
   background: var(--surface) !important;
   border-radius: var(--radius-lg) !important;
@@ -5,12 +7,7 @@
   border: 1px solid var(--border-light) !important;
   overflow: hidden;
   animation: fadeInUp 0.6s ease-out 0.4s both;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-elevated) !important;
-  }
+  @include card-hover;
 
   .mat-mdc-card-content {
     padding: 32px !important;
@@ -18,11 +15,7 @@
 }
 
 .birthday-list-header {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--secondary) 100%
-  );
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: white;
   padding: 32px;
   display: flex;
@@ -80,24 +73,6 @@
     :host-context(body.dark-theme) & {
       box-shadow: 0 6px 20px rgba(248, 113, 113, 0.7) !important;
     }
-  }
-}
-
-@keyframes pulse-undo {
-  0%, 100% {
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-  }
-  50% {
-    box-shadow: 0 6px 25px rgba(255, 107, 107, 0.7);
-  }
-}
-
-@keyframes pulse-undo-dark {
-  0%, 100% {
-    box-shadow: 0 4px 15px rgba(248, 113, 113, 0.5);
-  }
-  50% {
-    box-shadow: 0 6px 25px rgba(248, 113, 113, 0.8);
   }
 }
 
@@ -195,24 +170,7 @@
     padding-top: 8px;
     padding-bottom: 8px;
     margin-right: -7px;
-
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--surface-elevated);
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 4px;
-
-      &:hover {
-        background: var(--secondary);
-      }
-    }
+    @include custom-scrollbar;
   }
 }
 
@@ -283,15 +241,11 @@
   border: none !important;
   max-width: 600px;
   width: 100%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible !important;
+  @include card-hover;
 
   :host-context(body.dark-theme) & {
     background: linear-gradient(135deg, #4a5568 0%, #5a5a7a 50%, #6b5b7b 100%) !important;
-  }
-
-  &:hover {
-    transform: translateY(-4px) scale(1.02);
   }
 
   .mat-mdc-card-content {
@@ -392,17 +346,6 @@
       width: 20px;
       height: 20px;
     }
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
