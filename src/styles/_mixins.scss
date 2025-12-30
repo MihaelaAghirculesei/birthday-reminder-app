@@ -1,0 +1,113 @@
+@mixin circular-button($size, $gradient-start, $gradient-end, $icon-size: 20px) {
+  width: $size !important;
+  height: $size !important;
+  background: linear-gradient(135deg, $gradient-start 0%, $gradient-end 100%) !important;
+  color: white !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.1) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .mat-mdc-button-touch-target {
+    display: none !important;
+  }
+
+  mat-icon,
+  .icon,
+  [class$='-icon'] {
+    font-size: $icon-size !important;
+    width: $icon-size !important;
+    height: $icon-size !important;
+    color: white !important;
+    transition: all 0.3s ease;
+  }
+
+  &:hover mat-icon,
+  &:hover .icon,
+  &:hover [class$='-icon'] {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  }
+}
+
+@mixin form-input {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid #007bff !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #333 !important;
+  width: 100% !important;
+  transition: all 0.3s ease !important;
+
+  :host-context(body.dark-theme) & {
+    background: var(--surface-elevated) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-light) !important;
+  }
+
+  &:focus {
+    outline: none !important;
+    border-color: #0056b3 !important;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25) !important;
+    background: white !important;
+
+    :host-context(body.dark-theme) & {
+      background: var(--surface-hover) !important;
+      border-color: var(--primary) !important;
+    }
+  }
+
+  &::placeholder {
+    color: #6c757d !important;
+
+    :host-context(body.dark-theme) & {
+      color: var(--text-muted) !important;
+    }
+  }
+}
+
+@mixin card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--surface-elevated);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--secondary);
+    }
+  }
+}
+
+@mixin dark-theme-var($property, $light-value, $dark-var) {
+  #{$property}: $light-value;
+
+  :host-context(body.dark-theme) & {
+    #{$property}: var($dark-var);
+  }
+}
