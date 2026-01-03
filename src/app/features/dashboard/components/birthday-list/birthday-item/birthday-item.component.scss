@@ -1,10 +1,10 @@
 @import '../../../../../../styles/shared';
 
 .dashboard-avatar {
-  width: 200px !important;
-  height: 200px !important;
-  min-width: 200px !important;
-  min-height: 200px !important;
+  width: 200px;
+  height: 200px;
+  min-width: 200px;
+  min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,9 +23,9 @@
   }
 
   .dashboard-default-icon {
-    font-size: 100px !important;
-    width: 100px !important;
-    height: 100px !important;
+    font-size: 100px;
+    width: 100px;
+    height: 100px;
     background: var(--primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -34,7 +34,6 @@
 
   &:hover {
     transform: scale(1.05);
-    border-color: var(--primary);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
   }
 }
@@ -44,7 +43,7 @@
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
-  margin: 0 16px !important;
+  margin: 0 16px;
   position: relative;
   background: #d2d4d7;
   border-radius: 8px;
@@ -154,9 +153,9 @@
   margin: 4px 0;
 
   .small-icon {
-    font-size: 16px !important;
-    width: 16px !important;
-    height: 16px !important;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
     color: var(--text-secondary);
   }
 }
@@ -186,7 +185,7 @@
 
 .dashboard-category-inline {
   flex-shrink: 0;
-  font-size: 18px !important;
+  font-size: 18px;
 }
 
 .dashboard-name {
@@ -227,15 +226,15 @@
   flex-shrink: 0;
 
   button {
-    margin: 0 !important;
+    margin: 0;
     align-self: center;
   }
 }
 
 .edit-button-circle {
   @include circular-button(55px, #007bff, #0056b3);
-  margin-top: 29px !important;
-  margin-right: 8px !important;
+  margin-top: 29px;
+  margin-right: 8px;
 
   :host-context(body.dark-theme) & {
     background: var(--button-edit) !important;
@@ -249,8 +248,8 @@
 
 .save-button-circle {
   @include circular-button(55px, #28a745, #1e7e34);
-  margin-top: 29px !important;
-  margin-right: 8px !important;
+  margin-top: 29px;
+  margin-right: 8px;
 
   :host-context(body.dark-theme) & {
     background: var(--button-save) !important;
@@ -264,7 +263,7 @@
 
 .cancel-button-circle {
   @include circular-button(55px, #6c757d, #5a6268);
-  margin-top: 29px !important;
+  margin-top: 29px;
 
   :host-context(body.dark-theme) & {
     background: var(--button-cancel) !important;
@@ -284,35 +283,35 @@
 }
 
 .edit-name-input {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  margin-bottom: 4px !important;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .dashboard-notes-edit {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .dashboard-birth-date-edit {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  margin-bottom: 8px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .dashboard-category-edit {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  margin-top: 8px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .dashboard-photo-edit {
-  margin-top: 16px !important;
-  padding-top: 16px !important;
-  border-top: 1px solid var(--border-light) !important;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
 }
 
 .photo-section-title {
@@ -335,12 +334,12 @@
 }
 
 .edit-category-select {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 .delete-button-circle {
   @include circular-button(55px, #dc3545, #c82333, 34px);
-  margin-top: 29px !important;
+  margin-top: 29px;
 
   :host-context(body.dark-theme) & {
     background: var(--button-delete) !important;
@@ -373,44 +372,15 @@
   text-align: center;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: visible;
   flex-shrink: 0;
   cursor: pointer;
   margin: 18px;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    border-radius: 50%;
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 0;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
-    border-radius: 50%;
-    z-index: 1;
-  }
-
   .days-circle-content {
-    position: relative;
-    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
   }
 
   .days-number {
@@ -418,46 +388,21 @@
     font-weight: 900;
     line-height: 1;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    letter-spacing: -0.5px;
   }
 
   &.red-alert {
-    background: radial-gradient(circle, #ff4757 0%, #ff3742 40%, #c23616 100%);
-    animation: red-alert-attention 1.5s infinite;
-    box-shadow: 0 0 35px rgba(255, 71, 87, 0.9), 0 0 70px rgba(255, 71, 87, 0.5), 0 0 100px rgba(255, 71, 87, 0.2), inset 0 2px 10px rgba(255, 255, 255, 0.4);
-
-    &::before {
-      background: radial-gradient(circle, rgba(255, 71, 87, 0.7) 0%, transparent 70%);
-      animation: red-ring-pulse 2s infinite;
-      opacity: 1;
-    }
-
-    .days-number {
-      animation: red-text-glow 2s infinite;
-      font-weight: 900;
-    }
+    background: radial-gradient(circle, #ff4757 0%, #c23616 100%);
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.7);
   }
 
   &.orange-warning {
-    background: radial-gradient(circle, #ff9500 0%, #ff7675 40%, #e17055 100%);
-    animation: orange-warning-attention 2.5s infinite;
-    box-shadow: 0 0 25px rgba(255, 149, 0, 0.7), 0 0 50px rgba(255, 149, 0, 0.3), inset 0 2px 8px rgba(255, 255, 255, 0.3);
-
-    &::before {
-      background: radial-gradient(circle, rgba(255, 149, 0, 0.5) 0%, transparent 70%);
-      animation: orange-ring-pulse 3s infinite;
-    }
+    background: radial-gradient(circle, #ff9500 0%, #e17055 100%);
+    box-shadow: 0 0 15px rgba(255, 149, 0, 0.6);
   }
 
   &.green-safe {
-    background: radial-gradient(circle, #00b894 0%, #00a085 40%, #00cec9 100%);
-    animation: green-calm-glow 4s infinite;
-    box-shadow: 0 0 15px rgba(0, 184, 148, 0.5), 0 0 30px rgba(0, 184, 148, 0.2), inset 0 2px 8px rgba(255, 255, 255, 0.3);
-
-    &::before {
-      background: radial-gradient(circle, rgba(0, 184, 148, 0.3) 0%, transparent 70%);
-      animation: green-ring-pulse 4s infinite;
-    }
+    background: radial-gradient(circle, #00b894 0%, #00cec9 100%);
+    box-shadow: 0 0 10px rgba(0, 184, 148, 0.5);
   }
 
   &:hover {

@@ -3,7 +3,6 @@ import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
-import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { routes } from './app.routes';
@@ -26,13 +25,6 @@ export const appConfig: ApplicationConfig = {
       ui: uiReducer
     }),
     provideEffects([BirthdayEffects, CategoryEffects]),
-    provideStoreDevtools({
-      maxAge: 25,
-      logOnly: !isDevMode(),
-      autoPause: true,
-      trace: false,
-      traceLimit: 75
-    }),
     NotificationService,
     ThemeService,
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
