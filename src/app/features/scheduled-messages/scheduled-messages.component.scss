@@ -13,16 +13,24 @@
 
     h2 {
       margin: 0;
-      color: var(--text-primary);
+      color: #ffffff;
       font-weight: 600;
       font-size: 1.75rem;
+
+      :host-context(body.dark-theme) & {
+        color: var(--text-primary);
+      }
     }
 
     .subtitle {
       flex-basis: 100%;
       margin: 0;
-      color: var(--text-secondary);
+      color: rgba(255, 255, 255, 0.9);
       font-size: 0.95rem;
+
+      :host-context(body.dark-theme) & {
+        color: var(--text-secondary);
+      }
     }
 
     .add-message-fab {
@@ -144,6 +152,13 @@
               gap: 4px;
               color: var(--text-secondary);
               font-size: 0.9rem;
+              padding: 4px 12px;
+              border-radius: var(--radius-sm);
+
+              :host-context(body.dark-theme) & {
+                background: #4a5568;
+                color: #ffffff;
+              }
 
               .small-icon {
                 font-size: 16px;
@@ -176,16 +191,31 @@
               &.priority-low {
                 background: rgba(76, 175, 80, 0.15);
                 color: var(--success);
+
+                :host-context(body.dark-theme) & {
+                  background: #4a5568;
+                  color: #ffffff;
+                }
               }
 
               &.priority-normal {
                 background: rgba(33, 150, 243, 0.15);
                 color: var(--primary);
+
+                :host-context(body.dark-theme) & {
+                  background: #4a5568;
+                  color: #ffffff;
+                }
               }
 
               &.priority-high {
                 background: rgba(244, 67, 54, 0.15);
                 color: var(--error);
+
+                :host-context(body.dark-theme) & {
+                  background: #4a5568;
+                  color: #ffffff;
+                }
               }
             }
 
@@ -197,9 +227,19 @@
               background: rgba(158, 158, 158, 0.15);
               color: var(--text-secondary);
 
+              :host-context(body.dark-theme) & {
+                background: #4a5568;
+                color: #ffffff;
+              }
+
               &.active {
                 background: rgba(76, 175, 80, 0.15);
                 color: var(--success);
+
+                :host-context(body.dark-theme) & {
+                  background: #4a5568;
+                  color: #ffffff;
+                }
               }
             }
 
@@ -217,27 +257,30 @@
   .no-messages {
     text-align: center;
     padding: 60px 20px;
-    color: #666;
 
     .large-icon {
       font-size: 72px;
       width: 72px;
       height: 72px;
-      color: #ccc;
+      color: rgba(255, 255, 255, 0.6);
       margin-bottom: 16px;
+
+      :host-context(body.dark-theme) & {
+        color: #ccc;
+      }
     }
 
     h3 {
       margin: 16px 0 8px 0;
       font-size: 24px;
       font-weight: 400;
-      color: #333;
+      color: #ffffff !important;
     }
 
     p {
       margin-bottom: 24px;
       font-size: 16px;
-      color: #666;
+      color: rgba(255, 255, 255, 0.85) !important;
     }
 
     button {

@@ -206,6 +206,11 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeInUp 0.6s ease-out 0.3s both;
 
+  :host-context(body.dark-theme) & {
+    background: var(--surface) !important;
+    border: 1px solid var(--border-light) !important;
+  }
+
   &:hover {
     transform: translateY(-4px) scale(1.02);
   }
@@ -235,6 +240,12 @@
     min-height: 80px;
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255,255,255,0.3);
+
+    :host-context(body.dark-theme) & {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+    }
   }
 
   .test-info {
@@ -245,6 +256,10 @@
       font-size: 1.5rem;
       font-weight: 700;
       color: #ffffff !important;
+
+      :host-context(body.dark-theme) & {
+        color: var(--text-primary) !important;
+      }
     }
 
     p {
@@ -252,6 +267,10 @@
       font-size: 1rem;
       color: #ffffff !important;
       line-height: 1.4;
+
+      :host-context(body.dark-theme) & {
+        color: var(--text-secondary) !important;
+      }
     }
   }
 
@@ -271,8 +290,19 @@
 
     &:hover:not([disabled]) {
       background: rgba(255,255,255,0.9) !important;
+      color: #1e293b !important;
       transform: translateY(-2px);
       box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+
+      ::ng-deep .mat-mdc-button-touch-target,
+      ::ng-deep .mdc-button__label,
+      ::ng-deep span {
+        color: #1e293b !important;
+      }
+
+      mat-icon {
+        color: #1e293b !important;
+      }
     }
 
     &[disabled] {

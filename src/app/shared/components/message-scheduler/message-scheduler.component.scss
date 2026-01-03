@@ -227,16 +227,31 @@
             &.priority-low {
               background: #d1ecf1;
               color: #0c5460;
+
+              :host-context(body.dark-theme) & {
+                background: #4a5568;
+                color: #ffffff;
+              }
             }
 
             &.priority-normal {
               background: #fff3cd;
               color: #856404;
+
+              :host-context(body.dark-theme) & {
+                background: #4a5568;
+                color: #ffffff;
+              }
             }
 
             &.priority-high {
               background: #f8d7da;
               color: #721c24;
+
+              :host-context(body.dark-theme) & {
+                background: #4a5568;
+                color: #ffffff;
+              }
             }
           }
 
@@ -247,6 +262,11 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: bold;
+
+            :host-context(body.dark-theme) & {
+              background: #4a5568;
+              color: #ffffff;
+            }
           }
 
           .status-icon {

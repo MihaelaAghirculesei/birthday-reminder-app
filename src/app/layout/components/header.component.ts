@@ -4,13 +4,14 @@ import { RouterModule } from '@angular/router';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { NetworkStatusComponent } from '../../shared/components/network-status.component';
 import { ThemeService } from '../../core';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, NetworkStatusComponent, MatSlideToggleModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, RouterModule, NetworkStatusComponent, MatSlideToggleModule, MatIconModule, MatButtonModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="app-header">
@@ -27,7 +28,9 @@ import { ThemeService } from '../../core';
             [checked]="themeService.darkMode()"
             (change)="themeService.toggleDarkMode()"
             class="theme-toggle"
-            color="primary">
+            color="primary"
+            matTooltip="Toggle between light and dark theme for better visual comfort"
+            matTooltipPosition="below">
             <mat-icon>{{ themeService.darkMode() ? 'dark_mode' : 'light_mode' }}</mat-icon>
           </mat-slide-toggle>
           <app-network-status></app-network-status>
@@ -89,8 +92,13 @@ import { ThemeService } from '../../core';
     .hero-subtitle {
       font-size: 1.1rem;
       margin-top: 0.5rem;
-      opacity: 0.95;
+      opacity: 0.95 !important;
       font-weight: 300;
+      color: #ffffff !important;
+
+      * {
+        color: #ffffff !important;
+      }
     }
 
     .header-controls {
