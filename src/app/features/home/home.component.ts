@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Signal, ViewChild, ViewContainerRef, ComponentRef, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -19,7 +19,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PhotoUploadComponent, DEFAULT_CATEGORY, BirthdayCategory } from '../../shared';
 import { Birthday, getZodiacSign } from '../../shared';
-import { DashboardComponent } from '../dashboard';
 import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
 
 @Component({
@@ -36,7 +35,6 @@ import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    DashboardComponent,
     PhotoUploadComponent,
   ],
   templateUrl: './home.component.html',
@@ -62,6 +60,13 @@ import { BirthdayFacadeService, CategoryFacadeService } from '../../core';
   ],
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  @ViewChild('dashboardContainer', { read: ViewContainerRef }) dashboardContainer?: ViewContainerRef;
+
+  private readonly fb = inject(FormBuilder);
+  private readonly birthdayFacade = inject(BirthdayFacadeService);
+  private readonly categoryFacade = inject(CategoryFacadeService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   birthdayForm!: FormGroup;
   birthdays: Signal<Birthday[]> = this.birthdayFacade.birthdays;
   categories: Signal<BirthdayCategory[]> = this.categoryFacade.categories;
@@ -69,13 +74,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   isAddingTestData = false;
   isAddBirthdayExpanded = false;
   private testDataTimer: ReturnType<typeof setTimeout> | null = null;
+  private dashboardComponentRef: ComponentRef<unknown> | null = null;
+  private isDashboardLoaded = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private birthdayFacade: BirthdayFacadeService,
-    private categoryFacade: CategoryFacadeService,
-    private cdr: ChangeDetectorRef
-  ) {
+  constructor() {
     this.birthdayForm = this.fb.group({
       name: ['', Validators.required],
       birthDate: ['', [Validators.required, this.pastDateValidator]],
@@ -83,6 +85,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       notes: [''],
       reminderDays: [7, [Validators.min(1), Validators.max(365)]],
       photo: [null],
+    });
+
+    effect(() => {
+      const hasBirthdays = this.birthdays().length > 0;
+
+      if (hasBirthdays && !this.isDashboardLoaded) {
+        this.loadDashboard();
+      } else if (!hasBirthdays && this.isDashboardLoaded) {
+        this.unloadDashboard();
+      }
     });
   }
 
@@ -132,6 +144,33 @@ export class HomeComponent implements OnInit, OnDestroy {
       clearTimeout(this.testDataTimer);
       this.testDataTimer = null;
     }
+    this.unloadDashboard();
+  }
+
+  private async loadDashboard(): Promise<void> {
+    if (!this.dashboardContainer || this.isDashboardLoaded) {
+      return;
+    }
+
+    try {
+      const { DashboardComponent } = await import('../dashboard');
+      this.dashboardComponentRef = this.dashboardContainer.createComponent(DashboardComponent);
+      this.isDashboardLoaded = true;
+      this.cdr.markForCheck();
+    } catch (error) {
+      console.error('Failed to load dashboard component:', error);
+    }
+  }
+
+  private unloadDashboard(): void {
+    if (this.dashboardComponentRef) {
+      this.dashboardComponentRef.destroy();
+      this.dashboardComponentRef = null;
+    }
+    if (this.dashboardContainer) {
+      this.dashboardContainer.clear();
+    }
+    this.isDashboardLoaded = false;
   }
 
   toggleAddBirthdaySection(): void {
