@@ -1,0 +1,130 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$custom-primary: mat.define-palette((
+  50: #f3f0ff,
+  100: #e5deff,
+  200: #d0c1ff,
+  300: #b9a3ff,
+  400: #a68eff,
+  500: #667eea,  
+  600: #5a67d8,
+  700: #4c51bf,
+  800: #434190,
+  900: #3c366b,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #000000,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+  )
+));
+
+$custom-accent: mat.define-palette((
+  50: #f0f9ff,
+  100: #e0f2fe,
+  200: #bae6fd,
+  300: #7dd3fc,
+  400: #4facfe,  
+  500: #0ea5e9,
+  600: #0284c7,
+  700: #0369a1,
+  800: #075985,
+  900: #0c4a6e,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+  )
+));
+
+$custom-warn: mat.define-palette(mat.$red-palette);
+
+
+$custom-theme: mat.define-light-theme((
+  color: (
+    primary: $custom-primary,
+    accent: $custom-accent,
+    warn: $custom-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($custom-theme);
+
+.dark-theme {
+  $dark-primary: mat.define-palette((
+    50: #f5f3ff,
+    100: #ede9fe,
+    200: #ddd6fe,
+    300: #c4b5fd,
+    400: #a78bfa,
+    500: #7c3aed,
+    600: #6d28d9,
+    700: #5b21b6,
+    800: #4c1d95,
+    900: #2e1065,
+    contrast: (
+      50: #000000,
+      100: #000000,
+      200: #000000,
+      300: #000000,
+      400: #ffffff,
+      500: #ffffff,
+      600: #ffffff,
+      700: #ffffff,
+      800: #ffffff,
+      900: #ffffff,
+    )
+  ));
+
+  $dark-accent: mat.define-palette((
+    50: #ecfeff,
+    100: #cffafe,
+    200: #a5f3fc,
+    300: #67e8f9,
+    400: #22d3ee,
+    500: #06b6d4,
+    600: #0891b2,
+    700: #0e7490,
+    800: #155e75,
+    900: #164e63,
+    contrast: (
+      50: #000000,
+      100: #000000,
+      200: #000000,
+      300: #000000,
+      400: #000000,
+      500: #ffffff,
+      600: #ffffff,
+      700: #ffffff,
+      800: #ffffff,
+      900: #ffffff,
+    )
+  ));
+
+  $dark-theme: mat.define-dark-theme((
+    color: (
+      primary: $dark-primary,
+      accent: $dark-accent,
+      warn: $custom-warn,
+    ),
+  ));
+
+  @include mat.all-component-colors($dark-theme);
+}
