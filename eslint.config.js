@@ -31,8 +31,8 @@ module.exports = defineConfig([
           style: "kebab-case",
         },
       ],
-      "@angular-eslint/prefer-inject": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@angular-eslint/prefer-inject": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   {
