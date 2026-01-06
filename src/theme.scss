@@ -65,7 +65,20 @@ $custom-theme: mat.define-light-theme((
   density: 0,
 ));
 
-@include mat.all-component-themes($custom-theme);
+@include mat.core-theme($custom-theme);
+@include mat.button-theme($custom-theme);
+@include mat.card-theme($custom-theme);
+@include mat.chips-theme($custom-theme);
+@include mat.datepicker-theme($custom-theme);
+@include mat.dialog-theme($custom-theme);
+@include mat.expansion-theme($custom-theme);
+@include mat.form-field-theme($custom-theme);
+@include mat.icon-theme($custom-theme);
+@include mat.input-theme($custom-theme);
+@include mat.progress-spinner-theme($custom-theme);
+@include mat.select-theme($custom-theme);
+@include mat.slide-toggle-theme($custom-theme);
+@include mat.tooltip-theme($custom-theme);
 
 .dark-theme {
   $dark-primary: mat.define-palette((
@@ -126,5 +139,18 @@ $custom-theme: mat.define-light-theme((
     ),
   ));
 
-  @include mat.all-component-colors($dark-theme);
+  @include mat.core-color($dark-theme);
+  @include mat.button-color($dark-theme);
+  @include mat.card-color($dark-theme);
+  @include mat.chips-color($dark-theme);
+  @include mat.datepicker-color($dark-theme);
+  @include mat.dialog-color($dark-theme);
+  @include mat.expansion-color($dark-theme);
+  @include mat.form-field-color($dark-theme);
+  @include mat.icon-color($dark-theme);
+  @include mat.input-color($dark-theme);
+  @include mat.progress-spinner-color($dark-theme);
+  @include mat.select-color($dark-theme);
+  @include mat.slide-toggle-color($dark-theme);
+  @include mat.tooltip-color($dark-theme);
 }
