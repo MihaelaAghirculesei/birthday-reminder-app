@@ -39,7 +39,7 @@ describe('BackupService', () => {
     it('should throw error for missing birthdays array', async () => {
       const file = new File([JSON.stringify({ version: 1 })], 'backup.json', { type: 'application/json' });
 
-      await expectAsync(service.importFromFile(file)).toBeRejectedWithError('Invalid backup file format');
+      await expectAsync(service.importFromFile(file)).toBeRejectedWithError(/Invalid backup format: exportDate/);
     });
 
     it('should throw error for invalid date', async () => {

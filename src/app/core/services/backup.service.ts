@@ -1,11 +1,30 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { Birthday } from '../../shared';
+import { z } from 'zod';
 
 export interface BackupData {
   version: number;
   exportDate: string;
   birthdays: Birthday[];
 }
+
+const BackupSchema = z.object({
+  version: z.number(),
+  exportDate: z.string(),
+  birthdays: z.array(z.object({
+    name: z.string().min(1).max(200),
+    birthDate: z.union([z.string(), z.date()]),
+    id: z.string().optional(),
+    notes: z.string().max(1000).optional(),
+    category: z.string().max(100).optional(),
+    photo: z.string().max(500).optional(),
+    rememberPhoto: z.string().max(500).optional(),
+    zodiacSign: z.string().max(50).optional(),
+    googleCalendarEventId: z.string().optional(),
+    reminderDays: z.number().optional(),
+    scheduledMessages: z.array(z.any()).optional()
+  }))
+});
 
 @Injectable({
   providedIn: 'root'
@@ -46,9 +65,9 @@ export class BackupService {
   async importFromFile(file: File): Promise<Birthday[]> {
     const text = await file.text();
 
-    let backup: BackupData;
+    let parsedData: unknown;
     try {
-      backup = JSON.parse(text);
+      parsedData = JSON.parse(text);
     } catch (error) {
       if (isDevMode()) {
         console.error('Failed to parse JSON backup file:', error);
@@ -56,11 +75,21 @@ export class BackupService {
       throw new Error('Invalid JSON file. Please select a valid backup file.');
     }
 
-    if (!backup.birthdays || !Array.isArray(backup.birthdays)) {
+    let validatedData: z.infer<typeof BackupSchema>;
+    try {
+      validatedData = BackupSchema.parse(parsedData);
+    } catch (error) {
+      if (isDevMode()) {
+        console.error('Backup validation failed:', error);
+      }
+      if (error instanceof z.ZodError) {
+        const firstError = error.issues[0];
+        throw new Error(`Invalid backup format: ${firstError.path.join('.')} - ${firstError.message}`);
+      }
       throw new Error('Invalid backup file format');
     }
 
-    return backup.birthdays.map(b => {
+    return validatedData.birthdays.map(b => {
       const date = new Date(b.birthDate);
       if (isNaN(date.getTime())) {
         throw new Error(`Invalid date for ${b.name || 'birthday'}`);
@@ -69,7 +98,7 @@ export class BackupService {
         ...b,
         birthDate: date,
         id: b.id || crypto.randomUUID()
-      };
+      } as Birthday;
     });
   }
 
