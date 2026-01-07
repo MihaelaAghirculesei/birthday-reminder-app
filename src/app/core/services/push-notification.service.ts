@@ -1,6 +1,8 @@
 import { Injectable, OnDestroy, isDevMode } from '@angular/core';
 import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { Subject, interval } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Birthday, ScheduledMessage } from '../../shared/models';
 import { IndexedDBStorageService } from './offline-storage.service';
 
@@ -17,17 +19,15 @@ export interface BirthdayNotificationData {
 })
 export class PushNotificationService implements OnDestroy {
   private isNative = Capacitor.isNativePlatform();
-  private browserCheckInterval: ReturnType<typeof setInterval> | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(private storage: IndexedDBStorageService) {
     this.initializeNotifications();
   }
 
   ngOnDestroy(): void {
-    if (this.browserCheckInterval) {
-      clearInterval(this.browserCheckInterval);
-      this.browserCheckInterval = null;
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private async initializeNotifications(): Promise<void> {
@@ -57,9 +57,9 @@ export class PushNotificationService implements OnDestroy {
 
     this.checkBrowserNotifications();
 
-    this.browserCheckInterval = setInterval(() => {
-      this.checkBrowserNotifications();
-    }, 60000);
+    interval(60000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.checkBrowserNotifications());
   }
 
   private async checkBrowserNotifications(): Promise<void> {
