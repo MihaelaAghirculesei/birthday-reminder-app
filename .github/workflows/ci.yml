@@ -13,7 +13,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -23,10 +23,16 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser xvfb
+
       - run: npm ci
 
       - run: npm run lint
 
-      - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - name: Run tests
+        run: xvfb-run -a npm test -- --watch=false --browsers=ChromeHeadless
 
       - run: npm run build
