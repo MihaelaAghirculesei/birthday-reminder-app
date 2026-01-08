@@ -2,6 +2,7 @@
 
 A birthday management application built with Angular 17. Never forget a birthday again with calendar sync, notifications, and offline support.
 
+[![CI](https://github.com/MihaelaAghirculesei/birthday-reminder-app/actions/workflows/ci.yml/badge.svg)](https://github.com/MihaelaAghirculesei/birthday-reminder-app/actions/workflows/ci.yml)
 [![Angular](https://img.shields.io/badge/Angular-17.3-red?logo=angular)](https://angular.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Capacitor](https://img.shields.io/badge/Capacitor-7.4-blue?logo=capacitor)](https://capacitorjs.com/)
