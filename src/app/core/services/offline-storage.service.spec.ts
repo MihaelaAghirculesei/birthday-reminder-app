@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { IndexedDBStorageService } from './offline-storage.service';
-import { Birthday } from '../../shared';
+import { Birthday, ScheduledMessage } from '../../shared';
 
 describe('IndexedDBStorageService', () => {
   let service: IndexedDBStorageService;
@@ -14,12 +14,35 @@ describe('IndexedDBStorageService', () => {
     category: 'family'
   };
 
+  const mockBirthday2: Birthday = {
+    id: 'test-2',
+    name: 'Jane Smith',
+    birthDate: new Date('1985-06-20'),
+    zodiacSign: 'Gemini',
+    reminderDays: 3,
+    category: 'friends'
+  };
+
+  const mockMessage: ScheduledMessage = {
+    id: 'msg-1',
+    birthdayId: 'test-1',
+    title: 'Test Message',
+    message: 'Happy Birthday!',
+    scheduledTime: '10:00',
+    active: true,
+    messageType: 'text',
+    priority: 'normal',
+    createdDate: new Date()
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(IndexedDBStorageService);
   });
 
   afterEach(async () => {
+    await service.deleteScheduledMessage('msg-1').catch(() => undefined);
+    await service.deleteScheduledMessage('msg-2').catch(() => undefined);
     await service.clear();
   });
 
@@ -27,28 +50,141 @@ describe('IndexedDBStorageService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get birthdays without errors', async () => {
-    const birthdays = await service.getBirthdays();
-    expect(Array.isArray(birthdays)).toBe(true);
+  describe('Birthday Operations', () => {
+    it('should return empty array when no birthdays exist', async () => {
+      const birthdays = await service.getBirthdays();
+      expect(birthdays).toEqual([]);
+    });
+
+    it('should add a birthday and retrieve it', async () => {
+      await service.addBirthday(mockBirthday);
+      const birthdays = await service.getBirthdays();
+
+      expect(birthdays.length).toBe(1);
+      expect(birthdays[0].id).toBe(mockBirthday.id);
+      expect(birthdays[0].name).toBe(mockBirthday.name);
+      expect(birthdays[0].birthDate).toEqual(mockBirthday.birthDate);
+    });
+
+    it('should add multiple birthdays', async () => {
+      await service.addBirthday(mockBirthday);
+      await service.addBirthday(mockBirthday2);
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays.length).toBe(2);
+    });
+
+    it('should save birthdays replacing existing data', async () => {
+      await service.addBirthday(mockBirthday);
+      await service.saveBirthdays([mockBirthday2]);
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays.length).toBe(1);
+      expect(birthdays[0].id).toBe(mockBirthday2.id);
+    });
+
+    it('should update an existing birthday', async () => {
+      await service.addBirthday(mockBirthday);
+
+      const updated = { ...mockBirthday, name: 'Updated Name' };
+      await service.updateBirthday(updated);
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays[0].name).toBe('Updated Name');
+    });
+
+    it('should delete a birthday by id', async () => {
+      await service.addBirthday(mockBirthday);
+      await service.addBirthday(mockBirthday2);
+
+      await service.deleteBirthday(mockBirthday.id);
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays.length).toBe(1);
+      expect(birthdays[0].id).toBe(mockBirthday2.id);
+    });
+
+    it('should clear all birthdays', async () => {
+      await service.addBirthday(mockBirthday);
+      await service.addBirthday(mockBirthday2);
+
+      await service.clear();
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays.length).toBe(0);
+    });
+
+    it('should preserve birthDate as Date object after retrieval', async () => {
+      await service.addBirthday(mockBirthday);
+      const birthdays = await service.getBirthdays();
+
+      expect(birthdays[0].birthDate instanceof Date).toBe(true);
+      expect(birthdays[0].birthDate.getTime()).toBe(mockBirthday.birthDate.getTime());
+    });
+
+    it('should handle saving empty birthdays array', async () => {
+      await service.addBirthday(mockBirthday);
+      await service.saveBirthdays([]);
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays.length).toBe(0);
+    });
   });
 
-  it('should save birthdays without errors', async () => {
-    await expectAsync(service.saveBirthdays([mockBirthday])).toBeResolved();
-  });
+  describe('Scheduled Message Operations', () => {
+    it('should save a scheduled message', async () => {
+      await expectAsync(service.saveScheduledMessage(mockMessage)).toBeResolved();
+    });
 
-  it('should add birthday without errors', async () => {
-    await expectAsync(service.addBirthday(mockBirthday)).toBeResolved();
-  });
+    it('should get scheduled messages by birthday id', async () => {
+      await service.saveScheduledMessage(mockMessage);
 
-  it('should update birthday without errors', async () => {
-    await expectAsync(service.updateBirthday(mockBirthday)).toBeResolved();
-  });
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+      expect(messages.length).toBe(1);
+      expect(messages[0].id).toBe(mockMessage.id);
+      expect(messages[0].title).toBe(mockMessage.title);
+    });
 
-  it('should delete birthday without errors', async () => {
-    await expectAsync(service.deleteBirthday('test-1')).toBeResolved();
-  });
+    it('should return empty array when no messages exist for birthday', async () => {
+      const messages = await service.getScheduledMessagesByBirthday('non-existent');
+      expect(messages).toEqual([]);
+    });
 
-  it('should clear all data without errors', async () => {
-    await expectAsync(service.clear()).toBeResolved();
+    it('should update a scheduled message', async () => {
+      await service.saveScheduledMessage(mockMessage);
+
+      const updated = { ...mockMessage, title: 'Updated Title' };
+      await service.updateScheduledMessage(updated);
+
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+      expect(messages[0].title).toBe('Updated Title');
+    });
+
+    it('should delete a scheduled message', async () => {
+      await service.saveScheduledMessage(mockMessage);
+      await service.deleteScheduledMessage(mockMessage.id);
+
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+      expect(messages.length).toBe(0);
+    });
+
+    it('should save multiple messages for same birthday', async () => {
+      const message2 = { ...mockMessage, id: 'msg-2', title: 'Second Message' };
+      await service.saveScheduledMessage(mockMessage);
+      await service.saveScheduledMessage(message2);
+
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+      expect(messages.length).toBe(2);
+    });
+
+    it('should filter messages by birthday id', async () => {
+      const messageForBirthday2 = { ...mockMessage, id: 'msg-2', birthdayId: 'test-2' };
+      await service.saveScheduledMessage(mockMessage);
+      await service.saveScheduledMessage(messageForBirthday2);
+
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+      expect(messages.length).toBe(1);
+      expect(messages[0].birthdayId).toBe('test-1');
+    });
   });
 });
