@@ -142,5 +142,117 @@ describe('BackupService', () => {
 
       expect(result.length).toBe(0);
     });
+
+    it('should handle vCard with BDAY property syntax', async () => {
+      const vcard = 'BEGIN:VCARD\nFN:Jane Doe\nBDAY;VALUE=DATE:1990-05-15\nEND:VCARD';
+      const file = new File([vcard], 'contacts.vcf', { type: 'text/vcard' });
+
+      const result = await service.importFromVCard(file);
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe('Jane Doe');
+    });
+
+    it('should parse multiple vCards', async () => {
+      const vcard = 'BEGIN:VCARD\nFN:John\nBDAY:1990-05-15\nEND:VCARD\nBEGIN:VCARD\nFN:Jane\nBDAY:1985-06-20\nEND:VCARD';
+      const file = new File([vcard], 'contacts.vcf', { type: 'text/vcard' });
+
+      const result = await service.importFromVCard(file);
+
+      expect(result.length).toBe(2);
+    });
+
+    it('should skip vCards with invalid birthdates', async () => {
+      const vcard = 'BEGIN:VCARD\nFN:Invalid\nBDAY:not-a-date\nEND:VCARD';
+      const file = new File([vcard], 'contacts.vcf', { type: 'text/vcard' });
+
+      const result = await service.importFromVCard(file);
+
+      expect(result.length).toBe(0);
+    });
+  });
+
+  describe('exportToJSON', () => {
+    it('should export birthdays to JSON', () => {
+      const birthdays = [{
+        id: '1',
+        name: 'John',
+        birthDate: new Date('1990-05-15'),
+        zodiacSign: 'Taurus',
+        reminderDays: 7
+      }];
+
+      spyOn(document, 'createElement').and.callThrough();
+
+      service.exportToJSON(birthdays);
+
+      expect(document.createElement).toHaveBeenCalledWith('a');
+    });
+  });
+
+  describe('exportToCSV', () => {
+    it('should export birthdays to CSV', () => {
+      const birthdays = [{
+        id: '1',
+        name: 'John',
+        birthDate: new Date('1990-05-15'),
+        category: 'friends',
+        notes: 'Test',
+        zodiacSign: 'Taurus',
+        reminderDays: 7
+      }];
+
+      spyOn(document, 'createElement').and.callThrough();
+
+      service.exportToCSV(birthdays);
+
+      expect(document.createElement).toHaveBeenCalledWith('a');
+    });
+
+    it('should escape CSV special characters', () => {
+      const birthdays = [{
+        id: '1',
+        name: 'Smith, John',
+        birthDate: new Date('1990-05-15'),
+        notes: 'Has "quotes"',
+        category: 'Line\nbreak',
+        zodiacSign: 'Taurus',
+        reminderDays: 7
+      }];
+
+      spyOn(document, 'createElement').and.callThrough();
+
+      service.exportToCSV(birthdays);
+
+      expect(document.createElement).toHaveBeenCalledWith('a');
+    });
+  });
+
+  describe('importFromCSV edge cases', () => {
+    it('should throw error when no valid birthdays after parsing', async () => {
+      const csv = 'Name,Birth Date\n,invalid-date';
+      const file = new File([csv], 'test.csv', { type: 'text/csv' });
+
+      await expectAsync(service.importFromCSV(file)).toBeRejectedWithError('No valid birthdays found in CSV');
+    });
+
+    it('should handle CSV with empty category fields', async () => {
+      const csv = 'Name,Birth Date,Category\nJohn,1990-05-15,';
+      const file = new File([csv], 'test.csv', { type: 'text/csv' });
+
+      const result = await service.importFromCSV(file);
+
+      expect(result[0].category).toBeUndefined();
+    });
+
+    it('should handle invalid date strings', async () => {
+      const csv = 'Name,Birth Date,Category\nJohn,not-a-date,friends\nJane,1990-05-15,family';
+      const file = new File([csv], 'test.csv', { type: 'text/csv' });
+
+      const result = await service.importFromCSV(file);
+
+      expect(result.length).toBe(1);
+      expect(result[0].name).toBe('Jane');
+    });
   });
 });
