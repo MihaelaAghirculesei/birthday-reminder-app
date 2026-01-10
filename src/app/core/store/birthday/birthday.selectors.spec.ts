@@ -112,4 +112,153 @@ describe('Birthday Selectors', () => {
     const selector = fromSelectors.selectBirthdayById('2');
     expect(selector(state)).toEqual(mockBirthdays[1]);
   });
+
+  describe('Individual Filter Selectors', () => {
+    it('should select search term', () => {
+      const stateWithSearch = {
+        birthdays: {
+          ...mockState,
+          filters: { ...mockState.filters, searchTerm: 'test' }
+        }
+      };
+      expect(fromSelectors.selectSearchTerm(stateWithSearch)).toBe('test');
+    });
+
+    it('should select selected month', () => {
+      const stateWithMonth = {
+        birthdays: {
+          ...mockState,
+          filters: { ...mockState.filters, selectedMonth: 5 }
+        }
+      };
+      expect(fromSelectors.selectSelectedMonth(stateWithMonth)).toBe(5);
+    });
+
+    it('should select selected category', () => {
+      const stateWithCategory = {
+        birthdays: {
+          ...mockState,
+          filters: { ...mockState.filters, selectedCategory: 'family' }
+        }
+      };
+      expect(fromSelectors.selectSelectedCategory(stateWithCategory)).toBe('family');
+    });
+
+    it('should select sort order', () => {
+      const stateWithSort = {
+        birthdays: {
+          ...mockState,
+          filters: { ...mockState.filters, sortOrder: 'age' as const }
+        }
+      };
+      expect(fromSelectors.selectSortOrder(stateWithSort)).toBe('age');
+    });
+  });
+
+  describe('Sorting in Filtered Birthdays', () => {
+    it('should sort by age', () => {
+      const stateWithAgeSort = {
+        birthdays: {
+          ...mockState,
+          filters: { ...mockState.filters, sortOrder: 'age' as const }
+        }
+      };
+      const result = fromSelectors.selectFilteredBirthdays(stateWithAgeSort);
+      expect(result[0].name).toBe('Bob');
+      expect(result[2].name).toBe('Charlie');
+    });
+
+    it('should sort by next birthday', () => {
+      const stateWithNextBirthdaySort = {
+        birthdays: {
+          ...mockState,
+          filters: { ...mockState.filters, sortOrder: 'nextBirthday' as const }
+        }
+      };
+      const result = fromSelectors.selectFilteredBirthdays(stateWithNextBirthdaySort);
+      expect(result.length).toBe(3);
+    });
+  });
+
+  describe('Upcoming Birthdays', () => {
+    it('should select upcoming birthdays within 30 days', () => {
+      const selector = fromSelectors.selectUpcomingBirthdays(30);
+      const result = selector(state);
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('should select upcoming birthdays with custom days', () => {
+      const selector = fromSelectors.selectUpcomingBirthdays(60);
+      const result = selector(state);
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
+
+  it('should select birthdays this month', () => {
+    const result = fromSelectors.selectBirthdaysThisMonth(state);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('should select next 5 birthdays', () => {
+    const result = fromSelectors.selectNext5Birthdays(state);
+    expect(result.length).toBeLessThanOrEqual(5);
+    expect(result.length).toBe(3);
+    expect(result[0].nextBirthday).toBeDefined();
+    expect(result[0].daysUntil).toBeDefined();
+  });
+
+  it('should select average age with empty birthdays', () => {
+    const emptyState = {
+      birthdays: {
+        ...mockState,
+        ids: [],
+        entities: {}
+      }
+    };
+    expect(fromSelectors.selectAverageAge(emptyState)).toBe(0);
+  });
+
+  it('should select messages by birthday id', () => {
+    const mockMessage = {
+      id: 'msg1',
+      birthdayId: '1',
+      title: 'Test',
+      message: 'Test message',
+      scheduledTime: '10:00',
+      priority: 'normal' as const,
+      active: true,
+      messageType: 'text' as const,
+      createdDate: new Date()
+    };
+
+    const stateWithMessages = {
+      birthdays: {
+        ...mockState,
+        entities: {
+          ...mockState.entities,
+          '1': {
+            ...mockState.entities['1']!,
+            scheduledMessages: [mockMessage]
+          }
+        }
+      }
+    };
+
+    const selector = fromSelectors.selectMessagesByBirthday('1');
+    const result = selector(stateWithMessages);
+    expect(result.length).toBe(1);
+    expect(result[0]).toEqual(mockMessage);
+  });
+
+  it('should return empty array for messages when birthday has no messages', () => {
+    const selector = fromSelectors.selectMessagesByBirthday('2');
+    const result = selector(state);
+    expect(result).toEqual([]);
+  });
+
+  it('should return empty array for messages when birthday not found', () => {
+    const selector = fromSelectors.selectMessagesByBirthday('non-existent');
+    const result = selector(state);
+    expect(result).toEqual([]);
+  });
 });
