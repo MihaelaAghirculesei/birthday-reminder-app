@@ -242,4 +242,182 @@ describe('MessageSchedulerComponent', () => {
 
     expect(component.messagePreview).toBe('Test');
   });
+
+  describe('loadMessages', () => {
+    it('should load messages for birthday', () => {
+      component.birthday = mockBirthday;
+      birthdayFacadeMock.getMessagesByBirthday.and.returnValue(of([mockMessage]));
+
+      component.loadMessages();
+
+      expect(birthdayFacadeMock.getMessagesByBirthday).toHaveBeenCalledWith('1');
+    });
+
+    it('should handle null messages array', (done) => {
+      component.birthday = mockBirthday;
+      birthdayFacadeMock.getMessagesByBirthday.and.returnValue(of(null as any));
+
+      component.loadMessages();
+
+      setTimeout(() => {
+        expect(component.messages).toEqual([]);
+        done();
+      }, 50);
+    });
+
+    it('should not load messages when birthday is null', () => {
+      component.birthday = null;
+      component.loadMessages();
+
+      expect(birthdayFacadeMock.getMessagesByBirthday).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('saveMessage', () => {
+    beforeEach(() => {
+      component.birthday = mockBirthday;
+      component.messageForm.patchValue({
+        title: 'Test',
+        message: 'Test message',
+        scheduledTime: '10:00',
+        priority: 'high',
+        active: true
+      });
+    });
+
+    it('should create new message when not editing', async () => {
+      scheduledMessageServiceMock.createMessage.and.returnValue(mockMessage);
+      birthdayFacadeMock.getMessagesByBirthday.and.returnValue(of([]));
+
+      await component.saveMessage();
+
+      expect(scheduledMessageServiceMock.createMessage).toHaveBeenCalled();
+      expect(birthdayFacadeMock.addMessageToBirthday).toHaveBeenCalledWith('1', mockMessage);
+      expect(notificationServiceMock.show).toHaveBeenCalledWith('Scheduled message created!', 'success');
+      expect(component.isCreatingMessage).toBeFalse();
+    });
+
+    it('should update existing message when editing', async () => {
+      component.editingMessage = mockMessage;
+      birthdayFacadeMock.getMessagesByBirthday.and.returnValue(of([]));
+
+      await component.saveMessage();
+
+      expect(birthdayFacadeMock.updateMessageInBirthday).toHaveBeenCalledWith(
+        '1',
+        'msg1',
+        jasmine.any(Object)
+      );
+      expect(notificationServiceMock.show).toHaveBeenCalledWith('Message updated!', 'success');
+      expect(component.isCreatingMessage).toBeFalse();
+    });
+
+    it('should not save when form is invalid', async () => {
+      component.messageForm.patchValue({ title: '', message: '' });
+
+      await component.saveMessage();
+
+      expect(scheduledMessageServiceMock.createMessage).not.toHaveBeenCalled();
+      expect(birthdayFacadeMock.addMessageToBirthday).not.toHaveBeenCalled();
+    });
+
+    it('should not save when birthday is null', async () => {
+      component.birthday = null;
+
+      await component.saveMessage();
+
+      expect(scheduledMessageServiceMock.createMessage).not.toHaveBeenCalled();
+      expect(birthdayFacadeMock.addMessageToBirthday).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('toggleMessageStatus', () => {
+    it('should toggle message active status', async () => {
+      component.birthday = mockBirthday;
+      birthdayFacadeMock.getMessagesByBirthday.and.returnValue(of([]));
+
+      await component.toggleMessageStatus(mockMessage);
+
+      expect(birthdayFacadeMock.updateMessageInBirthday).toHaveBeenCalledWith(
+        '1',
+        'msg1',
+        { active: false }
+      );
+    });
+
+    it('should not toggle when birthday is null', async () => {
+      component.birthday = null;
+
+      await component.toggleMessageStatus(mockMessage);
+
+      expect(birthdayFacadeMock.updateMessageInBirthday).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('testMessage', () => {
+    it('should show test notification with processed message', () => {
+      component.birthday = mockBirthday;
+
+      component.testMessage(mockMessage);
+
+      expect(notificationServiceMock.show).toHaveBeenCalledWith(
+        jasmine.stringContaining('🧪 TEST'),
+        'info',
+        5000
+      );
+    });
+
+    it('should not show notification when birthday is null', () => {
+      component.birthday = null;
+
+      component.testMessage(mockMessage);
+
+      expect(notificationServiceMock.show).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteMessage', () => {
+    it('should delete message after confirmation', async () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      component.birthday = mockBirthday;
+      birthdayFacadeMock.getMessagesByBirthday.and.returnValue(of([]));
+
+      await component.deleteMessage(mockMessage);
+
+      expect(birthdayFacadeMock.deleteMessageFromBirthday).toHaveBeenCalledWith('1', 'msg1');
+      expect(notificationServiceMock.show).toHaveBeenCalledWith('Message deleted', 'success');
+    });
+
+    it('should not delete when confirmation is cancelled', async () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.birthday = mockBirthday;
+
+      await component.deleteMessage(mockMessage);
+
+      expect(birthdayFacadeMock.deleteMessageFromBirthday).not.toHaveBeenCalled();
+    });
+
+    it('should not delete when birthday is null', async () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      component.birthday = null;
+
+      await component.deleteMessage(mockMessage);
+
+      expect(birthdayFacadeMock.deleteMessageFromBirthday).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('message value changes', () => {
+    it('should update preview when message value changes', (done) => {
+      component.birthday = mockBirthday;
+      fixture.detectChanges();
+
+      component.messageForm.patchValue({ message: 'Hello {name}!' });
+
+      setTimeout(() => {
+        expect(component.messagePreview).toContain('John Doe');
+        done();
+      }, 50);
+    });
+  });
 });
