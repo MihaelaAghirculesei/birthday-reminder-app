@@ -132,4 +132,226 @@ describe('Birthday Reducer', () => {
     expect(state.ids.length).toBe(0);
     expect(state.selectedId).toBeNull();
   });
+
+  describe('Failure Actions', () => {
+    it('should handle addBirthdayFailure', () => {
+      const error = 'Add failed';
+      const action = BirthdayActions.addBirthdayFailure({ error });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.error).toBe(error);
+      expect(state.loading).toBe(false);
+    });
+
+    it('should handle updateBirthdayFailure', () => {
+      const error = 'Update failed';
+      const action = BirthdayActions.updateBirthdayFailure({ error });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.error).toBe(error);
+      expect(state.loading).toBe(false);
+    });
+
+    it('should handle deleteBirthdayFailure', () => {
+      const error = 'Delete failed';
+      const action = BirthdayActions.deleteBirthdayFailure({ error });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.error).toBe(error);
+      expect(state.loading).toBe(false);
+    });
+
+    it('should handle clearAllBirthdaysFailure', () => {
+      const error = 'Clear failed';
+      const action = BirthdayActions.clearAllBirthdaysFailure({ error });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.error).toBe(error);
+      expect(state.loading).toBe(false);
+    });
+  });
+
+  describe('Loading Actions', () => {
+    it('should set loading on addBirthday', () => {
+      const action = BirthdayActions.addBirthday({ birthday: mockBirthday });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.loading).toBe(true);
+      expect(state.error).toBeNull();
+    });
+
+    it('should set loading on updateBirthday', () => {
+      const action = BirthdayActions.updateBirthday({ birthday: mockBirthday });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.loading).toBe(true);
+      expect(state.error).toBeNull();
+    });
+
+    it('should set loading on deleteBirthday', () => {
+      const action = BirthdayActions.deleteBirthday({ id: '1' });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.loading).toBe(true);
+      expect(state.error).toBeNull();
+    });
+
+    it('should set loading on clearAllBirthdays', () => {
+      const action = BirthdayActions.clearAllBirthdays();
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.loading).toBe(true);
+      expect(state.error).toBeNull();
+    });
+  });
+
+  describe('Message Actions', () => {
+    const mockMessage = {
+      id: 'msg1',
+      birthdayId: '1',
+      title: 'Test',
+      message: 'Test message',
+      scheduledTime: '10:00',
+      priority: 'normal' as const,
+      active: true,
+      messageType: 'text' as const,
+      createdDate: new Date()
+    };
+
+    it('should add message to birthday', () => {
+      let state = birthdayReducer(
+        initialBirthdayState,
+        BirthdayActions.addBirthdaySuccess({ birthday: mockBirthday })
+      );
+
+      const action = BirthdayActions.addMessageToBirthdaySuccess({
+        birthdayId: '1',
+        message: mockMessage
+      });
+      state = birthdayReducer(state, action);
+
+      expect(state.entities['1']?.scheduledMessages?.length).toBe(1);
+      expect(state.entities['1']?.scheduledMessages?.[0]).toEqual(mockMessage);
+    });
+
+    it('should return same state when adding message to non-existent birthday', () => {
+      const action = BirthdayActions.addMessageToBirthdaySuccess({
+        birthdayId: 'non-existent',
+        message: mockMessage
+      });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state).toBe(initialBirthdayState);
+    });
+
+    it('should update message in birthday', () => {
+      let state = birthdayReducer(
+        initialBirthdayState,
+        BirthdayActions.addBirthdaySuccess({ birthday: mockBirthday })
+      );
+
+      state = birthdayReducer(
+        state,
+        BirthdayActions.addMessageToBirthdaySuccess({ birthdayId: '1', message: mockMessage })
+      );
+
+      const action = BirthdayActions.updateMessageInBirthdaySuccess({
+        birthdayId: '1',
+        messageId: 'msg1',
+        updates: { title: 'Updated Title', active: false }
+      });
+      state = birthdayReducer(state, action);
+
+      expect(state.entities['1']?.scheduledMessages?.[0].title).toBe('Updated Title');
+      expect(state.entities['1']?.scheduledMessages?.[0].active).toBe(false);
+    });
+
+    it('should return same state when updating message in non-existent birthday', () => {
+      const action = BirthdayActions.updateMessageInBirthdaySuccess({
+        birthdayId: 'non-existent',
+        messageId: 'msg1',
+        updates: { title: 'Updated' }
+      });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state).toBe(initialBirthdayState);
+    });
+
+    it('should delete message from birthday', () => {
+      let state = birthdayReducer(
+        initialBirthdayState,
+        BirthdayActions.addBirthdaySuccess({ birthday: mockBirthday })
+      );
+
+      state = birthdayReducer(
+        state,
+        BirthdayActions.addMessageToBirthdaySuccess({ birthdayId: '1', message: mockMessage })
+      );
+
+      const action = BirthdayActions.deleteMessageFromBirthdaySuccess({
+        birthdayId: '1',
+        messageId: 'msg1'
+      });
+      state = birthdayReducer(state, action);
+
+      expect(state.entities['1']?.scheduledMessages?.length).toBe(0);
+    });
+
+    it('should return same state when deleting message from non-existent birthday', () => {
+      const action = BirthdayActions.deleteMessageFromBirthdaySuccess({
+        birthdayId: 'non-existent',
+        messageId: 'msg1'
+      });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state).toBe(initialBirthdayState);
+    });
+  });
+
+  describe('updateFilters action', () => {
+    it('should update multiple filters at once', () => {
+      const filters = { searchTerm: 'John', selectedMonth: 5, selectedCategory: 'family' };
+      const action = BirthdayActions.updateFilters({ filters });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.filters.searchTerm).toBe('John');
+      expect(state.filters.selectedMonth).toBe(5);
+      expect(state.filters.selectedCategory).toBe('family');
+    });
+
+    it('should preserve existing filters when updating partial filters', () => {
+      let state = birthdayReducer(initialBirthdayState, BirthdayActions.setSearchTerm({ searchTerm: 'Test' }));
+      state = birthdayReducer(state, BirthdayActions.updateFilters({ filters: { selectedMonth: 3 } }));
+
+      expect(state.filters.searchTerm).toBe('Test');
+      expect(state.filters.selectedMonth).toBe(3);
+    });
+  });
+
+  describe('Test Data Actions', () => {
+    it('should set loading on loadTestData', () => {
+      const action = BirthdayActions.loadTestData();
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.loading).toBe(true);
+      expect(state.error).toBeNull();
+    });
+
+    it('should handle loadTestDataSuccess', () => {
+      const action = BirthdayActions.loadTestDataSuccess({ birthdays: [mockBirthday] });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.loading).toBe(false);
+      expect(state.error).toBeNull();
+    });
+
+    it('should handle loadTestDataFailure', () => {
+      const error = 'Test data load failed';
+      const action = BirthdayActions.loadTestDataFailure({ error });
+      const state = birthdayReducer(initialBirthdayState, action);
+
+      expect(state.error).toBe(error);
+      expect(state.loading).toBe(false);
+    });
+  });
 });
