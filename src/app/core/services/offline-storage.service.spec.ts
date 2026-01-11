@@ -41,9 +41,13 @@ describe('IndexedDBStorageService', () => {
   });
 
   afterEach(async () => {
-    await service.deleteScheduledMessage('msg-1').catch(() => undefined);
-    await service.deleteScheduledMessage('msg-2').catch(() => undefined);
-    await service.clear();
+    try {
+      await service.deleteScheduledMessage('msg-1').catch(() => undefined);
+      await service.deleteScheduledMessage('msg-2').catch(() => undefined);
+      await service.clear().catch(() => undefined);
+    } catch {
+      // Ignore cleanup errors
+    }
   });
 
   it('should be created', () => {
@@ -185,6 +189,74 @@ describe('IndexedDBStorageService', () => {
       const messages = await service.getScheduledMessagesByBirthday('test-1');
       expect(messages.length).toBe(1);
       expect(messages[0].birthdayId).toBe('test-1');
+    });
+  });
+
+  describe('Additional edge cases', () => {
+    it('should handle birthday with scheduled messages', async () => {
+      const birthdayWithMessages = {
+        ...mockBirthday,
+        scheduledMessages: [mockMessage]
+      };
+
+      await service.addBirthday(birthdayWithMessages);
+      const birthdays = await service.getBirthdays();
+
+      expect(birthdays.length).toBe(1);
+      expect(birthdays[0].scheduledMessages).toBeDefined();
+    });
+
+    it('should handle multiple operations in sequence', async () => {
+      await service.addBirthday(mockBirthday);
+      await service.saveScheduledMessage(mockMessage);
+
+      const birthdays = await service.getBirthdays();
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+
+      expect(birthdays.length).toBe(1);
+      expect(messages.length).toBe(1);
+    });
+
+    it('should handle updating non-existent birthday', async () => {
+      const result = await service.updateBirthday(mockBirthday);
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle deleting non-existent birthday', async () => {
+      const result = await service.deleteBirthday('non-existent');
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle saving messages for non-existent birthday', async () => {
+      await service.saveScheduledMessage(mockMessage);
+      const messages = await service.getScheduledMessagesByBirthday('test-1');
+      expect(messages.length).toBe(1);
+    });
+
+    it('should handle updating non-existent message', async () => {
+      const result = await service.updateScheduledMessage(mockMessage);
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle deleting non-existent message', async () => {
+      const result = await service.deleteScheduledMessage('non-existent');
+      expect(result).toBeUndefined();
+    });
+
+    it('should preserve other properties when updating birthday', async () => {
+      const birthdayWithExtra = {
+        ...mockBirthday,
+        notes: 'Extra notes',
+        photoUrl: 'some-url'
+      };
+
+      await service.addBirthday(birthdayWithExtra);
+      const updated = { ...birthdayWithExtra, name: 'New Name' };
+      await service.updateBirthday(updated);
+
+      const birthdays = await service.getBirthdays();
+      expect(birthdays[0].name).toBe('New Name');
+      expect((birthdays[0] as any).notes).toBe('Extra notes');
     });
   });
 });
